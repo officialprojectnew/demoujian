@@ -5,67 +5,84 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxQVFWzJg8WqGIHV41YxJazeXaJ0m8NJ65lxFyspj0IkZbn3lWh186UVmzovFemJJ9c/exec';
 
 
-// Event Listener saat form login disubmit
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
-  e.preventDefault(); // Mencegah halaman reload
+// Cek jika sudah login sebelumnya, langsung arahkan ke halaman masing-masing
+window.onload = function() {
+  const user = JSON.parse(localStorage.getItem('userCBT'));
+  if (user) {
+    window.location.href = `${user.role}.html`;
+  }
+};
 
-  // Mengambil elemen dari index.html
+// Fungsi saat tombol Masuk ditekan
+document.getElementById('loginForm')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
   const roleVal = document.getElementById('role').value;
   const userVal = document.getElementById('username').value;
   const passVal = document.getElementById('password').value;
-  
   const btnSubmit = document.getElementById('btnSubmit');
   const alertMsg = document.getElementById('alert-msg');
 
-  // Ubah status tombol
+  // Ubah tampilan tombol saat memproses data ke database
   btnSubmit.innerHTML = "Memproses...";
   btnSubmit.disabled = true;
-  alertMsg.classList.add('hidden');
-
-  // Siapkan data yang mau dikirim ke Backend
-  const payload = {
-    action: 'login',
-    role: roleVal,
-    username: userVal,
-    password: passVal
-  };
-
+  alertMsg.classList.add('hidden'); // Sembunyikan error sebelumnya
+  
   try {
-    // Proses kirim data ke Google Apps Script menggunakan Fetch API
+    // 2. Siapkan data Payload untuk dikirim ke Backend Google Script
+    const payload = { 
+      action: 'login', 
+      role: roleVal, 
+      username: userVal, 
+      password: passVal 
+    };
+
+    // 3. Proses pengiriman data via Fetch API
     const response = await fetch(GAS_URL, {
       method: 'POST',
-      // Menggunakan text/plain agar Google Script tidak memblokir masalah CORS preflight
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8',
-      },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload)
     });
-
-    // Menerima balasan (response) dari Google Script
+    
+    // 4. Menerima balasan dari Google Script
     const result = await response.json();
-
-    // Mengembalikan status tombol
+    
+    // Kembalikan status tombol
     btnSubmit.innerHTML = "Masuk";
     btnSubmit.disabled = false;
 
-    // Logika setelah menerima respon
+    // 5. Cek apakah login berhasil berdasarkan balasan database
     if (result.status === 'success') {
-      alertMsg.innerText = `Selamat Datang, ${result.nama}!`;
-      alertMsg.className = "text-center mt-3 text-sm font-semibold text-green-500 block";
       
-      // Lanjut ke logika memunculkan Dashboard
-      // Misalnya: setTimeout(() => loadDashboard(roleVal), 1000);
+      // Simpan data asli dari database ke LocalStorage agar diingat sistem
+      const userData = { 
+        role: roleVal, 
+        nama: result.nama, // Nama asli dari Google Sheets
+        id: result.id      // ID/NIS asli dari Google Sheets
+      };
+      localStorage.setItem('userCBT', JSON.stringify(userData));
+
+      // Munculkan notifikasi sukses sejenak sebelum pindah halaman
+      alertMsg.innerText = `Berhasil masuk! Mengalihkan...`;
+      alertMsg.className = "text-center mt-3 text-sm font-semibold text-green-500 block";
+
+      // Arahkan ke file HTML sesuai role (admin.html, guru.html, atau siswa.html)
+      setTimeout(() => {
+        window.location.href = `${roleVal}.html`; 
+      }, 500);
 
     } else {
+      // Munculkan pesan error dari database (misal: "Password salah!")
       alertMsg.innerText = result.pesan;
       alertMsg.className = "text-center mt-3 text-sm font-semibold text-red-500 block";
     }
 
   } catch (error) {
+    // Jika gagal koneksi (URL salah atau tidak ada internet)
     btnSubmit.innerHTML = "Masuk";
     btnSubmit.disabled = false;
-    alertMsg.innerText = "Terjadi kesalahan jaringan!";
+    alertMsg.innerText = "Error: Cek koneksi atau URL Apps Script belum diisi!";
     alertMsg.className = "text-center mt-3 text-sm font-semibold text-red-500 block";
-    console.error("Error:", error);
+    console.error("Detail Error:", error);
   }
 });
