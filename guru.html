@@ -10,7 +10,6 @@
 </head>
 <body class="flex h-screen overflow-hidden">
 
-  <!-- Sidebar -->
   <div class="w-64 bg-white shadow-lg flex flex-col h-full">
     <div class="p-6 text-xl font-bold text-green-700 border-b">Panel Guru</div>
     <div class="flex-1 p-4 space-y-2">
@@ -25,7 +24,6 @@
     </div>
   </div>
 
-  <!-- Konten Utama -->
   <div class="flex-1 p-8 overflow-y-auto">
     <h1 class="text-2xl font-bold text-gray-800 mb-4">Selamat Datang, <span id="salam-nama-guru">Guru</span>!</h1>
     <div class="bg-white p-6 rounded-xl shadow-sm border">
@@ -34,19 +32,15 @@
     </div>
   </div>
 
-  <script>
-    const user = JSON.parse(localStorage.getItem('userCBT'));
-    if (!user || user.role !== 'guru') {
-      window.location.href = 'index.html';
-    } else {
-      document.getElementById('nama-guru-login').innerText = user.nama;
-      document.getElementById('salam-nama-guru').innerText = user.nama;
-    }
+  <script src="script.js"></script>
 
-    function logout() {
-      localStorage.removeItem('userCBT');
-      window.location.href = 'index.html';
-    }
+  <script>
+    // Cek Sesi (Menggunakan fungsi global)
+    const user = checkAuth('guru');
+    
+    // Set Nama di UI
+    document.getElementById('nama-guru-login').innerText = user.nama;
+    document.getElementById('salam-nama-guru').innerText = user.nama;
   </script>
 </body>
 </html>
