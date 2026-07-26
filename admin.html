@@ -1,30 +1,4 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: sans-serif; background-color: #f3f4f6; }
-    .menu-active { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; }
-  </style>
-</head>
-<body class="text-gray-800 flex h-screen overflow-hidden">
-
-  <!-- Sidebar Admin -->
-  <div class="w-64 bg-white shadow-lg flex flex-col h-full">
-    <div class="p-6 text-xl font-bold text-blue-700 border-b">Panel Admin</div>
-    <div class="flex-1 overflow-y-auto py-4">
-      <button onclick="switchMenu('admin-input-siswa')" id="btn-admin-input-siswa" class="w-full text-left px-6 py-3 hover:bg-gray-50 menu-active">Input Siswa</button>
-      <button onclick="switchMenu('admin-rekap-siswa')" id="btn-admin-rekap-siswa" class="w-full text-left px-6 py-3 hover:bg-gray-50">Rekapan Siswa</button>
-      <button onclick="switchMenu('admin-input-guru')" id="btn-admin-input-guru" class="w-full text-left px-6 py-3 hover:bg-gray-50">Input Guru</button>
-      <button onclick="switchMenu('admin-manajemen-ujian')" id="btn-admin-manajemen-ujian" class="w-full text-left px-6 py-3 hover:bg-gray-50">Manajemen Ujian</button>
-      <button onclick="switchMenu('admin-rekap-ujian')" id="btn-admin-rekap-ujian" class="w-full text-left px-6 py-3 hover:bg-gray-50">Rekap Ujian</button>
-    </div>
-    <button onclick="logout()" class="p-4 bg-red-50 text-red-600 font-bold hover:bg-red-100">Logout</button>
-  </div>
-  
-  <!-- Konten Admin -->
+<!-- Konten Admin -->
   <div class="flex-1 p-8 overflow-y-auto">
     <!-- Menu Input Siswa -->
     <div id="admin-input-siswa" class="admin-menu block bg-white p-6 rounded-xl shadow-sm">
@@ -32,9 +6,11 @@
       <div class="grid grid-cols-2 gap-6">
         <div class="border p-4 rounded-lg">
           <h3 class="font-bold mb-2">Input Manual</h3>
-          <input type="text" placeholder="NIS" class="w-full mb-2 p-2 border rounded">
-          <input type="text" placeholder="Nama Siswa" class="w-full mb-2 p-2 border rounded">
-          <button class="bg-blue-600 text-white px-4 py-2 rounded">Simpan</button>
+          <input type="text" id="nis-siswa" placeholder="NIS" class="w-full mb-2 p-2 border rounded">
+          <input type="text" id="nama-siswa" placeholder="Nama Lengkap" class="w-full mb-2 p-2 border rounded">
+          <input type="text" id="kelas-siswa" placeholder="Kelas (Misal: X IPA 1)" class="w-full mb-2 p-2 border rounded">
+          <input type="password" id="pass-siswa" placeholder="Password Default" class="w-full mb-4 p-2 border rounded">
+          <button onclick="simpanSiswa()" id="btn-simpan-siswa" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Simpan Siswa</button>
         </div>
         <div class="border p-4 rounded-lg bg-gray-50">
           <h3 class="font-bold mb-2">Import dari Excel</h3>
@@ -44,13 +20,36 @@
       </div>
     </div>
     
+    <!-- Menu Input Guru (Sudah dilengkapi) -->
+    <div id="admin-input-guru" class="admin-menu hidden bg-white p-6 rounded-xl shadow-sm">
+      <h2 class="text-2xl font-bold mb-4">Input Data Guru</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div class="border p-4 rounded-lg">
+          <h3 class="font-bold mb-2">Input Manual</h3>
+          <input type="text" id="nip-guru" placeholder="NIP / ID Guru" class="w-full mb-2 p-2 border rounded">
+          <input type="text" id="nama-guru" placeholder="Nama Lengkap Guru" class="w-full mb-2 p-2 border rounded">
+          <input type="text" id="user-guru" placeholder="Username Login" class="w-full mb-2 p-2 border rounded">
+          <input type="password" id="pass-guru" placeholder="Password Login" class="w-full mb-4 p-2 border rounded">
+          <button onclick="simpanGuru()" id="btn-simpan-guru" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Simpan Guru</button>
+        </div>
+        <div class="border p-4 rounded-lg bg-gray-50">
+          <h3 class="font-bold mb-2">Import dari Excel</h3>
+          <input type="file" class="block w-full text-sm mb-3">
+          <button class="bg-green-600 text-white px-4 py-2 rounded">Import</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Placeholder Menu Lain -->
     <div id="admin-rekap-siswa" class="admin-menu hidden bg-white p-6 rounded-xl shadow-sm"><h2 class="text-2xl font-bold">Rekapan Siswa</h2></div>
-    <div id="admin-input-guru" class="admin-menu hidden bg-white p-6 rounded-xl shadow-sm"><h2 class="text-2xl font-bold">Input Data Guru</h2></div>
     <div id="admin-manajemen-ujian" class="admin-menu hidden bg-white p-6 rounded-xl shadow-sm"><h2 class="text-2xl font-bold">Manajemen Ujian</h2></div>
     <div id="admin-rekap-ujian" class="admin-menu hidden bg-white p-6 rounded-xl shadow-sm"><h2 class="text-2xl font-bold">Rekap Ujian</h2></div>
   </div>
 
   <script>
+    // MASUKKAN URL GOOGLE SCRIPT YANG SAMA DENGAN script.js DI SINI
+    const GAS_URL = 'MASUKKAN_URL_WEB_APP_ANDA_DISINI';
+
     // Proteksi Halaman
     const user = JSON.parse(localStorage.getItem('userCBT'));
     if (!user || user.role !== 'admin') window.location.href = 'index.html';
@@ -66,6 +65,85 @@
       localStorage.removeItem('userCBT');
       window.location.href = 'index.html';
     }
+
+    // --- FUNGSI MENGIRIM DATA KE DATABASE ---
+
+    async function simpanSiswa() {
+      const nis = document.getElementById('nis-siswa').value;
+      const nama = document.getElementById('nama-siswa').value;
+      const kelas = document.getElementById('kelas-siswa').value;
+      const password = document.getElementById('pass-siswa').value;
+      const btn = document.getElementById('btn-simpan-siswa');
+
+      if(!nis || !nama || !kelas || !password) return alert('Harap isi semua kolom!');
+
+      btn.innerText = "Menyimpan...";
+      btn.disabled = true;
+
+      const payload = {
+        action: 'simpanSiswa',
+        data: { nis, nama, kelas, password }
+      };
+
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        alert(result.pesan);
+        
+        // Kosongkan form jika sukses
+        if(result.status === 'success') {
+          document.getElementById('nis-siswa').value = '';
+          document.getElementById('nama-siswa').value = '';
+          document.getElementById('kelas-siswa').value = '';
+          document.getElementById('pass-siswa').value = '';
+        }
+      } catch(e) {
+        alert("Gagal menyimpan data. Cek koneksi Anda.");
+      }
+      btn.innerText = "Simpan Siswa";
+      btn.disabled = false;
+    }
+
+    async function simpanGuru() {
+      const nip = document.getElementById('nip-guru').value;
+      const nama = document.getElementById('nama-guru').value;
+      const username = document.getElementById('user-guru').value;
+      const password = document.getElementById('pass-guru').value;
+      const btn = document.getElementById('btn-simpan-guru');
+
+      if(!nip || !nama || !username || !password) return alert('Harap isi semua kolom!');
+
+      btn.innerText = "Menyimpan...";
+      btn.disabled = true;
+
+      const payload = {
+        action: 'simpanGuru',
+        data: { nip, nama, username, password }
+      };
+
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        alert(result.pesan);
+        
+        if(result.status === 'success') {
+          document.getElementById('nip-guru').value = '';
+          document.getElementById('nama-guru').value = '';
+          document.getElementById('user-guru').value = '';
+          document.getElementById('pass-guru').value = '';
+        }
+      } catch(e) {
+        alert("Gagal menyimpan data. Cek koneksi Anda.");
+      }
+      btn.innerText = "Simpan Guru";
+      btn.disabled = false;
+    }
   </script>
-</body>
-</html>
