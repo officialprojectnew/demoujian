@@ -9,7 +9,6 @@
   <style>
     body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; }
     .menu-active { background-color: #eff6ff; color: #2563eb; border-right: 4px solid #2563eb; font-weight: 600;}
-    /* Scrollbar minimalis untuk tabel */
     ::-webkit-scrollbar { height: 8px; width: 8px; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
   </style>
@@ -19,7 +18,6 @@
   <!-- ================= SIDEBAR ================= -->
   <div class="w-64 bg-white shadow-lg flex flex-col h-full z-10">
     <div class="p-6 text-xl font-bold text-blue-700 border-b flex items-center gap-2">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
       Panel Admin
     </div>
     <div class="flex-1 overflow-y-auto py-4">
@@ -45,39 +43,33 @@
     <div id="admin-input-siswa" class="admin-menu block bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <h2 class="text-2xl font-bold mb-6 text-gray-800">Input Data Siswa</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Manual Input -->
         <div class="border border-gray-200 p-5 rounded-xl">
           <h3 class="font-bold mb-4 text-blue-600 border-b pb-2">Input Manual</h3>
           <div class="space-y-3">
             <div>
               <label class="text-sm text-gray-600 font-medium">NIS</label>
-              <input type="text" id="nis-siswa" placeholder="Masukkan NIS" class="w-full mt-1 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+              <input type="text" id="nis-siswa" placeholder="Masukkan NIS" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
             </div>
             <div>
               <label class="text-sm text-gray-600 font-medium">Nama Lengkap</label>
-              <input type="text" id="nama-siswa" placeholder="Masukkan Nama" class="w-full mt-1 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+              <input type="text" id="nama-siswa" placeholder="Masukkan Nama" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
             </div>
             <div>
               <label class="text-sm text-gray-600 font-medium">Kelas</label>
-              <input type="text" id="kelas-siswa" placeholder="Contoh: X IPA 1" class="w-full mt-1 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+              <input type="text" id="kelas-siswa" placeholder="Contoh: X IPA 1" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
             </div>
             <div>
               <label class="text-sm text-gray-600 font-medium">Password Default</label>
-              <input type="password" id="pass-siswa" placeholder="Buat password" class="w-full mt-1 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+              <input type="password" id="pass-siswa" placeholder="Buat password" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
             </div>
             <button onclick="simpanSiswa()" id="btn-simpan-siswa" class="w-full mt-2 bg-blue-600 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-700 transition">Simpan Siswa</button>
           </div>
         </div>
-        <!-- Import Excel -->
         <div class="border border-gray-200 p-5 rounded-xl bg-gray-50 flex flex-col justify-center items-center text-center">
           <h3 class="font-bold mb-2 text-green-600">Import dari Excel</h3>
           <p class="text-sm text-gray-500 mb-4">Pastikan format kolom: NIS | Nama | Kelas | Password</p>
-          <a href="#" class="text-blue-600 text-sm font-medium underline mb-6 hover:text-blue-800">Unduh Template Excel</a>
-          
-          <div class="w-full max-w-xs">
-            <input type="file" accept=".xlsx, .xls" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4 cursor-pointer">
-            <button class="w-full bg-green-600 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-green-700 transition">Proses Import</button>
-          </div>
+          <input type="file" accept=".xlsx, .xls" class="block w-full text-sm text-gray-500 mb-4 cursor-pointer">
+          <button class="w-full bg-green-600 text-white font-semibold px-4 py-2.5 rounded-lg">Proses Import</button>
         </div>
       </div>
     </div>
@@ -86,8 +78,8 @@
     <div id="admin-rekap-siswa" class="admin-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Data Rekapan Siswa</h2>
-        <button onclick="alert('Fitur muat data dari sheet akan dibuat di Code.gs nanti')" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-blue-200 flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Muat Ulang Data
+        <button onclick="loadRekapSiswa()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-blue-200 flex items-center gap-2">
+          Muat Ulang Data
         </button>
       </div>
       
@@ -102,26 +94,8 @@
               <th class="p-3 border-b font-semibold text-center">Aksi</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- Contoh Data Tampilan -->
-            <tr class="hover:bg-gray-50 border-b">
-              <td class="p-3 text-center text-sm text-gray-500">1</td>
-              <td class="p-3 text-sm font-medium">100123</td>
-              <td class="p-3 text-sm">Ahmad Budi</td>
-              <td class="p-3 text-sm text-gray-600">X IPA 1</td>
-              <td class="p-3 text-center">
-                <button class="text-red-500 hover:text-red-700 text-sm font-medium">Hapus</button>
-              </td>
-            </tr>
-            <tr class="hover:bg-gray-50 border-b">
-              <td class="p-3 text-center text-sm text-gray-500">2</td>
-              <td class="p-3 text-sm font-medium">100124</td>
-              <td class="p-3 text-sm">Siti Aminah</td>
-              <td class="p-3 text-sm text-gray-600">X IPA 2</td>
-              <td class="p-3 text-center">
-                <button class="text-red-500 hover:text-red-700 text-sm font-medium">Hapus</button>
-              </td>
-            </tr>
+          <tbody id="tabel-rekap-siswa">
+            <tr><td colspan="5" class="p-4 text-center text-gray-500">Klik "Muat Ulang Data" atau buka menu ini untuk memuat data.</td></tr>
           </tbody>
         </table>
       </div>
@@ -131,39 +105,32 @@
     <div id="admin-input-guru" class="admin-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <h2 class="text-2xl font-bold mb-6 text-gray-800">Input Data Guru</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Manual Input -->
         <div class="border border-gray-200 p-5 rounded-xl">
           <h3 class="font-bold mb-4 text-blue-600 border-b pb-2">Input Manual</h3>
           <div class="space-y-3">
             <div>
               <label class="text-sm text-gray-600 font-medium">ID Guru / NIP</label>
-              <input type="text" id="nip-guru" placeholder="Masukkan ID / NIP" class="w-full mt-1 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+              <input type="text" id="nip-guru" placeholder="Masukkan ID / NIP" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
             </div>
             <div>
               <label class="text-sm text-gray-600 font-medium">Nama Lengkap Guru</label>
-              <input type="text" id="nama-guru" placeholder="Masukkan Nama" class="w-full mt-1 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+              <input type="text" id="nama-guru" placeholder="Masukkan Nama" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
             </div>
             <div>
               <label class="text-sm text-gray-600 font-medium">Username Login</label>
-              <input type="text" id="user-guru" placeholder="Buat Username" class="w-full mt-1 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+              <input type="text" id="user-guru" placeholder="Buat Username" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
             </div>
             <div>
               <label class="text-sm text-gray-600 font-medium">Password Default</label>
-              <input type="password" id="pass-guru" placeholder="Buat password" class="w-full mt-1 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+              <input type="password" id="pass-guru" placeholder="Buat password" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
             </div>
             <button onclick="simpanGuru()" id="btn-simpan-guru" class="w-full mt-2 bg-blue-600 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-700 transition">Simpan Guru</button>
           </div>
         </div>
-        <!-- Import Excel -->
         <div class="border border-gray-200 p-5 rounded-xl bg-gray-50 flex flex-col justify-center items-center text-center">
           <h3 class="font-bold mb-2 text-green-600">Import dari Excel</h3>
-          <p class="text-sm text-gray-500 mb-4">Pastikan format kolom: NIP | Nama | Username | Password</p>
-          <a href="#" class="text-blue-600 text-sm font-medium underline mb-6 hover:text-blue-800">Unduh Template Excel</a>
-          
-          <div class="w-full max-w-xs">
-            <input type="file" accept=".xlsx, .xls" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4 cursor-pointer">
-            <button class="w-full bg-green-600 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-green-700 transition">Proses Import</button>
-          </div>
+          <input type="file" accept=".xlsx, .xls" class="block w-full text-sm text-gray-500 mb-4 cursor-pointer">
+          <button class="w-full bg-green-600 text-white font-semibold px-4 py-2.5 rounded-lg">Proses Import</button>
         </div>
       </div>
     </div>
@@ -171,129 +138,45 @@
     <!-- 4. MENU MANAJEMEN UJIAN -->
     <div id="admin-manajemen-ujian" class="admin-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <h2 class="text-2xl font-bold mb-6 text-gray-800">Manajemen Ujian & Token</h2>
-      
-      <!-- Panel Aktivasi Ujian -->
-      <div class="bg-blue-50 border border-blue-200 p-5 rounded-xl mb-8 flex flex-col md:flex-row gap-4 items-end">
-        <div class="flex-1">
-          <label class="text-sm text-gray-700 font-semibold mb-1 block">Kode Soal (Dari Guru)</label>
-          <input type="text" placeholder="Masukkan Kode Soal (Contoh: MAT-X-1)" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div class="w-full md:w-48">
-          <label class="text-sm text-gray-700 font-semibold mb-1 block">Waktu (Menit)</label>
-          <input type="number" placeholder="Contoh: 90" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <button class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition h-[46px]">
-          Aktifkan & Buat Token
-        </button>
-      </div>
-
-      <!-- Tabel Ujian Aktif -->
-      <h3 class="font-bold text-gray-700 mb-3">Daftar Ujian Aktif</h3>
-      <div class="overflow-x-auto border rounded-lg">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-gray-100 text-gray-700 text-sm">
-              <th class="p-3 border-b font-semibold">Kode Soal</th>
-              <th class="p-3 border-b font-semibold">Token</th>
-              <th class="p-3 border-b font-semibold">Waktu</th>
-              <th class="p-3 border-b font-semibold text-center">Status</th>
-              <th class="p-3 border-b font-semibold text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="hover:bg-gray-50 border-b">
-              <td class="p-3 text-sm font-medium">MAT-X-1</td>
-              <td class="p-3 text-lg font-bold tracking-widest text-green-600">X9K2P</td>
-              <td class="p-3 text-sm">90 Menit</td>
-              <td class="p-3 text-center"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Aktif</span></td>
-              <td class="p-3 text-center">
-                <button class="text-red-500 hover:text-red-700 text-sm font-medium mr-2">Nonaktifkan</button>
-                <button class="text-gray-500 hover:text-gray-700 text-sm font-medium">Hapus</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
     <!-- 5. MENU REKAP UJIAN -->
     <div id="admin-rekap-ujian" class="admin-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <h2 class="text-2xl font-bold mb-6 text-gray-800">Rekap Hasil Ujian</h2>
-      
-      <!-- Filter Pencarian -->
-      <div class="flex flex-col md:flex-row gap-3 mb-6 bg-gray-50 p-4 rounded-xl border">
-        <input type="text" placeholder="Cari berdasarkan Kode Soal..." class="flex-1 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-        <input type="text" placeholder="Filter Kelas (Opsional)" class="w-full md:w-48 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-        <button class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition">Cari Nilai</button>
-      </div>
-
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="font-bold text-gray-700">Hasil Pencarian:</h3>
-        <button class="text-green-600 border border-green-600 px-3 py-1 rounded hover:bg-green-50 text-sm font-semibold transition">Export ke Excel</button>
-      </div>
-
-      <div class="overflow-x-auto border rounded-lg">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-gray-100 text-gray-700 text-sm">
-              <th class="p-3 border-b font-semibold w-16 text-center">No</th>
-              <th class="p-3 border-b font-semibold">NIS</th>
-              <th class="p-3 border-b font-semibold">Nama Siswa</th>
-              <th class="p-3 border-b font-semibold">Kode Soal</th>
-              <th class="p-3 border-b font-semibold text-center">Nilai Pilihan Ganda</th>
-              <th class="p-3 border-b font-semibold text-center">Nilai Essay</th>
-              <th class="p-3 border-b font-semibold text-center">Total Nilai</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="hover:bg-gray-50 border-b">
-              <td class="p-3 text-center text-sm text-gray-500">1</td>
-              <td class="p-3 text-sm">100123</td>
-              <td class="p-3 text-sm font-medium">Ahmad Budi</td>
-              <td class="p-3 text-sm text-gray-500">MAT-X-1</td>
-              <td class="p-3 text-center text-sm">80</td>
-              <td class="p-3 text-center text-sm">15</td>
-              <td class="p-3 text-center font-bold text-blue-600">95</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
 
   </div>
 
-  <!-- ================= JAVASCRIPT LOGIKA ================= -->
   <script>
-    // 1. PASTIKAN URL INI SAMA DENGAN YANG ADA DI script.js
+    // GANTI DENGAN URL WEB APP ANDA
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxQVFWzJg8WqGIHV41YxJazeXaJ0m8NJ65lxFyspj0IkZbn3lWh186UVmzovFemJJ9c/exec';
 
-    // 2. PROTEKSI HALAMAN & NAMA ADMIN
     const user = JSON.parse(localStorage.getItem('userCBT'));
     if (!user || user.role !== 'admin') {
-      window.location.href = 'index.html'; // Usir jika bukan admin
+      window.location.href = 'index.html';
     } else {
       document.getElementById('nama-admin-login').innerText = user.nama;
     }
 
-    // 3. FUNGSI PINDAH MENU DI SIDEBAR
     function switchMenu(targetId) {
-      // Sembunyikan semua menu
       document.querySelectorAll('.admin-menu').forEach(el => el.classList.replace('block', 'hidden'));
-      // Hilangkan gaya tombol aktif
       document.querySelectorAll('[id^="btn-admin"]').forEach(btn => btn.classList.remove('menu-active'));
       
-      // Munculkan menu yang dituju
       document.getElementById(targetId).classList.replace('hidden', 'block');
       document.getElementById('btn-' + targetId).classList.add('menu-active');
+
+      // Jika membuka menu Rekap Siswa, otomatis tarik data dari sheet
+      if(targetId === 'admin-rekap-siswa') {
+        loadRekapSiswa();
+      }
     }
 
-    // 4. FUNGSI LOGOUT
     function logout() {
       localStorage.removeItem('userCBT');
       window.location.href = 'index.html';
     }
 
-    // 5. FUNGSI SIMPAN SISWA MANUAL KE GOOGLE SCRIPT
+    // SIMPAN SISWA
     async function simpanSiswa() {
       const nis = document.getElementById('nis-siswa').value;
       const nama = document.getElementById('nama-siswa').value;
@@ -306,37 +189,30 @@
       btn.innerText = "Menyimpan...";
       btn.disabled = true;
 
-      const payload = {
-        action: 'simpanSiswa',
-        data: { nis, nama, kelas, password }
-      };
-
       try {
         const response = await fetch(GAS_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload),
-          redirect: 'follow' // <--- TAMBAHKAN BARIS INI
+          body: JSON.stringify({ action: 'simpanSiswa', data: { nis, nama, kelas, password } }),
+          redirect: 'follow'
         });
         const result = await response.json();
-        alert(result.pesan); // Munculkan popup dari database
+        alert(result.pesan);
         
         if(result.status === 'success') {
-          // Bersihkan form
           document.getElementById('nis-siswa').value = '';
           document.getElementById('nama-siswa').value = '';
           document.getElementById('kelas-siswa').value = '';
           document.getElementById('pass-siswa').value = '';
         }
       } catch(e) {
-        alert("Gagal menyimpan data. Cek koneksi internet atau URL API Anda.");
-        console.error(e);
+        alert("Gagal menyimpan data.");
       }
       btn.innerText = "Simpan Siswa";
       btn.disabled = false;
     }
 
-    // 6. FUNGSI SIMPAN GURU MANUAL KE GOOGLE SCRIPT
+    // SIMPAN GURU
     async function simpanGuru() {
       const nip = document.getElementById('nip-guru').value;
       const nama = document.getElementById('nama-guru').value;
@@ -349,35 +225,91 @@
       btn.innerText = "Menyimpan...";
       btn.disabled = true;
 
-      const payload = {
-        action: 'simpanGuru',
-        data: { nip, nama, username, password }
-      };
-
-     try {
+      try {
         const response = await fetch(GAS_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload),
-          redirect: 'follow' // <--- TAMBAHKAN BARIS INI
+          body: JSON.stringify({ action: 'simpanGuru', data: { nip, nama, username, password } }),
+          redirect: 'follow'
         });
         const result = await response.json();
-        // ... (kode sisanya biarkan sama)
-        alert(result.pesan); // Munculkan popup dari database
+        alert(result.pesan);
         
         if(result.status === 'success') {
-          // Bersihkan form
           document.getElementById('nip-guru').value = '';
           document.getElementById('nama-guru').value = '';
           document.getElementById('user-guru').value = '';
           document.getElementById('pass-guru').value = '';
         }
       } catch(e) {
-        alert("Gagal menyimpan data. Cek koneksi internet atau URL API Anda.");
-        console.error(e);
+        alert("Gagal menyimpan data.");
       }
       btn.innerText = "Simpan Guru";
       btn.disabled = false;
+    }
+
+    // LOAD REKAP SISWA DARI DATABASE
+    async function loadRekapSiswa() {
+      const tbody = document.getElementById('tabel-rekap-siswa');
+      tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Memuat data dari database...</td></tr>`;
+
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getSiswa' }),
+          redirect: 'follow'
+        });
+        const result = await response.json();
+
+        if(result.status === 'success') {
+          if(result.data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Belum ada data siswa.</td></tr>`;
+            return;
+          }
+
+          let html = '';
+          result.data.forEach((siswa, index) => {
+            html += `
+              <tr class="hover:bg-gray-50 border-b">
+                <td class="p-3 text-center text-sm text-gray-500">${index + 1}</td>
+                <td class="p-3 text-sm font-medium">${siswa.nis}</td>
+                <td class="p-3 text-sm">${siswa.nama}</td>
+                <td class="p-3 text-sm text-gray-600">${siswa.kelas}</td>
+                <td class="p-3 text-center">
+                  <button onclick="hapusSiswa('${siswa.nis}')" class="text-red-500 hover:text-red-700 text-sm font-medium">Hapus</button>
+                </td>
+              </tr>
+            `;
+          });
+          tbody.innerHTML = html;
+        } else {
+          tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Gagal memuat data.</td></tr>`;
+        }
+      } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Kesalahan jaringan.</td></tr>`;
+      }
+    }
+
+    // HAPUS SISWA
+    async function hapusSiswa(nis) {
+      if(!confirm(`Yakin ingin menghapus siswa dengan NIS ${nis}?`)) return;
+
+      try {
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'hapusSiswa', nis: nis }),
+          redirect: 'follow'
+        });
+        const result = await response.json();
+        alert(result.pesan);
+        if(result.status === 'success') {
+          loadRekapSiswa(); // Refresh tabel setelah hapus
+        }
+      } catch(e) {
+        alert("Gagal menghapus data.");
+      }
     }
   </script>
 </body>
