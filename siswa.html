@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Portal Siswa CBT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+
+  <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div class="bg-blue-600 p-6 flex justify-between items-center text-white">
+      <div>
+        <h2 class="text-xl font-bold">Portal Siswa</h2>
+        <p class="text-sm opacity-80" id="nama-siswa">Memuat nama...</p>
+      </div>
+      <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded font-bold hover:bg-red-600">Logout</button>
+    </div>
+    
+    <!-- Area Masukkan Token -->
+    <div id="siswa-token-area" class="p-10 text-center block">
+      <h3 class="text-2xl font-bold mb-4">Mulai Ujian</h3>
+      <input type="text" id="input-kodesoal" placeholder="Kode Soal" class="w-full max-w-sm mx-auto mb-3 px-4 py-3 border rounded text-center text-xl outline-none">
+      <input type="text" id="input-token" placeholder="TOKEN UJIAN" class="w-full max-w-sm mx-auto mb-6 px-4 py-3 border rounded text-center text-2xl font-bold uppercase outline-none">
+      <button onclick="mulaiUjian()" class="bg-green-600 text-white font-bold py-3 px-8 rounded-full">Mulai Kerjakan</button>
+    </div>
+
+    <!-- Area Kerjakan Soal -->
+    <div id="siswa-ujian-area" class="p-8 hidden">
+      <h3 class="font-bold text-lg mb-4">Soal 1</h3>
+      <div class="text-lg mb-6">Berapakah hasil dari 1 + 1?</div>
+      <div class="space-y-3">
+        <label class="block p-3 border rounded"><input type="radio" name="soal1"> A. 1</label>
+        <label class="block p-3 border rounded"><input type="radio" name="soal1"> B. 2</label>
+      </div>
+      <div class="mt-8 flex justify-end">
+        <button onclick="selesaiUjian()" class="bg-blue-600 text-white px-6 py-2 rounded font-bold">Selesai</button>
+      </div>
+    </div>
+    
+    <!-- Area Hasil -->
+    <div id="siswa-hasil-area" class="p-10 text-center hidden">
+      <h3 class="text-3xl font-bold mb-2">Ujian Selesai!</h3>
+      <p>Nilai Anda telah direkam.</p>
+    </div>
+  </div>
+
+  <script>
+    // Cek Akses
+    const user = JSON.parse(localStorage.getItem('userCBT'));
+    if (!user || user.role !== 'siswa') window.location.href = 'index.html';
+    
+    // Tampilkan nama siswa dari session
+    document.getElementById('nama-siswa').innerText = `Siswa: ${user.nama} (${user.id})`;
+
+    function mulaiUjian() {
+      document.getElementById('siswa-token-area').classList.replace('block', 'hidden');
+      document.getElementById('siswa-ujian-area').classList.replace('hidden', 'block');
+    }
+
+    function selesaiUjian() {
+      document.getElementById('siswa-ujian-area').classList.replace('block', 'hidden');
+      document.getElementById('siswa-hasil-area').classList.replace('hidden', 'block');
+    }
+
+    function logout() {
+      localStorage.removeItem('userCBT');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
