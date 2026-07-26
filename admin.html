@@ -265,7 +265,7 @@
   <!-- ================= JAVASCRIPT LOGIKA ================= -->
   <script>
     // 1. PASTIKAN URL INI SAMA DENGAN YANG ADA DI script.js
-    const GAS_URL = 'MASUKKAN_URL_WEB_APP_ANDA_DISINI';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxQVFWzJg8WqGIHV41YxJazeXaJ0m8NJ65lxFyspj0IkZbn3lWh186UVmzovFemJJ9c/exec';
 
     // 2. PROTEKSI HALAMAN & NAMA ADMIN
     const user = JSON.parse(localStorage.getItem('userCBT'));
@@ -315,7 +315,8 @@
         const response = await fetch(GAS_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          redirect: 'follow' // <--- TAMBAHKAN BARIS INI
         });
         const result = await response.json();
         alert(result.pesan); // Munculkan popup dari database
@@ -353,13 +354,15 @@
         data: { nip, nama, username, password }
       };
 
-      try {
+     try {
         const response = await fetch(GAS_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          redirect: 'follow' // <--- TAMBAHKAN BARIS INI
         });
         const result = await response.json();
+        // ... (kode sisanya biarkan sama)
         alert(result.pesan); // Munculkan popup dari database
         
         if(result.status === 'success') {
