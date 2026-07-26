@@ -31,139 +31,233 @@
     
     <div id="guru-buat-soal" class="guru-menu block bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <h2 class="text-2xl font-bold mb-6">Manajemen Pembuatan Soal</h2>
+      
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <div class="border p-5 rounded-xl">
-          <h3 class="font-bold mb-4 text-green-700 border-b pb-2">Buat Soal Manual (Header Ujian)</h3>
+        <div class="border p-5 rounded-xl bg-white shadow-sm" id="box-header-soal">
+          <h3 class="font-bold mb-4 text-green-700 border-b pb-2">1. Buat Header Paket Soal</h3>
           <div class="space-y-3">
             <div>
-              <label class="text-sm text-gray-600 font-medium">Kode Soal</label>
-              <input type="text" placeholder="Contoh: BING-X-01" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
+              <label class="text-sm font-medium">Kode Soal (Unik)</label>
+              <input type="text" id="soal-kode" placeholder="Contoh: BING-X-01" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-green-500">
             </div>
             <div>
-              <label class="text-sm text-gray-600 font-medium">Mata Pelajaran</label>
-              <input type="text" placeholder="Masukkan Mata Pelajaran" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
+              <label class="text-sm font-medium">Mata Pelajaran</label>
+              <input type="text" id="soal-mapel" placeholder="Masukkan Mapel" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-green-500">
             </div>
             <div>
-              <label class="text-sm text-gray-600 font-medium">Kelas Tujuan</label>
-              <input type="text" placeholder="Contoh: X IPA" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
+              <label class="text-sm font-medium">Kelas Tujuan</label>
+              <input type="text" id="soal-kelas" placeholder="Contoh: X IPA" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-green-500">
             </div>
             <div class="flex gap-4">
               <div class="flex-1">
-                <label class="text-sm text-gray-600 font-medium">Nilai Per Butir</label>
-                <input type="number" placeholder="Contoh: 2.5" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
+                <label class="text-sm font-medium">Nilai Per Butir</label>
+                <input type="number" id="soal-nilai" placeholder="Contoh: 2" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-green-500">
               </div>
               <div class="flex-1">
-                <label class="text-sm text-gray-600 font-medium">Waktu (Menit)</label>
-                <input type="number" placeholder="Contoh: 90" class="w-full mt-1 p-2.5 border rounded-lg outline-none">
+                <label class="text-sm font-medium">Waktu (Menit)</label>
+                <input type="number" id="soal-waktu" placeholder="Contoh: 90" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-green-500">
               </div>
             </div>
-            <button class="w-full mt-2 bg-green-600 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-green-700 transition">Simpan Header & Lanjut Buat Butir Soal</button>
+            <button onclick="simpanHeaderSoal()" id="btn-header" class="w-full mt-2 bg-green-600 text-white font-bold px-4 py-3 rounded-lg hover:bg-green-700 transition">Simpan Header & Lanjut</button>
           </div>
         </div>
 
         <div class="border p-5 rounded-xl bg-gray-50 flex flex-col items-center text-center">
-          <h3 class="font-bold mb-2 text-blue-600">Import Soal dari Excel</h3>
-          <p class="text-sm text-gray-500 mb-4">Gunakan format Excel standar sistem kami agar soal terbaca dengan benar.</p>
-          <a href="#" class="mb-6 text-sm text-blue-600 underline font-medium hover:text-blue-800">⬇️ Download Template Excel</a>
+          <h3 class="font-bold mb-2 text-blue-600">Atau Import via Excel / CSV</h3>
+          <p class="text-sm text-gray-500 mb-4">Gunakan format standar kami agar data masuk ke database dengan benar.</p>
+          
+          <button onclick="downloadTemplate()" class="mb-6 text-sm text-blue-600 underline font-bold hover:text-blue-800">⬇️ Download Template CSV</button>
           
           <div class="w-full bg-white p-4 rounded border border-dashed border-gray-300">
-            <input type="file" accept=".xlsx, .xls" class="block w-full text-sm text-gray-500 mb-4 cursor-pointer">
-            <button class="w-full bg-blue-600 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-700">Proses Import Excel</button>
+            <input type="file" accept=".csv, .xlsx" class="block w-full text-sm text-gray-500 mb-4 cursor-pointer">
+            <button class="w-full bg-blue-600 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-700">Proses Import (Segera Hadir)</button>
           </div>
         </div>
+      </div>
 
+      <div id="box-butir-soal" class="hidden mt-8 border p-6 rounded-xl bg-green-50 border-green-200">
+        <h3 class="font-bold text-lg mb-2 text-green-800">2. Input Butir Soal</h3>
+        <p class="text-sm text-gray-600 mb-4">Menambahkan soal untuk Kode: <span id="label-kode-aktif" class="font-bold text-black"></span></p>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-semibold">Pertanyaan</label>
+            <textarea id="pertanyaan" rows="3" class="w-full mt-1 p-3 border rounded-lg outline-none focus:border-green-500"></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm font-semibold">Opsi A</label>
+              <input type="text" id="opsi_a" class="w-full mt-1 p-2 border rounded-lg outline-none">
+            </div>
+            <div>
+              <label class="text-sm font-semibold">Opsi B</label>
+              <input type="text" id="opsi_b" class="w-full mt-1 p-2 border rounded-lg outline-none">
+            </div>
+            <div>
+              <label class="text-sm font-semibold">Opsi C</label>
+              <input type="text" id="opsi_c" class="w-full mt-1 p-2 border rounded-lg outline-none">
+            </div>
+            <div>
+              <label class="text-sm font-semibold">Opsi D</label>
+              <input type="text" id="opsi_d" class="w-full mt-1 p-2 border rounded-lg outline-none">
+            </div>
+          </div>
+          <div>
+            <label class="text-sm font-semibold">Kunci Jawaban</label>
+            <select id="kunci" class="w-full mt-1 p-2 border rounded-lg outline-none">
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+            </select>
+          </div>
+          <button onclick="simpanButirSoal()" id="btn-simpan-butir" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700">Simpan Pertanyaan ke Database</button>
+        </div>
       </div>
     </div>
 
     <div id="guru-edit-soal" class="guru-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <h2 class="text-2xl font-bold mb-6">Edit Soal Saya</h2>
-      <p class="text-sm text-gray-500 mb-4">Hanya menampilkan paket soal yang Anda buat.</p>
-      
-      <div class="overflow-x-auto border rounded-lg">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-gray-100 text-gray-700 text-sm">
-              <th class="p-3 border-b font-semibold text-center">No</th>
-              <th class="p-3 border-b font-semibold">Kode Soal</th>
-              <th class="p-3 border-b font-semibold">Mapel & Kelas</th>
-              <th class="p-3 border-b font-semibold text-center">Jml Soal</th>
-              <th class="p-3 border-b font-semibold text-center">Waktu</th>
-              <th class="p-3 border-b font-semibold text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="hover:bg-gray-50 border-b">
-              <td class="p-3 text-center text-sm">1</td>
-              <td class="p-3 text-sm font-bold text-green-700">BING-X-01</td>
-              <td class="p-3 text-sm">Bahasa Inggris (X IPA)</td>
-              <td class="p-3 text-center text-sm">40</td>
-              <td class="p-3 text-center text-sm">90 mnt</td>
-              <td class="p-3 text-center">
-                <button class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded text-sm font-semibold hover:bg-yellow-200">Edit</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <p class="text-gray-500">Fitur penarikan data untuk diedit akan dihubungkan di tahap selanjutnya.</p>
     </div>
 
     <div id="guru-rekap-ujian" class="guru-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <h2 class="text-2xl font-bold mb-6">Rekap Nilai Ujian</h2>
-      
-      <div class="mb-6 bg-gray-50 p-4 rounded-lg border">
-        <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Paket Ujian Anda:</label>
-        <select class="w-full md:w-1/2 p-2 border rounded-lg outline-none">
-          <option>-- Pilih Kode Soal --</option>
-          <option>BING-X-01 - Bahasa Inggris (X IPA)</option>
-        </select>
-        <button class="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm">Tampilkan Nilai</button>
-      </div>
-
-      <div class="overflow-x-auto border rounded-lg">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-gray-100 text-gray-700 text-sm">
-              <th class="p-3 border-b font-semibold text-center">No</th>
-              <th class="p-3 border-b font-semibold">NIS</th>
-              <th class="p-3 border-b font-semibold">Nama Siswa</th>
-              <th class="p-3 border-b font-semibold text-center">Nilai Pilihan Ganda</th>
-              <th class="p-3 border-b font-semibold text-center">Nilai Essay (Edit)</th>
-              <th class="p-3 border-b font-semibold text-center">Total Nilai</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="hover:bg-gray-50 border-b">
-              <td class="p-3 text-center text-sm">1</td>
-              <td class="p-3 text-sm">101123</td>
-              <td class="p-3 text-sm font-medium">Ahmad Maulana</td>
-              <td class="p-3 text-center text-sm">75</td>
-              <td class="p-3 text-center text-sm">
-                <input type="number" value="0" class="w-16 p-1 border rounded text-center outline-none focus:border-blue-500">
-              </td>
-              <td class="p-3 text-center text-sm font-bold text-green-600">75</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <button class="mt-4 bg-green-600 text-white font-bold px-6 py-2 rounded-lg float-right">Simpan Perubahan Nilai</button>
+      <p class="text-gray-500">Fitur penilaian dan rekap sedang dalam penyelesaian.</p>
     </div>
 
   </div>
 
   <script src="script.js"></script>
   <script>
-    // Cek Sesi
     const user = checkAuth('guru');
     document.getElementById('nama-guru-login').innerText = user.nama;
+    let kodeSoalAktif = ""; // Menyimpan kode soal yang sedang dibuat
 
-    // FUNGSI GANTI MENU
     function switchMenu(targetId) {
       document.querySelectorAll('.guru-menu').forEach(el => el.classList.replace('block', 'hidden'));
       document.querySelectorAll('[id^="btn-guru"]').forEach(btn => btn.classList.remove('menu-active'));
-      
       document.getElementById(targetId).classList.replace('hidden', 'block');
       document.getElementById('btn-' + targetId).classList.add('menu-active');
+    }
+
+    // ==========================================
+    // FUNGSI DOWNLOAD TEMPLATE
+    // ==========================================
+    function downloadTemplate() {
+      // Membuat konten CSV standar
+      const csvContent = "Kode_Soal,Pertanyaan,Opsi_A,Opsi_B,Opsi_C,Opsi_D,Kunci\nBING-01,Apa warna daun?,Merah,Hijau,Biru,Kuning,B\nBING-01,1+1=?,1,2,3,4,B";
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "Template_Soal_CBT.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // ==========================================
+    // FUNGSI SIMPAN HEADER SOAL KE DATABASE
+    // ==========================================
+    async function simpanHeaderSoal() {
+      const kode = document.getElementById('soal-kode').value;
+      const mapel = document.getElementById('soal-mapel').value;
+      const kelas = document.getElementById('soal-kelas').value;
+      const nilai = document.getElementById('soal-nilai').value;
+      const waktu = document.getElementById('soal-waktu').value;
+      const btn = document.getElementById('btn-header');
+
+      if(!kode || !mapel || !kelas || !nilai || !waktu) return alert('Lengkapi semua data header!');
+
+      btn.innerText = "Memproses Database...";
+      btn.disabled = true;
+
+      try {
+        const payload = {
+          action: 'simpanPaketSoal',
+          data: { kode, mapel, kelas, nilai, waktu, id_guru: user.id }
+        };
+
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        alert(result.pesan);
+
+        if(result.status === 'success') {
+          // Kunci form header agar tidak diganti-ganti
+          document.getElementById('soal-kode').disabled = true;
+          document.getElementById('btn-header').classList.add('hidden');
+          
+          // Tampilkan form butir soal
+          kodeSoalAktif = kode;
+          document.getElementById('label-kode-aktif').innerText = kodeSoalAktif;
+          document.getElementById('box-butir-soal').classList.remove('hidden');
+        }
+      } catch(e) {
+        alert('Gagal menghubungi database.');
+      }
+      
+      btn.innerText = "Simpan Header & Lanjut";
+      btn.disabled = false;
+    }
+
+    // ==========================================
+    // FUNGSI SIMPAN BUTIR SOAL KE DATABASE
+    // ==========================================
+    async function simpanButirSoal() {
+      const pertanyaan = document.getElementById('pertanyaan').value;
+      const opsi_a = document.getElementById('opsi_a').value;
+      const opsi_b = document.getElementById('opsi_b').value;
+      const opsi_c = document.getElementById('opsi_c').value;
+      const opsi_d = document.getElementById('opsi_d').value;
+      const kunci = document.getElementById('kunci').value;
+      const btn = document.getElementById('btn-simpan-butir');
+
+      if(!pertanyaan || !opsi_a || !opsi_b || !opsi_c || !opsi_d) {
+        return alert("Harap isi pertanyaan dan semua opsi jawaban!");
+      }
+
+      btn.innerText = "Menyimpan Soal...";
+      btn.disabled = true;
+
+      try {
+        const payload = {
+          action: 'simpanButirSoal',
+          data: { kode_soal: kodeSoalAktif, pertanyaan, opsi_a, opsi_b, opsi_c, opsi_d, kunci }
+        };
+
+        const response = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        
+        if(result.status === 'success') {
+          alert('Soal berhasil ditambahkan!');
+          // Kosongkan form untuk soal berikutnya
+          document.getElementById('pertanyaan').value = '';
+          document.getElementById('opsi_a').value = '';
+          document.getElementById('opsi_b').value = '';
+          document.getElementById('opsi_c').value = '';
+          document.getElementById('opsi_d').value = '';
+        } else {
+          alert(result.pesan);
+        }
+      } catch(e) {
+        alert('Gagal menyimpan soal ke database.');
+      }
+      
+      btn.innerText = "Simpan Pertanyaan ke Database";
+      btn.disabled = false;
     }
   </script>
 </body>
