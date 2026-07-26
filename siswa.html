@@ -10,7 +10,6 @@
 </head>
 <body class="flex flex-col h-screen justify-between">
 
-  <!-- Header Navbar -->
   <div class="bg-white shadow px-8 py-4 flex justify-between items-center">
     <h1 class="text-xl font-bold text-blue-600">CBT Siswa</h1>
     <div class="flex items-center gap-4">
@@ -22,7 +21,6 @@
     </div>
   </div>
 
-  <!-- Konten Utama -->
   <div class="flex-1 p-8 flex items-center justify-center">
     <div class="bg-white p-8 rounded-2xl shadow-sm border max-w-md w-full text-center">
       <h2 class="text-xl font-bold mb-2">Mulai Ujian</h2>
@@ -33,25 +31,21 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <div class="bg-white text-center py-3 text-xs text-gray-400 border-t">
     CBT Online System &copy; 2026
   </div>
 
+  <script src="script.js"></script>
+
   <script>
-    const user = JSON.parse(localStorage.getItem('userCBT'));
-    if (!user || user.role !== 'siswa') {
-      window.location.href = 'index.html';
-    } else {
-      document.getElementById('nama-siswa-login').innerText = user.nama;
-      document.getElementById('nis-siswa-login').innerText = `NIS: ${user.id}`;
-    }
+    // Cek Sesi (Menggunakan fungsi global)
+    const user = checkAuth('siswa');
+    
+    // Set Data di UI
+    document.getElementById('nama-siswa-login').innerText = user.nama;
+    document.getElementById('nis-siswa-login').innerText = `NIS: ${user.id}`;
 
-    function logout() {
-      localStorage.removeItem('userCBT');
-      window.location.href = 'index.html';
-    }
-
+    // Fungsi Mulai Ujian (Bisa dikembangkan lebih lanjut memanggil GAS_URL)
     function mulaiUjian() {
       const token = document.getElementById('token-ujian').value.trim();
       if(!token) return alert('Masukkan token ujian terlebih dahulu!');
