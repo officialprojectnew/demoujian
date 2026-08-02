@@ -19,7 +19,6 @@
     .ql-editor { min-height: 150px; font-size: 16px; font-family: 'Poppins', sans-serif; }
     .ql-toolbar.ql-snow { border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; background: #f9fafb; }
     .ql-container.ql-snow { border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
-    /* Progress Bar Animation */
     .progress-bar-fill { transition: width 0.4s ease; }
   </style>
 </head>
@@ -29,7 +28,7 @@
     <div class="p-6 text-xl font-bold text-green-700 border-b">Panel Guru</div>
     <div class="flex-1 overflow-y-auto py-4">
       <button onclick="switchMenu('guru-buat-soal')" id="btn-guru-buat-soal" class="w-full text-left px-6 py-3 hover:bg-gray-50 menu-active transition-colors">Buat / Import Soal</button>
-      <button onclick="switchMenu('guru-edit-soal')" id="btn-guru-edit-soal" class="w-full text-left px-6 py-3 hover:bg-gray-50 transition-colors">Edit Soal</button>
+      <button onclick="switchMenu('guru-edit-soal')" id="btn-guru-edit-soal" class="w-full text-left px-6 py-3 hover:bg-gray-50 transition-colors">Edit Soal Saya</button>
       <button onclick="switchMenu('guru-rekap-ujian')" id="btn-guru-rekap-ujian" class="w-full text-left px-6 py-3 hover:bg-gray-50 transition-colors">Rekap Ujian</button>
     </div>
     <div class="p-4 border-t">
@@ -45,18 +44,19 @@
       
       <div class="flex justify-between items-start mb-6">
         <div>
-          <h2 class="text-2xl font-bold">Pembuatan Soal</h2>
-          <p class="text-sm text-gray-500">Buat soal secara manual atau import dari file pendukung.</p>
+          <h2 class="text-2xl font-bold" id="title-buat-soal">Pembuatan Soal</h2>
+          <p class="text-sm text-gray-500" id="desc-buat-soal">Buat soal secara manual atau import dari file pendukung.</p>
         </div>
-        <div class="bg-gray-50 p-4 border rounded-xl flex flex-col gap-2 min-w-[300px]">
+        <div class="bg-gray-50 p-4 border rounded-xl flex flex-col gap-2 min-w-[300px]" id="box-import">
           <p class="text-xs font-bold text-gray-600 mb-1">Import Soal Massal:</p>
           <div class="flex gap-2">
             <button onclick="downloadTemplateExcel()" class="flex-1 text-xs bg-green-100 text-green-700 font-semibold py-2 rounded hover:bg-green-200">Unduh Template Excel</button>
-            <button onclick="downloadTemplateWord()" class="flex-1 text-xs bg-blue-100 text-blue-700 font-semibold py-2 rounded hover:bg-blue-200">Unduh Template Word</button>
+            <button onclick="downloadTemplateWord()" class="flex-1 text-xs bg-blue-100 text-blue-700 font-semibold py-2 rounded hover:bg-blue-200">Unduh Template Word (.doc)</button>
           </div>
           <input type="file" id="file-import" accept=".xlsx, .xls, .docx" class="text-xs mt-2 w-full cursor-pointer">
           <button onclick="prosesImportFile()" id="btn-proses-import" class="w-full bg-blue-600 text-white font-bold text-sm py-2 rounded shadow hover:bg-blue-700">Proses Import File</button>
         </div>
+        <button onclick="batalkanEdit()" id="btn-batal-edit" class="hidden bg-red-100 text-red-600 font-bold px-4 py-2 rounded-lg hover:bg-red-200">❌ Batalkan Mode Edit</button>
       </div>
       
       <div class="bg-blue-50 p-5 rounded-xl border border-blue-100 mb-6 shadow-sm">
@@ -133,7 +133,7 @@
 
     <div id="guru-edit-soal" class="guru-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Edit Soal Saya</h2>
+        <h2 class="text-2xl font-bold">Manajemen Edit Soal</h2>
         <button onclick="loadEditSoal()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-blue-200 text-sm">Muat Ulang Data</button>
       </div>
       <div class="overflow-x-auto border rounded-lg">
@@ -151,8 +151,9 @@
           </tbody>
         </table>
       </div>
+      
       <div id="detail-soal-edit" class="mt-6 border p-4 rounded-lg bg-gray-50 hidden">
-        <h3 class="font-bold text-lg mb-4 text-blue-700 flex justify-between">Daftar Teks Soal <button onclick="tutupDetailEdit()" class="text-sm text-red-500">Tutup [X]</button></h3>
+        <h3 class="font-bold text-lg mb-4 text-blue-700 flex justify-between">Mode Lihat Teks Soal <button onclick="tutupDetailEdit()" class="text-sm text-red-500 hover:underline">Tutup [X]</button></h3>
         <div id="list-butir-edit" class="space-y-4"></div>
       </div>
     </div>
@@ -193,6 +194,7 @@
   <script>
     const user = checkAuth('guru');
     document.getElementById('nama-guru-login').innerText = user.nama;
+    let isEditMode = false; // Penanda mode edit paket
 
     // NAVIGASI MENU
     function switchMenu(targetId) {
@@ -208,8 +210,6 @@
     // ==========================================
     // LOGIKA PEMBUATAN SOAL MS WORD STYLE & KERANJANG
     // ==========================================
-    
-    // Inisialisasi Quill Editor
     var quill = new Quill('#editor-container', {
       theme: 'snow',
       placeholder: 'Ketik pertanyaan soal di sini...',
@@ -295,7 +295,6 @@
       keranjangSoal.push(objSoal);
       renderDropdownKeranjang();
       
-      // Kosongkan form untuk soal berikutnya
       quill.root.innerHTML = '';
       document.getElementById('upload-gambar').value = '';
       document.getElementById('preview-img').classList.add('hidden');
@@ -328,10 +327,10 @@
               <div class="p-4 text-sm text-gray-800 border-t">
                 <div class="mb-3">${s.pertanyaan}</div>
                 ${s.gambar ? `<img src="${s.gambar}" class="h-20 rounded mb-2 border shadow-sm">` : ''}
-                <div class="bg-gray-50 p-2 rounded text-xs mb-3 font-mono">${txtPG}</div>
+                <div class="bg-gray-50 p-2 rounded text-xs mb-3 font-mono leading-relaxed">${txtPG}</div>
                 <p class="font-bold text-green-600 mb-4">Kunci Jawaban: ${s.kunci}</p>
                 <div class="flex gap-2">
-                  <button onclick="editSoalDariKeranjang(${index})" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded hover:bg-blue-200 font-bold text-xs">✏️ Edit Kembali</button>
+                  <button onclick="editSoalDariKeranjang(${index})" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded hover:bg-blue-200 font-bold text-xs">✏️ Tarik Ke Editor</button>
                   <button onclick="hapusSoalDariKeranjang(${index})" class="bg-red-100 text-red-700 px-3 py-1.5 rounded hover:bg-red-200 font-bold text-xs">🗑️ Hapus Soal</button>
                 </div>
               </div>
@@ -343,37 +342,36 @@
       document.getElementById('label-nomor-soal').innerText = `Pengetikan Soal No. ${keranjangSoal.length + 1}`;
     }
 
-    // Fungsi Untuk Tombol Edit di Keranjang (Menarik soal kembali ke Editor)
     function editSoalDariKeranjang(index) {
       const s = keranjangSoal[index];
       quill.root.innerHTML = s.pertanyaan;
       document.getElementById('tipe-soal').value = s.tipe;
       gantiTipeSoal();
       document.getElementById('bobot-soal').value = s.bobot;
+      
       gambarBase64Aktif = s.gambar;
       if (s.gambar) {
         document.getElementById('preview-img').src = s.gambar;
         document.getElementById('preview-img').classList.remove('hidden');
       }
 
-      if (s.tipe === 'PG') {
-        document.getElementById('opsi_A').value = s.opsi.A; document.getElementById('opsi_B').value = s.opsi.B;
-        document.getElementById('opsi_C').value = s.opsi.C; document.getElementById('opsi_D').value = s.opsi.D;
-        if(document.getElementById(`radio_pg_${s.kunci}`)) document.getElementById(`radio_pg_${s.kunci}`).checked = true;
-      } else if (s.tipe === 'PGK') {
-        document.getElementById('opsi_A').value = s.opsi.A; document.getElementById('opsi_B').value = s.opsi.B;
-        document.getElementById('opsi_C').value = s.opsi.C; document.getElementById('opsi_D').value = s.opsi.D;
-        let keys = s.kunci.split(',');
-        keys.forEach(k => { if(document.getElementById(`kunci_pgk_${k}`)) document.getElementById(`kunci_pgk_${k}`).checked = true; });
-      } else if (s.tipe === 'ISIAN') {
-        document.getElementById('kunci_isian').value = s.kunci;
-      }
+      setTimeout(() => { // Kasih jeda render elemen gantiTipeSoal
+        if (s.tipe === 'PG') {
+          document.getElementById('opsi_A').value = s.opsi.A; document.getElementById('opsi_B').value = s.opsi.B;
+          document.getElementById('opsi_C').value = s.opsi.C; document.getElementById('opsi_D').value = s.opsi.D;
+          if(document.getElementById(`radio_pg_${s.kunci}`)) document.getElementById(`radio_pg_${s.kunci}`).checked = true;
+        } else if (s.tipe === 'PGK') {
+          document.getElementById('opsi_A').value = s.opsi.A; document.getElementById('opsi_B').value = s.opsi.B;
+          document.getElementById('opsi_C').value = s.opsi.C; document.getElementById('opsi_D').value = s.opsi.D;
+          let keys = s.kunci.split(',');
+          keys.forEach(k => { if(document.getElementById(`kunci_pgk_${k}`)) document.getElementById(`kunci_pgk_${k}`).checked = true; });
+        } else if (s.tipe === 'ISIAN') {
+          document.getElementById('kunci_isian').value = s.kunci;
+        }
+      }, 50);
       
-      // Hapus dari keranjang setelah ditarik
       keranjangSoal.splice(index, 1);
       renderDropdownKeranjang();
-      
-      // Scroll animasi kembali ke atas (Editor)
       document.getElementById('form-editor-container').scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -403,10 +401,12 @@
       const progressPercent = document.getElementById('progress-percent');
       progressContainer.classList.remove('hidden');
 
-      // 1. Simpan Header ke Manajemen_Ujian
-      progressText.innerText = "Mempersiapkan Database & Validasi Kode Soal...";
+      // 1. Simpan/Update Header
+      progressText.innerText = "Mempersiapkan Database & Validasi...";
+      let endPointAction = isEditMode ? 'updatePaketHeaderOnly' : 'simpanPaketHeaderOnly';
+      
       try {
-        let resHead = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanPaketHeaderOnly', data: header }) });
+        let resHead = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: endPointAction, data: header }) });
         let resultHead = await resHead.json();
         if(resultHead.status === 'error') {
            progressContainer.classList.add('hidden');
@@ -419,7 +419,7 @@
       let total = keranjangSoal.length;
       for (let i = 0; i < total; i++) {
         let persen = Math.round(((i + 1) / total) * 100);
-        progressText.innerText = `Menyimpan dan mengupload gambar: Soal ke ${i + 1} dari ${total}...`;
+        progressText.innerText = `Mengunggah: Soal ke ${i + 1} dari ${total}...`;
         progressBar.style.width = `${persen}%`;
         progressPercent.innerText = `${persen}%`;
 
@@ -428,18 +428,13 @@
             action: 'simpanSoalSatuan', 
             data: { header: header, soal: keranjangSoal[i] } 
           })});
-        } catch(e) {
-          console.error(`Gagal menyimpan soal no ${i+1}`);
-        }
+        } catch(e) { console.error(`Gagal menyimpan soal no ${i+1}`); }
       }
 
-      alert("🎉 Seluruh Soal Berhasil Disimpan & Gambar Diupload ke Drive!");
+      alert(isEditMode ? "🎉 Paket Soal Berhasil Diperbarui!" : "🎉 Paket Soal Berhasil Disimpan Baru!");
       
       // Reset Layar
-      keranjangSoal = [];
-      renderDropdownKeranjang();
-      progressContainer.classList.add('hidden');
-      ['head-kode', 'head-mapel', 'head-kelas', 'head-waktu'].forEach(id => document.getElementById(id).value = '');
+      batalkanEdit(); // Reset semua UI kembali ke normal
     }
 
     // ==========================================
@@ -457,12 +452,34 @@
     }
 
     function downloadTemplateWord() {
-      // Simulasi download File Docx menggunakan blob (format text bantuan)
-      const isi = `TULIS SOAL ANDA DENGAN FORMAT INI:\n\n#TIPE: PG\n#TANYA: <p>Siapa penemu gaya gravitasi?</p>\n#A: Newton\n#B: Tesla\n#C: Einstein\n#D: Edison\n#KUNCI: A\n#BOBOT: 10\n---\n#TIPE: ISIAN\n#TANYA: <p>Presiden RI Ke-1?</p>\n#KUNCI: Soekarno\n#BOBOT: 10\n---`;
-      const blob = new Blob([isi], { type: 'text/plain;charset=utf-8;' });
+      // Trick mengubah HTML format agar diunduh sebagai .doc yang dikenali MS Word
+      const htmlContent = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>Template Soal</title></head>
+        <body style="font-family: Arial, sans-serif;">
+          <h2>Template Penulisan Soal CBT</h2>
+          <p><b>PENTING:</b> Jangan mengubah/menghapus tag yang berawalan <b>#</b>. Ketiklah teks Anda setelah tag tersebut.</p>
+          <hr>
+          <p>#TIPE: PG</p>
+          <p>#SOAL: Siapa penemu gaya gravitasi?</p>
+          <p>#A: Isaac Newton</p>
+          <p>#B: Albert Einstein</p>
+          <p>#C: Nikola Tesla</p>
+          <p>#D: Thomas Edison</p>
+          <p>#KUNCI: A</p>
+          <p>#BOBOT: 10</p>
+          <p>---</p>
+          <p>#TIPE: ISIAN</p>
+          <p>#SOAL: Sebutkan ibukota negara Indonesia!</p>
+          <p>#KUNCI: Jakarta</p>
+          <p>#BOBOT: 10</p>
+          <p>---</p>
+        </body></html>
+      `;
+      const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = url; link.download = "Template_Soal_Format_Word.txt";
+      link.href = url; link.download = "Template_Soal_CBT.doc";
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
@@ -484,9 +501,7 @@
           json.forEach(row => {
             keranjangSoal.push({
               tipe: row['Tipe_Soal (PG/PGK/ISIAN/ESSAY)'] || 'PG',
-              pertanyaan: row['Pertanyaan'] || '',
-              gambar: '',
-              bobot: row['Bobot'] || '10',
+              pertanyaan: row['Pertanyaan'] || '', gambar: '', bobot: row['Bobot'] || '10',
               opsi: { A: row['Opsi_A']||'', B: row['Opsi_B']||'', C: row['Opsi_C']||'', D: row['Opsi_D']||'' },
               kunci: row['Kunci'] || ''
             });
@@ -497,22 +512,21 @@
           fileInput.value = '';
         };
         reader.readAsArrayBuffer(file);
-      } else if (fileName.endsWith('.docx')) {
+      } else if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
         const reader = new FileReader();
         reader.onload = function(e) {
           mammoth.extractRawText({arrayBuffer: e.target.result}).then(function(result){
             let blocks = result.value.split('---');
             blocks.forEach(block => {
               if(block.trim()==='') return;
-              let tipe = block.match(/#TIPE:\s*(.*)/);
-              let tanya = block.match(/#TANYA:\s*(.*)/);
+              let tipe = block.match(/#TIPE:\s*(.*)/); let soalText = block.match(/#SOAL:\s*(.*)/);
               let A = block.match(/#A:\s*(.*)/); let B = block.match(/#B:\s*(.*)/);
               let C = block.match(/#C:\s*(.*)/); let D = block.match(/#D:\s*(.*)/);
               let kunci = block.match(/#KUNCI:\s*(.*)/); let bobot = block.match(/#BOBOT:\s*(.*)/);
               
-              if(tanya) {
+              if(soalText) {
                 keranjangSoal.push({
-                  tipe: tipe ? tipe[1].trim() : 'PG', pertanyaan: tanya[1].trim(), gambar: '', bobot: bobot ? bobot[1].trim() : '10',
+                  tipe: tipe ? tipe[1].trim() : 'PG', pertanyaan: `<p>${soalText[1].trim()}</p>`, gambar: '', bobot: bobot ? bobot[1].trim() : '10',
                   opsi: { A: A?A[1].trim():'', B: B?B[1].trim():'', C: C?C[1].trim():'', D: D?D[1].trim():'' },
                   kunci: kunci ? kunci[1].trim() : ''
                 });
@@ -522,6 +536,9 @@
             document.getElementById('btn-proses-import').innerText = "Selesai. Soal Masuk ke Keranjang!";
             setTimeout(()=>document.getElementById('btn-proses-import').innerText = "Proses Import File", 2000);
             fileInput.value = '';
+          }).catch(err => {
+            alert("Terjadi kesalahan saat membaca file Word.");
+            document.getElementById('btn-proses-import').innerText = "Proses Import File";
           });
         };
         reader.readAsArrayBuffer(file);
@@ -532,7 +549,7 @@
     }
 
     // ==========================================
-    // FUNGSI EDIT SOAL LAMA & REKAP (SUDAH AKTIF)
+    // FUNGSI TARIK DATA & EDIT PAKET FULL
     // ==========================================
     async function loadEditSoal() {
       const tbody = document.getElementById('tabel-edit-soal');
@@ -545,11 +562,75 @@
         
         let html = '';
         result.data.forEach((p,i) => {
+          let jsData = JSON.stringify(p).replace(/'/g, "\\'");
           html += `<tr class="border-b"><td class="p-3 text-center">${i+1}</td><td class="p-3 font-bold text-blue-600">${p.kode}</td><td class="p-3">${p.mapel} (${p.kelas})</td>
-          <td class="p-3 text-center"><button onclick="lihatDetailSoal('${p.kode}')" class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded">Lihat Soal</button></td></tr>`;
+          <td class="p-3 text-center flex gap-2 justify-center">
+            <button onclick="lihatDetailSoal('${p.kode}')" class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded text-xs font-bold">👀 Lihat Saja</button>
+            <button onclick='masukModeEditPaket(${jsData})' class="bg-blue-100 text-blue-700 px-3 py-1 rounded text-xs font-bold">✏️ Edit Paket</button>
+          </td></tr>`;
         });
         tbody.innerHTML = html;
       } catch(e) {}
+    }
+
+    async function masukModeEditPaket(paket) {
+      isEditMode = true;
+      
+      // Ubah UI menjadi Mode Edit
+      switchMenu('guru-buat-soal');
+      document.getElementById('title-buat-soal').innerText = "Mode Edit Paket Soal";
+      document.getElementById('desc-buat-soal').innerText = `Anda sedang mengedit paket ${paket.kode}. Simpan jika sudah selesai.`;
+      document.getElementById('box-import').classList.add('hidden');
+      document.getElementById('btn-batal-edit').classList.remove('hidden');
+      document.getElementById('btn-simpan-final').innerText = "💾 UPDATE SELURUH PAKET KE DATABASE";
+      
+      // Isi Header
+      document.getElementById('head-kode').value = paket.kode;
+      document.getElementById('head-kode').disabled = true; // Kode tidak boleh diubah
+      document.getElementById('head-kode').classList.add('bg-gray-200');
+      document.getElementById('head-mapel').value = paket.mapel;
+      document.getElementById('head-kelas').value = paket.kelas;
+      document.getElementById('head-waktu').value = paket.waktu;
+      
+      // Kosongkan keranjang & Munculkan loading
+      keranjangSoal = [];
+      document.getElementById('daftar-soal-sementara').classList.remove('hidden');
+      document.getElementById('list-accordion').innerHTML = '<p class="p-3 text-blue-600">Menarik soal dari database...</p>';
+      
+      // Tarik Butir Soal dari Bank Soal
+      try {
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getBankSoal', kode_soal: paket.kode }) });
+        const result = await res.json();
+        
+        result.data.forEach(s => {
+          keranjangSoal.push({
+            tipe: s.tipe || 'PG', pertanyaan: s.pertanyaan, gambar: s.gambar || '', bobot: s.bobot || 10,
+            opsi: { A: s.a, B: s.b, C: s.c, D: s.d }, kunci: s.kunci
+          });
+        });
+        renderDropdownKeranjang();
+      } catch (e) {
+        alert("Gagal menarik detail soal.");
+        batalkanEdit();
+      }
+    }
+
+    function batalkanEdit() {
+      isEditMode = false;
+      document.getElementById('title-buat-soal').innerText = "Pembuatan Soal";
+      document.getElementById('desc-buat-soal').innerText = "Buat soal secara manual atau import dari file pendukung.";
+      document.getElementById('box-import').classList.remove('hidden');
+      document.getElementById('btn-batal-edit').classList.add('hidden');
+      document.getElementById('btn-simpan-final').innerText = "💾 SIMPAN SELURUH PAKET KE DATABASE";
+      
+      document.getElementById('head-kode').disabled = false;
+      document.getElementById('head-kode').classList.remove('bg-gray-200');
+      
+      ['head-kode', 'head-mapel', 'head-kelas', 'head-waktu'].forEach(id => document.getElementById(id).value = '');
+      
+      keranjangSoal = [];
+      renderDropdownKeranjang();
+      progressContainer = document.getElementById('progress-container').classList.add('hidden');
     }
 
     async function lihatDetailSoal(kode) {
@@ -572,7 +653,6 @@
         div.innerHTML = html || "<p>Belum ada butir soal di paket ini.</p>";
       } catch(e) {}
     }
-    
     function tutupDetailEdit() { document.getElementById('detail-soal-edit').classList.add('hidden'); }
 
     // ==========================================
@@ -633,7 +713,7 @@
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanNilaiEssay', data: dataUpdate }) });
         const result = await res.json();
         alert(result.pesan);
-        tampilkanRekap(); // Refresh tabel setelah diubah
+        tampilkanRekap(); 
       } catch(e) { alert('Gagal update nilai!'); }
       
       btn.innerText = "Simpan Perubahan Nilai Essay"; btn.disabled = false;
