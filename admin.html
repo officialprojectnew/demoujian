@@ -47,7 +47,7 @@
             <div><label class="text-sm font-medium">NIS</label><input type="text" id="nis-siswa" class="w-full mt-1 p-2 border rounded-lg outline-none"></div>
             <div><label class="text-sm font-medium">Nama Lengkap</label><input type="text" id="nama-siswa" class="w-full mt-1 p-2 border rounded-lg outline-none"></div>
             <div><label class="text-sm font-medium">Kelas</label><input type="text" id="kelas-siswa" class="w-full mt-1 p-2 border rounded-lg outline-none"></div>
-            <div><label class="text-sm font-medium">Password Default</label><input type="text" id="pass-siswa" class="w-full mt-1 p-2 border rounded-lg outline-none"></div>
+            <div><label class="text-sm font-medium">Password Default</label><input type="password" id="pass-siswa" class="w-full mt-1 p-2 border rounded-lg outline-none"></div>
             <button onclick="simpanSiswa()" id="btn-simpan-siswa" class="w-full mt-2 bg-blue-600 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-700">Simpan Siswa</button>
           </div>
         </div>
@@ -85,7 +85,7 @@
             <div><label class="text-sm font-medium">NIP / ID Guru</label><input type="text" id="nip-guru" class="w-full mt-1 p-2 border rounded-lg outline-none"></div>
             <div><label class="text-sm font-medium">Nama Lengkap Guru</label><input type="text" id="nama-guru" class="w-full mt-1 p-2 border rounded-lg outline-none"></div>
             <div><label class="text-sm font-medium">Username Login</label><input type="text" id="user-guru" class="w-full mt-1 p-2 border rounded-lg outline-none"></div>
-            <div><label class="text-sm font-medium">Password Default</label><input type="text" id="pass-guru" class="w-full mt-1 p-2 border rounded-lg outline-none"></div>
+            <div><label class="text-sm font-medium">Password Default</label><input type="password" id="pass-guru" class="w-full mt-1 p-2 border rounded-lg outline-none"></div>
             <button onclick="simpanGuru()" id="btn-simpan-guru" class="w-full mt-2 bg-blue-600 text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-blue-700">Simpan Guru</button>
           </div>
         </div>
@@ -114,7 +114,65 @@
       </div>
     </div>
 
+    <div id="admin-manajemen-ujian" class="admin-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Manajemen Semua Ujian</h2>
+        <button onclick="loadManajemenUjian()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-blue-200">Muat Ulang Data</button>
+      </div>
+      <p class="text-sm text-gray-500 mb-4">Daftar paket soal yang telah dibuat oleh seluruh guru. Aktifkan untuk membuat Token.</p>
+      <div class="overflow-x-auto border rounded-lg">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-gray-100 text-gray-700 text-sm">
+              <th class="p-3 border-b text-center">No</th>
+              <th class="p-3 border-b">Kode Soal</th>
+              <th class="p-3 border-b">Mata Pelajaran</th>
+              <th class="p-3 border-b text-center">Status</th>
+              <th class="p-3 border-b text-center">Token</th>
+              <th class="p-3 border-b text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tabel-manajemen-ujian"><tr><td colspan="6" class="p-4 text-center text-gray-500">Memuat data...</td></tr></tbody>
+        </table>
+      </div>
     </div>
+
+    <div id="admin-rekap-ujian" class="admin-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Rekap Hasil Ujian Global</h2>
+        <button onclick="loadDropdownRekapAdmin()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg text-sm">Muat Paket Ujian</button>
+      </div>
+      
+      <div class="mb-6 bg-gray-50 p-4 rounded-lg border flex items-end gap-4">
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Paket Ujian:</label>
+          <select id="select-rekap-admin" class="w-full p-2 border rounded-lg outline-none">
+            <option value="">-- Pilih Kode Soal --</option>
+          </select>
+        </div>
+        <button onclick="tampilkanRekapAdmin()" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700">Tampilkan Nilai</button>
+      </div>
+
+      <div class="overflow-x-auto border rounded-lg">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-gray-100 text-gray-700 text-sm">
+              <th class="p-3 border-b text-center">No</th>
+              <th class="p-3 border-b">NIS</th>
+              <th class="p-3 border-b">Nama Siswa</th>
+              <th class="p-3 border-b text-center">Nilai PG</th>
+              <th class="p-3 border-b text-center">Nilai Essay</th>
+              <th class="p-3 border-b text-center font-bold">Total Nilai</th>
+            </tr>
+          </thead>
+          <tbody id="tabel-rekap-nilai-admin">
+            <tr><td colspan="6" class="p-4 text-center text-gray-500">Pilih paket dan klik tampilkan.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
 
   <div id="modal-edit-siswa" class="fixed inset-0 modal-overlay hidden z-50 flex justify-center items-center">
     <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
@@ -136,7 +194,7 @@
           <input type="text" id="edit-kelas-siswa" class="w-full mt-1 p-2.5 border rounded-lg outline-none focus:border-blue-500">
         </div>
         <div>
-          <label class="text-sm font-medium">Password Baru</label>
+          <label class="text-sm font-medium">Password</label>
           <input type="text" id="edit-pass-siswa" class="w-full mt-1 p-2.5 border rounded-lg outline-none focus:border-blue-500">
         </div>
         <div class="pt-3 flex gap-3">
@@ -167,7 +225,7 @@
           <input type="text" id="edit-user-guru" class="w-full mt-1 p-2.5 border rounded-lg outline-none focus:border-blue-500">
         </div>
         <div>
-          <label class="text-sm font-medium">Password Baru</label>
+          <label class="text-sm font-medium">Password</label>
           <input type="text" id="edit-pass-guru" class="w-full mt-1 p-2.5 border rounded-lg outline-none focus:border-blue-500">
         </div>
         <div class="pt-3 flex gap-3">
@@ -195,6 +253,8 @@
 
       if(targetId === 'admin-rekap-siswa') loadRekapSiswa();
       if(targetId === 'admin-rekap-guru') loadRekapGuru();
+      if(targetId === 'admin-manajemen-ujian') loadManajemenUjian();
+      if(targetId === 'admin-rekap-ujian') loadDropdownRekapAdmin();
     }
 
     // FUNGSI KONTROL MODAL (POPUP)
@@ -202,7 +262,30 @@
       document.getElementById(idModal).classList.add('hidden');
     }
 
-    // ================= FITUR REKAP & EDIT SISWA =================
+    // ================= FITUR INPUT, REKAP & EDIT SISWA =================
+    async function simpanSiswa() {
+      const data = {
+        nis: document.getElementById('nis-siswa').value,
+        nama: document.getElementById('nama-siswa').value,
+        kelas: document.getElementById('kelas-siswa').value,
+        password: document.getElementById('pass-siswa').value
+      };
+      if(!data.nis || !data.nama || !data.kelas || !data.password) return alert('Harap isi semua kolom!');
+
+      const btn = document.getElementById('btn-simpan-siswa');
+      btn.innerText = "Menyimpan..."; btn.disabled = true;
+
+      try {
+        const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanSiswa', data }) });
+        const result = await response.json();
+        alert(result.pesan);
+        if(result.status === 'success') {
+          ['nis-siswa','nama-siswa','kelas-siswa','pass-siswa'].forEach(id => document.getElementById(id).value = '');
+        }
+      } catch(e) { alert("Gagal menyimpan data."); }
+      btn.innerText = "Simpan Siswa"; btn.disabled = false;
+    }
+
     async function loadRekapSiswa() {
       const tbody = document.getElementById('tabel-rekap-siswa');
       tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">Memuat data dari database...</td></tr>`;
@@ -213,7 +296,6 @@
         
         let html = '';
         result.data.forEach((s, i) => {
-          // Escaping quote untuk parameter JS
           let jsData = JSON.stringify(s).replace(/'/g, "\\'");
           html += `<tr class="hover:bg-gray-50 border-b">
             <td class="p-3 text-center text-sm">${i + 1}</td><td class="p-3 text-sm font-medium">${s.nis}</td>
@@ -261,7 +343,40 @@
       btn.innerText = "Simpan Perubahan"; btn.disabled = false;
     }
 
-    // ================= FITUR REKAP & EDIT GURU =================
+    async function hapusSiswa(nis) {
+      if(!confirm(`Yakin hapus siswa NIS ${nis}?`)) return;
+      try {
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusSiswa', nis }) });
+        const result = await res.json();
+        alert(result.pesan);
+        if(result.status === 'success') loadRekapSiswa();
+      } catch(e) { alert("Gagal menghapus."); }
+    }
+
+    // ================= FITUR INPUT, REKAP & EDIT GURU =================
+    async function simpanGuru() {
+      const data = {
+        nip: document.getElementById('nip-guru').value,
+        nama: document.getElementById('nama-guru').value,
+        username: document.getElementById('user-guru').value,
+        password: document.getElementById('pass-guru').value
+      };
+      if(!data.nip || !data.nama || !data.username || !data.password) return alert('Isi semua kolom!');
+
+      const btn = document.getElementById('btn-simpan-guru');
+      btn.innerText = "Menyimpan..."; btn.disabled = true;
+
+      try {
+        const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanGuru', data }) });
+        const result = await response.json();
+        alert(result.pesan);
+        if(result.status === 'success') {
+          ['nip-guru','nama-guru','user-guru','pass-guru'].forEach(id => document.getElementById(id).value = '');
+        }
+      } catch(e) { alert("Gagal menyimpan data."); }
+      btn.innerText = "Simpan Guru"; btn.disabled = false;
+    }
+
     async function loadRekapGuru() {
       const tbody = document.getElementById('tabel-rekap-guru');
       tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">Memuat data guru...</td></tr>`;
@@ -319,8 +434,17 @@
       btn.innerText = "Simpan Perubahan"; btn.disabled = false;
     }
 
+    async function hapusGuru(nip) {
+      if(!confirm(`Yakin hapus guru ID/NIP ${nip}?`)) return;
+      try {
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusGuru', nip }) });
+        const result = await res.json();
+        alert(result.pesan);
+        if(result.status === 'success') loadRekapGuru();
+      } catch(e) { alert("Gagal menghapus."); }
+    }
 
-     // ================= MANAJEMEN UJIAN (ADMIN) =================
+    // ================= MANAJEMEN UJIAN (ADMIN) DENGAN TOKEN =================
     async function loadManajemenUjian() {
       const tbody = document.getElementById('tabel-manajemen-ujian');
       tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">Memuat paket ujian...</td></tr>`;
@@ -331,7 +455,6 @@
         
         let html = '';
         result.data.forEach((u, i) => {
-          // Setting UI Berdasarkan Status
           let badgeClass = u.status === 'Aktif' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
           let tokenDisplay = u.token ? `<span class="font-mono font-bold text-lg tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">${u.token}</span>` : '<span class="text-gray-400">-</span>';
           let btnAction = u.status === 'Aktif'
@@ -354,7 +477,6 @@
     async function toggleStatusUjian(kode, targetStatus) {
       if(!confirm(`Yakin ingin mengubah ujian ${kode} menjadi ${targetStatus}?`)) return;
 
-      // Generate random 5-character token jika diaktifkan, atau kosongkan jika dinonaktifkan
       let tokenBaru = '';
       if (targetStatus === 'Aktif') {
          tokenBaru = Math.random().toString(36).substring(2, 7).toUpperCase();
@@ -366,7 +488,7 @@
         const result = await res.json();
         
         if(result.status === 'success') {
-            loadManajemenUjian(); // Refresh tabel secara otomatis untuk menampilkan Token
+            loadManajemenUjian(); 
         } else {
             alert(result.pesan);
         }
@@ -394,7 +516,6 @@
       tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center">Menarik data nilai...</td></tr>`;
       
       try {
-        // Menggunakan endpoint getRekapUjian yang sama dengan Guru
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) });
         const result = await res.json();
         if(result.data.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center">Belum ada siswa yang mengerjakan ujian ini.</td></tr>`;
