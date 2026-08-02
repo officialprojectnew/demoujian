@@ -5,13 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Guru - CBT System</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
-  
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; }
@@ -20,6 +17,8 @@
     .ql-toolbar.ql-snow { border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; background: #f9fafb; }
     .ql-container.ql-snow { border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
     .progress-bar-fill { transition: width 0.4s ease; }
+    /* Pastikan gambar di dalam editor dan view tidak melebar melebihi kontainer */
+    img { max-width: 100%; height: auto; }
   </style>
 </head>
 <body class="flex h-screen overflow-hidden text-gray-800">
@@ -41,7 +40,6 @@
   <div class="flex-1 p-8 overflow-y-auto w-full">
     
     <div id="guru-buat-soal" class="guru-menu block bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-      
       <div class="flex justify-between items-start mb-6">
         <div>
           <h2 class="text-2xl font-bold" id="title-buat-soal">Pembuatan Soal</h2>
@@ -106,7 +104,7 @@
           <label class="block text-sm font-semibold mb-1">Import Gambar (Opsional)</label>
           <p class="text-xs text-gray-500 mb-2">Gambar akan otomatis di-upload ke Google Drive.</p>
           <input type="file" id="upload-gambar" accept="image/*" onchange="previewGambar(event)" class="text-sm cursor-pointer">
-          <img id="preview-img" src="" class="mt-3 max-h-32 hidden rounded shadow border">
+          <img id="preview-img" src="" class="mt-3 max-h-48 hidden rounded shadow border object-contain">
         </div>
 
         <div id="area-jawaban" class="space-y-3 mb-6 bg-gray-50 p-4 rounded border"></div>
@@ -194,22 +192,27 @@
   <script>
     const user = checkAuth('guru');
     document.getElementById('nama-guru-login').innerText = user.nama;
-    let isEditMode = false; // Penanda mode edit paket
+    let isEditMode = false;
 
-    // NAVIGASI MENU
+    // FUNGSI KONVERSI URL GOOGLE DRIVE (Agar gambar lama muncul)
+    function getDirectImageUrl(url) {
+      if (!url) return '';
+      if (url.includes('file/d/')) {
+        let match = url.match(/\/d\/(.+?)\//);
+        if (match) return "https://drive.google.com/uc?export=view&id=" + match[1];
+      }
+      return url;
+    }
+
     function switchMenu(targetId) {
       document.querySelectorAll('.guru-menu').forEach(el => el.classList.replace('block', 'hidden'));
       document.querySelectorAll('[id^="btn-guru"]').forEach(btn => btn.classList.remove('menu-active'));
       document.getElementById(targetId).classList.replace('hidden', 'block');
       document.getElementById('btn-' + targetId).classList.add('menu-active');
-      
       if(targetId === 'guru-edit-soal') loadEditSoal();
       if(targetId === 'guru-rekap-ujian') loadDropdownRekap();
     }
 
-    // ==========================================
-    // LOGIKA PEMBUATAN SOAL MS WORD STYLE & KERANJANG
-    // ==========================================
     var quill = new Quill('#editor-container', {
       theme: 'snow',
       placeholder: 'Ketik pertanyaan soal di sini...',
@@ -267,7 +270,6 @@
       const tipe = document.getElementById('tipe-soal').value;
       const pertanyaan = quill.root.innerHTML;
       const bobot = document.getElementById('bobot-soal').value;
-      
       if (quill.getText().trim() === "") return alert("Pertanyaan tidak boleh kosong!");
 
       let objSoal = { tipe, pertanyaan, gambar: gambarBase64Aktif, bobot, opsi: { A: "", B: "", C: "", D: "" }, kunci: "" };
@@ -317,6 +319,8 @@
       let html = '';
       keranjangSoal.forEach((s, index) => {
         let txtPG = s.tipe.includes('PG') ? `A. ${s.opsi.A}<br>B. ${s.opsi.B}<br>C. ${s.opsi.C}<br>D. ${s.opsi.D}` : '';
+        let imgSrc = getDirectImageUrl(s.gambar); // Gunakan konverter
+        
         html += `
           <div class="bg-white border rounded-lg shadow-sm">
             <details class="group cursor-pointer">
@@ -326,7 +330,7 @@
               </summary>
               <div class="p-4 text-sm text-gray-800 border-t">
                 <div class="mb-3">${s.pertanyaan}</div>
-                ${s.gambar ? `<img src="${s.gambar}" class="h-20 rounded mb-2 border shadow-sm">` : ''}
+                ${imgSrc ? `<img src="${imgSrc}" class="max-h-48 rounded mb-2 border shadow-sm object-contain">` : ''}
                 <div class="bg-gray-50 p-2 rounded text-xs mb-3 font-mono leading-relaxed">${txtPG}</div>
                 <p class="font-bold text-green-600 mb-4">Kunci Jawaban: ${s.kunci}</p>
                 <div class="flex gap-2">
@@ -350,12 +354,13 @@
       document.getElementById('bobot-soal').value = s.bobot;
       
       gambarBase64Aktif = s.gambar;
-      if (s.gambar) {
-        document.getElementById('preview-img').src = s.gambar;
+      let imgSrc = getDirectImageUrl(s.gambar);
+      if (imgSrc) {
+        document.getElementById('preview-img').src = imgSrc;
         document.getElementById('preview-img').classList.remove('hidden');
       }
 
-      setTimeout(() => { // Kasih jeda render elemen gantiTipeSoal
+      setTimeout(() => { 
         if (s.tipe === 'PG') {
           document.getElementById('opsi_A').value = s.opsi.A; document.getElementById('opsi_B').value = s.opsi.B;
           document.getElementById('opsi_C').value = s.opsi.C; document.getElementById('opsi_D').value = s.opsi.D;
@@ -382,9 +387,6 @@
       }
     }
 
-    // ==========================================
-    // SIMPAN FINAL (PROGRES SATU PER SATU)
-    // ==========================================
     async function simpanPaketKeDatabase() {
       const header = {
         kode: document.getElementById('head-kode').value, mapel: document.getElementById('head-mapel').value,
@@ -401,7 +403,6 @@
       const progressPercent = document.getElementById('progress-percent');
       progressContainer.classList.remove('hidden');
 
-      // 1. Simpan/Update Header
       progressText.innerText = "Mempersiapkan Database & Validasi...";
       let endPointAction = isEditMode ? 'updatePaketHeaderOnly' : 'simpanPaketHeaderOnly';
       
@@ -415,7 +416,6 @@
         }
       } catch(e) { return alert("Server Error saat menyimpan Header!"); }
 
-      // 2. Looping Simpan Soal Satu per Satu
       let total = keranjangSoal.length;
       for (let i = 0; i < total; i++) {
         let persen = Math.round(((i + 1) / total) * 100);
@@ -424,22 +424,14 @@
         progressPercent.innerText = `${persen}%`;
 
         try {
-          await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ 
-            action: 'simpanSoalSatuan', 
-            data: { header: header, soal: keranjangSoal[i] } 
-          })});
+          await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanSoalSatuan', data: { header: header, soal: keranjangSoal[i] } })});
         } catch(e) { console.error(`Gagal menyimpan soal no ${i+1}`); }
       }
 
       alert(isEditMode ? "🎉 Paket Soal Berhasil Diperbarui!" : "🎉 Paket Soal Berhasil Disimpan Baru!");
-      
-      // Reset Layar
-      batalkanEdit(); // Reset semua UI kembali ke normal
+      batalkanEdit(); 
     }
 
-    // ==========================================
-    // LOGIKA IMPORT TEMPLATE EXCEL & WORD
-    // ==========================================
     function downloadTemplateExcel() {
       const ws = XLSX.utils.aoa_to_sheet([
         ["Tipe_Soal (PG/PGK/ISIAN/ESSAY)", "Pertanyaan", "Opsi_A", "Opsi_B", "Opsi_C", "Opsi_D", "Kunci", "Bobot"],
@@ -452,7 +444,6 @@
     }
 
     function downloadTemplateWord() {
-      // Trick mengubah HTML format agar diunduh sebagai .doc yang dikenali MS Word
       const htmlContent = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
         <head><meta charset='utf-8'><title>Template Soal</title></head>
@@ -548,9 +539,6 @@
       }
     }
 
-    // ==========================================
-    // FUNGSI TARIK DATA & EDIT PAKET FULL
-    // ==========================================
     async function loadEditSoal() {
       const tbody = document.getElementById('tabel-edit-soal');
       document.getElementById('detail-soal-edit').classList.add('hidden');
@@ -575,8 +563,6 @@
 
     async function masukModeEditPaket(paket) {
       isEditMode = true;
-      
-      // Ubah UI menjadi Mode Edit
       switchMenu('guru-buat-soal');
       document.getElementById('title-buat-soal').innerText = "Mode Edit Paket Soal";
       document.getElementById('desc-buat-soal').innerText = `Anda sedang mengedit paket ${paket.kode}. Simpan jika sudah selesai.`;
@@ -584,20 +570,17 @@
       document.getElementById('btn-batal-edit').classList.remove('hidden');
       document.getElementById('btn-simpan-final').innerText = "💾 UPDATE SELURUH PAKET KE DATABASE";
       
-      // Isi Header
       document.getElementById('head-kode').value = paket.kode;
-      document.getElementById('head-kode').disabled = true; // Kode tidak boleh diubah
+      document.getElementById('head-kode').disabled = true; 
       document.getElementById('head-kode').classList.add('bg-gray-200');
       document.getElementById('head-mapel').value = paket.mapel;
       document.getElementById('head-kelas').value = paket.kelas;
       document.getElementById('head-waktu').value = paket.waktu;
       
-      // Kosongkan keranjang & Munculkan loading
       keranjangSoal = [];
       document.getElementById('daftar-soal-sementara').classList.remove('hidden');
       document.getElementById('list-accordion').innerHTML = '<p class="p-3 text-blue-600">Menarik soal dari database...</p>';
       
-      // Tarik Butir Soal dari Bank Soal
       try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getBankSoal', kode_soal: paket.kode }) });
         const result = await res.json();
@@ -630,7 +613,7 @@
       
       keranjangSoal = [];
       renderDropdownKeranjang();
-      progressContainer = document.getElementById('progress-container').classList.add('hidden');
+      document.getElementById('progress-container').classList.add('hidden');
     }
 
     async function lihatDetailSoal(kode) {
@@ -642,10 +625,11 @@
         const result = await res.json();
         let html = '';
         result.data.forEach((s, i) => {
+          let imgSrc = getDirectImageUrl(s.gambar); // Gunakan konverter
           html += `<div class="p-3 border bg-white rounded shadow-sm text-sm">
             <p class="font-bold text-blue-600">No ${i+1}.</p>
             <div class="mb-2 text-gray-700">${s.pertanyaan}</div>
-            ${s.gambar ? `<img src="${s.gambar}" class="h-16 mb-2 border rounded">` : ''}
+            ${imgSrc ? `<img src="${imgSrc}" class="max-h-48 mb-2 border rounded object-contain">` : ''}
             <p class="text-xs text-gray-600">A. ${s.a} | B. ${s.b} | C. ${s.c} | D. ${s.d}</p>
             <p class="text-xs font-bold text-green-600 mt-1">Kunci: ${s.kunci} (Bobot: ${s.bobot})</p>
           </div>`;
@@ -655,9 +639,6 @@
     }
     function tutupDetailEdit() { document.getElementById('detail-soal-edit').classList.add('hidden'); }
 
-    // ==========================================
-    // FUNGSI REKAP UJIAN GURU
-    // ==========================================
     async function loadDropdownRekap() {
       const select = document.getElementById('select-rekap');
       select.innerHTML = '<option value="">Sedang memuat...</option>';
