@@ -251,6 +251,7 @@
     }
 
     let dataRekapSaatIni = [];
+    let bankSoalSaatIni = []; // Menyimpan soal asli dari database
     let barisEditAktif = 0;
     let detailEditAktif = [];
 
@@ -258,17 +259,23 @@
       const kode = document.getElementById('select-rekap').value;
       if(!kode) return alert('Pilih paket dulu!');
       const tbody = document.getElementById('tabel-rekap-nilai');
-      tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center">Menarik data nilai...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center">Menarik data nilai dan soal dari database...</td></tr>`;
       
       try {
+        // 1. Tarik Bank Soal (Untuk Modal Popup Penilaian)
+        const resSoal = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getBankSoal', kode_soal: kode }) });
+        const resultSoal = await resSoal.json();
+        bankSoalSaatIni = resultSoal.data;
+
+        // 2. Tarik Data Rekap Ujian
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) });
         const result = await res.json();
         dataRekapSaatIni = result.data;
+
         if(dataRekapSaatIni.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center">Belum ada siswa yang mengerjakan ujian.</td></tr>`;
         
         let html = '';
         dataRekapSaatIni.forEach((s, i) => {
-          // Tombol Aksi diubah menjadi Lihat & Nilai (Membuka Popup Modal)
           html += `<tr class="border-b hover:bg-gray-50">
             <td class="p-3 text-center">${s.nis}</td>
             <td class="p-3 font-semibold">${s.nama}</td>
@@ -291,50 +298,59 @@
       barisEditAktif = index;
       document.getElementById('nama-siswa-penilaian').innerText = s.nama;
 
-      // Parse JSON Jawaban Siswa
+      // Parse JSON Jawaban Siswa yang sudah diringkas
       try { detailEditAktif = JSON.parse(s.detail); } catch(e) { detailEditAktif = []; }
 
       const container = document.getElementById('container-detail-jawaban');
       let html = '';
 
-      if(detailEditAktif.length === 0) {
-        html = '<p class="text-center text-gray-500 py-10 font-bold">Data detail jawaban siswa ini tidak ditemukan atau siswa ujian menggunakan versi aplikasi yang lama.</p>';
+      if(detailEditAktif.length === 0 || bankSoalSaatIni.length === 0) {
+        html = '<p class="text-center text-gray-500 py-10 font-bold">Data tidak sinkron atau siswa belum mengirim jawaban.</p>';
       } else {
-        detailEditAktif.forEach((d, i) => {
-          let isEssay = d.tipe === 'ESSAY';
-          let txtJawabanSiswa = Array.isArray(d.jawaban_siswa) ? d.jawaban_siswa.join(', ') : d.jawaban_siswa;
-          let imgHtml = d.gambar ? `<img src="${getDirectImageUrl(d.gambar)}" class="max-h-40 rounded border shadow-sm mb-3">` : '';
+        // MENGGABUNGKAN (MAPPING) SOAL DARI DATABASE DENGAN JAWABAN SISWA
+        bankSoalSaatIni.forEach((soalDB, i) => {
+          
+          // Cari jawaban siswa berdasarkan No Soal
+          let d = detailEditAktif.find(ans => ans.no === (i + 1)) || detailEditAktif[i] || { jaw: '-', sk: 0 };
+          
+          let isEssay = soalDB.tipe === 'ESSAY';
+          // Membaca key json versi ringkas (.jaw dan .sk) atau versi lama (.jawaban_siswa dan .skor)
+          let jawabanSiswa = d.jaw !== undefined ? d.jaw : (d.jawaban_siswa || '-');
+          let skorSiswa = d.sk !== undefined ? d.sk : (d.skor || 0);
+
+          let txtJawabanSiswa = Array.isArray(jawabanSiswa) ? jawabanSiswa.join(', ') : jawabanSiswa;
+          let imgHtml = soalDB.gambar ? `<img src="${getDirectImageUrl(soalDB.gambar)}" class="max-h-40 rounded border shadow-sm mb-3 object-contain">` : '';
 
           let skorBadge = '';
           if(isEssay) {
-             // Jika ESSAY: Munculkan Input Box Penilaian
+             // Form Nilai Manual Essay
              skorBadge = `
                <div class="flex items-center gap-3 mt-4 bg-yellow-50 p-4 rounded-xl border border-yellow-200">
                  <span class="font-bold text-yellow-800">Berikan Nilai Manual Essay:</span>
-                 <input type="number" id="input-skor-${i}" value="${d.skor || 0}" max="${d.bobot}" min="0" class="w-24 p-2 border-2 border-yellow-400 rounded-lg outline-none text-center font-black text-yellow-700 text-lg">
-                 <span class="font-bold text-gray-500">/ ${d.bobot}</span>
+                 <input type="number" id="input-skor-${i}" value="${skorSiswa || 0}" max="${soalDB.bobot}" min="0" class="w-24 p-2 border-2 border-yellow-400 rounded-lg outline-none text-center font-black text-yellow-700 text-lg">
+                 <span class="font-bold text-gray-500">/ ${soalDB.bobot}</span>
                </div>
              `;
           } else {
-             // Jika PG/Otomatis: Hanya tampilkan Skor
-             let color = d.skor > 0 ? 'text-green-600 bg-green-50 border-green-200' : 'text-red-500 bg-red-50 border-red-200';
-             skorBadge = `<div class="mt-4 p-3 rounded-lg border inline-block ${color}"><p class="text-sm font-bold">Skor Otomatis: ${d.skor} / ${d.bobot}</p></div>`;
+             // Skor Otomatis PG
+             let color = skorSiswa > 0 ? 'text-green-600 bg-green-50 border-green-200' : 'text-red-500 bg-red-50 border-red-200';
+             skorBadge = `<div class="mt-4 p-3 rounded-lg border inline-block ${color}"><p class="text-sm font-bold">Skor Otomatis: ${skorSiswa} / ${soalDB.bobot}</p></div>`;
           }
 
           html += `
           <details class="bg-white border rounded-xl shadow-sm group mb-3">
             <summary class="p-4 font-semibold text-gray-700 bg-blue-50 rounded-t-xl cursor-pointer outline-none hover:bg-blue-100 flex justify-between items-center list-none border-b border-blue-200">
-              <span class="text-blue-800">Soal No. ${d.no} - Tipe: ${d.tipe}</span>
-              <span class="text-xs font-bold text-blue-500 border border-blue-300 px-2 py-1 rounded bg-white">Lihat Detail ▼</span>
+              <span class="text-blue-800">Soal No. ${i + 1} - Tipe: ${soalDB.tipe}</span>
+              <span class="text-xs font-bold text-blue-500 border border-blue-300 px-2 py-1 rounded bg-white shadow-sm">Lihat Detail ▼</span>
             </summary>
             <div class="p-5 text-sm text-gray-800 border-x border-b rounded-b-xl">
-              <div class="mb-4 text-base">${d.pertanyaan}</div>
+              <div class="mb-4 text-base leading-relaxed">${soalDB.pertanyaan}</div>
               ${imgHtml}
               <div class="bg-gray-100 p-4 rounded-lg mb-3 border border-gray-200">
                 <p class="font-bold text-gray-500 text-xs uppercase mb-1">Jawaban Siswa (Terkunci):</p>
                 <p class="font-bold text-gray-900 text-lg">${txtJawabanSiswa}</p>
               </div>
-              <p class="text-sm font-semibold text-gray-600 bg-gray-50 p-2 rounded inline-block border">Kunci Sistem: <span class="font-bold text-black">${d.kunci}</span></p>
+              <p class="text-sm font-semibold text-gray-600 bg-gray-50 p-2 rounded inline-block border">Kunci Sistem: <span class="font-bold text-black">${soalDB.kunci}</span></p>
               ${skorBadge}
             </div>
           </details>`;
@@ -353,18 +369,21 @@
       const s = dataRekapSaatIni[barisEditAktif];
       let totalEssay = 0;
 
-      // Ambil seluruh inputan skor essai yang baru
-      detailEditAktif.forEach((d, i) => {
-        if(d.tipe === 'ESSAY') {
+      // Ambil skor essai yang diketik oleh Guru dan update ke detail JSON
+      bankSoalSaatIni.forEach((soalDB, i) => {
+        if(soalDB.tipe === 'ESSAY') {
           let val = document.getElementById(`input-skor-${i}`).value;
-          d.skor = Number(val) || 0;
-        }
-        if(d.tipe === 'ESSAY') {
-          totalEssay += d.skor;
+          let skorBaru = Number(val) || 0;
+          totalEssay += skorBaru;
+
+          let target = detailEditAktif.find(d => d.no === (i + 1)) || detailEditAktif[i];
+          if (target) {
+             if (target.sk !== undefined) target.sk = skorBaru;
+             else target.skor = skorBaru;
+          }
         }
       });
 
-      // Kalkulasi total akhir
       let totalPG = Number(s.nilai_pg) || 0;
       let finalTotal = totalPG + totalEssay;
 
@@ -374,7 +393,7 @@
           baris: s.baris,
           nilai_essay: totalEssay,
           total: finalTotal,
-          detail: detailEditAktif // Kirim JSON terbaru
+          detail: detailEditAktif // Kirim JSON ringan yang sudah diperbarui skornya
         }
       };
 
@@ -387,7 +406,7 @@
         alert(result.pesan);
         if(result.status === 'success') {
           tutupModalPenilaian();
-          tampilkanRekap(); // Refresh data di tabel utama
+          tampilkanRekap(); 
         }
       } catch(e) {
         alert('Gagal menyimpan penilaian.');
