@@ -17,7 +17,6 @@
     .ql-toolbar.ql-snow { border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; background: #f9fafb; }
     .ql-container.ql-snow { border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
     .progress-bar-fill { transition: width 0.4s ease; }
-    /* Pastikan gambar di dalam editor dan view tidak melebar melebihi kontainer */
     img { max-width: 100%; height: auto; }
   </style>
 </head>
@@ -194,14 +193,29 @@
     document.getElementById('nama-guru-login').innerText = user.nama;
     let isEditMode = false;
 
-    // FUNGSI KONVERSI URL GOOGLE DRIVE (Agar gambar lama muncul)
+    // FUNGSI KONVERSI URL GOOGLE DRIVE YANG SANGAT KUAT
+    // Mengubah link apapun dari Drive menjadi lh3.googleusercontent.com yang tidak diblokir browser
     function getDirectImageUrl(url) {
       if (!url) return '';
-      if (url.includes('file/d/')) {
-        let match = url.match(/\/d\/(.+?)\//);
-        if (match) return "https://drive.google.com/uc?export=view&id=" + match[1];
+      let fileId = '';
+
+      // Ekstrak ID dari format lama (file/d/ID/view)
+      if (url.includes('/file/d/')) {
+        let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match) fileId = match[1];
       }
-      return url;
+      // Ekstrak ID dari format export=view atau uc?id=ID
+      else if (url.includes('id=')) {
+        let match = url.match(/id=([a-zA-Z0-9_-]+)/);
+        if (match) fileId = match[1];
+      }
+
+      if (fileId) {
+        // Trik terbaru untuk bypass CORS di tag <img> Google Drive
+        return "https://lh3.googleusercontent.com/d/" + fileId;
+      }
+      
+      return url; // Return apa adanya jika bukan link Drive (misal base64 sementara)
     }
 
     function switchMenu(targetId) {
@@ -319,7 +333,7 @@
       let html = '';
       keranjangSoal.forEach((s, index) => {
         let txtPG = s.tipe.includes('PG') ? `A. ${s.opsi.A}<br>B. ${s.opsi.B}<br>C. ${s.opsi.C}<br>D. ${s.opsi.D}` : '';
-        let imgSrc = getDirectImageUrl(s.gambar); // Gunakan konverter
+        let imgSrc = getDirectImageUrl(s.gambar); 
         
         html += `
           <div class="bg-white border rounded-lg shadow-sm">
@@ -625,7 +639,7 @@
         const result = await res.json();
         let html = '';
         result.data.forEach((s, i) => {
-          let imgSrc = getDirectImageUrl(s.gambar); // Gunakan konverter
+          let imgSrc = getDirectImageUrl(s.gambar);
           html += `<div class="p-3 border bg-white rounded shadow-sm text-sm">
             <p class="font-bold text-blue-600">No ${i+1}.</p>
             <div class="mb-2 text-gray-700">${s.pertanyaan}</div>
