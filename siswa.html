@@ -176,7 +176,18 @@
 
         if (result.status === 'success') {
           dataUjian = result.ujian;
-          listSoal = result.soal;
+          
+          // MENGAMBIL SOAL DAN MENYIMPAN NOMOR ASLI
+          listSoal = result.soal.map((soal, index) => {
+            soal.original_no = index + 1; // Simpan nomor urut dari database
+            return soal;
+          });
+
+          // ACAK URUTAN SOAL (FISHER-YATES SHUFFLE)
+          for (let i = listSoal.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [listSoal[i], listSoal[j]] = [listSoal[j], listSoal[i]];
+          }
 
           document.getElementById('header-mapel').innerText = `${dataUjian.mapel} (${dataUjian.kode})`;
           document.getElementById('header-kelas').innerText = `Kelas: ${dataUjian.kelas}`;
@@ -222,6 +233,7 @@
       indexAktif = index;
       const s = listSoal[index];
 
+      // Siswa melihat urutan soal secara normal (1, 2, 3...) meski aslinya teracak
       document.getElementById('soal-nomor-badge').innerText = `Soal No. ${index + 1} dari ${listSoal.length}`;
       document.getElementById('soal-tipe-badge').innerText = `(${s.tipe})`;
       document.getElementById('soal-bobot-badge').innerText = `Bobot: ${s.bobot}`;
@@ -316,7 +328,6 @@
       let totalSkorPG = 0;
       let detailJawaban = [];
 
-      // Proses pengumpulan rincian jawaban (Sangat Penting untuk Penilaian Guru)
       listSoal.forEach((s, idx) => {
         let jaw = jawabanSiswa[idx];
         let kunci = (s.kunci || '').toString().trim().toUpperCase();
@@ -334,18 +345,16 @@
 
         totalSkorPG += skor;
 
-        // Menyusun objek per nomor untuk direkap di halaman Guru
+        // SIMPAN MENGGUNAKAN NOMOR ASLI SOAL DARI DATABASE (AGAR TIDAK TERTUKAR DI GURU)
         detailJawaban.push({
-          no: idx + 1,
-          tipe: s.tipe,
-          pertanyaan: s.pertanyaan,
-          gambar: s.gambar,
-          kunci: kunci,
-          bobot: bobot,
-          jawaban_siswa: jaw || '-',
-          skor: skor // skor ini adalah nilai otomatis
+          no: s.original_no, 
+          jaw: jaw || '-',
+          sk: skor
         });
       });
+
+      // MENGURUTKAN KEMBALI JAWABAN BERDASARKAN NOMOR ASLI (1, 2, 3...)
+      detailJawaban.sort((a, b) => a.no - b.no);
 
       const payload = {
         action: 'simpanHasilUjian',
@@ -356,7 +365,7 @@
           nilai_pg: totalSkorPG,
           nilai_essay: 0,
           total: totalSkorPG,
-          detail: detailJawaban // Kirim kode rincian json
+          detail: detailJawaban
         }
       };
 
