@@ -9,18 +9,18 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
     body { font-family: 'Poppins', sans-serif; background-color: #f1f5f9; }
-    /* Kustomisasi Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     .modal-overlay { background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
-    /* Animasi Sidebar Active */
     .sidebar-active { background-color: #2563eb; color: #ffffff; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4); }
   </style>
 </head>
@@ -34,7 +34,7 @@
   <div class="w-64 bg-[#1e293b] text-gray-400 flex flex-col h-full z-20 shadow-xl overflow-y-auto">
     <div class="p-5 flex items-center gap-3 border-b border-slate-700/50 mb-2 sticky top-0 bg-[#1e293b] z-10">
       <img src="https://i.ibb.co.com/d4jMLcQk/Gemini-Generated-Image-kfq5nlkfq5nlkfq5-removebg-preview.png" alt="Logo" class="w-8 h-8 object-contain">
-      <h1 class="text-white font-bold text-base tracking-wide">SMA INDONESIA</h1>
+      <h1 class="text-white font-bold text-base tracking-wide">PANEL ADMIN</h1>
     </div>
 
     <div class="flex-1 py-2 flex flex-col gap-1 pr-4">
@@ -118,7 +118,7 @@
             </div>
             <div>
               <h2 class="text-2xl font-bold text-gray-800">Selamat Datang, Administrator!</h2>
-              <p class="text-gray-500 text-sm mt-1">Ini adalah ringkasan aktivitas sekolah Anda hari ini.</p>
+              <p class="text-gray-500 text-sm mt-1">Pantau progres dan kelola pengguna CBT dengan mudah.</p>
             </div>
           </div>
           <div class="bg-[#1e293b] rounded-3xl p-6 shadow-lg text-white flex items-center gap-5 relative overflow-hidden">
@@ -178,51 +178,62 @@
           </div>
         </div>
         
-        <div class="flex items-center gap-4 mb-5 pl-2">
-          <h2 class="text-xl font-bold text-gray-800">Mata Pelajaran Ujian</h2>
-          <button onclick="switchMenu('view-bank-soal')" class="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow-sm"><i class="fas fa-plus mr-1"></i> Tambah Mapel</button>
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-gray-800">Progres Penyelesaian Ujian Siswa</h2>
+            <button onclick="loadDashboard()" class="text-blue-500 hover:text-blue-700 transition"><i class="fas fa-sync-alt"></i> Refresh Diagram</button>
+          </div>
+          <p class="text-sm text-gray-500 mb-4">Grafik ini membandingkan jumlah siswa yang <b>Sudah Selesai</b> dan <b>Belum Mengerjakan</b> berdasarkan setiap ujian yang aktif / terdaftar.</p>
+          <div class="relative w-full h-80">
+            <canvas id="ujianChart"></canvas>
+          </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="dashboard-mapel-container">
-          <p class="text-gray-500 italic text-sm pl-2">Memuat data ujian...</p>
-        </div>
+
       </div>
 
       <div id="view-manajemen-user" class="admin-menu hidden">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">Manajemen Pengguna</h2>
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Manajemen Pengguna & Kelas</h2>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
           <div class="flex border-b border-gray-200">
-            <button onclick="switchTabUser('siswa')" id="tab-btn-siswa" class="flex-1 py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 bg-blue-50/50 transition">Data Siswa</button>
+            <button onclick="switchTabUser('siswa')" id="tab-btn-siswa" class="flex-1 py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 bg-blue-50/50 transition">Data Siswa / Manajemen Kelas</button>
             <button onclick="switchTabUser('guru')" id="tab-btn-guru" class="flex-1 py-4 text-center font-bold text-gray-500 hover:text-blue-600 hover:bg-blue-50/30 transition border-b-2 border-transparent">Data Guru</button>
           </div>
           
-          <div id="tab-content-siswa" class="p-6">
+          <div id="tab-content-siswa" class="p-6 bg-gray-50/30">
+            <div class="mb-6">
+              <h3 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2">Ringkasan Jumlah Siswa Per Kelas</h3>
+              <div id="kelas-cards-container" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <p class="text-sm text-gray-500 italic">Memuat data kelas...</p>
+              </div>
+            </div>
+
             <div class="flex justify-between items-center mb-6">
-              <h3 class="text-lg font-bold text-gray-800">Daftar Siswa</h3>
+              <h3 class="text-lg font-bold text-gray-800">Daftar Detail Siswa</h3>
               <div class="flex gap-2">
-                <button onclick="loadRekapSiswa()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button onclick="loadRekapSiswa()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-300 transition"><i class="fas fa-sync-alt"></i> Refresh</button>
                 <button onclick="bukaModalTambahSiswa()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 shadow-sm transition"><i class="fas fa-plus"></i> Tambah Siswa</button>
               </div>
             </div>
-            <div class="overflow-x-auto border border-gray-200 rounded-xl">
+            <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white">
               <table class="w-full text-left border-collapse whitespace-nowrap">
-                <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b text-center font-semibold">Foto</th><th class="p-4 border-b font-semibold">NIS</th><th class="p-4 border-b font-semibold">Nama Lengkap</th><th class="p-4 border-b font-semibold">Kelas</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b text-center font-semibold">Foto</th><th class="p-4 border-b font-semibold">NIS</th><th class="p-4 border-b font-semibold">Nama Lengkap</th><th class="p-4 border-b font-semibold">Kelas</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
                 <tbody id="tabel-rekap-siswa"><tr><td colspan="7" class="p-8 text-center text-gray-500 text-sm">Klik Refresh Data...</td></tr></tbody>
               </table>
             </div>
           </div>
 
-          <div id="tab-content-guru" class="p-6 hidden">
+          <div id="tab-content-guru" class="p-6 hidden bg-gray-50/30">
             <div class="flex justify-between items-center mb-6">
               <h3 class="text-lg font-bold text-gray-800">Daftar Guru</h3>
               <div class="flex gap-2">
-                <button onclick="loadRekapGuru()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button onclick="loadRekapGuru()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-300 transition"><i class="fas fa-sync-alt"></i> Refresh</button>
                 <button onclick="bukaModalTambahGuru()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 shadow-sm transition"><i class="fas fa-plus"></i> Tambah Guru</button>
               </div>
             </div>
-            <div class="overflow-x-auto border border-gray-200 rounded-xl">
+            <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white">
               <table class="w-full text-left border-collapse whitespace-nowrap">
-                <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIP/ID</th><th class="p-4 border-b font-semibold">Nama Guru</th><th class="p-4 border-b font-semibold">Username</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIP/ID</th><th class="p-4 border-b font-semibold">Nama Guru</th><th class="p-4 border-b font-semibold">Username</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
                 <tbody id="tabel-rekap-guru"><tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">Klik Refresh Data...</td></tr></tbody>
               </table>
             </div>
@@ -376,6 +387,7 @@
   <script src="script.js"></script>
   <script>
     const user = checkAuth('admin');
+    let chartInstance = null; // Menyimpan instance diagram chart.js
     
     // UTILITIES
     function getBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); }); }
@@ -432,9 +444,9 @@
     function bukaModalTambahSiswa() { ['tambah-nis-siswa','tambah-nama-siswa','tambah-kelas-siswa','tambah-pass-siswa','tambah-foto-siswa'].forEach(i => document.getElementById(i).value=''); bukaModal('modal-tambah-siswa'); }
     function bukaModalTambahGuru() { ['tambah-nip-guru','tambah-nama-guru','tambah-user-guru','tambah-pass-guru'].forEach(i => document.getElementById(i).value=''); bukaModal('modal-tambah-guru'); }
 
-    // ================= FITUR DASHBOARD (Visual Baru) =================
+    // ================= FITUR DASHBOARD DENGAN CHART.JS =================
     async function loadDashboard() {
-      showLoader('Menyinkronkan Dashboard...');
+      showLoader('Menyinkronkan Dashboard & Chart...');
       try {
         const [resSiswa, resGuru, resUjian] = await Promise.all([
           fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }).then(r=>r.json()),
@@ -442,37 +454,84 @@
           fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }).then(r=>r.json())
         ]);
 
-        document.getElementById('dash-siswa').innerText = resSiswa.data ? resSiswa.data.length : 0;
+        const siswaData = resSiswa.data || [];
+        document.getElementById('dash-siswa').innerText = siswaData.length;
         document.getElementById('dash-guru').innerText = resGuru.data ? resGuru.data.length : 0;
         
-        let aktif = 0; let totalSoal = 0; // Estimasi jika ingin hitung riil
-        if(resUjian.data) {
+        let aktif = 0; 
+        let labels = [];
+        let dataSelesai = [];
+        let dataBelum = [];
+
+        if(resUjian.data && resUjian.data.length > 0) {
           document.getElementById('dash-ujian').innerText = resUjian.data.length;
-          resUjian.data.forEach(u => { if(u.status === 'Aktif') aktif++; });
-          // Render Mapel Cards
-          let htmlMapel = '';
-          resUjian.data.forEach(u => {
-            htmlMapel += `
-            <div class="bg-blue-600 rounded-3xl p-6 text-white relative overflow-hidden shadow-lg shadow-blue-500/30 cursor-pointer hover:scale-[1.03] transition-all" onclick="switchMenu('view-bank-soal')">
-              <div class="absolute right-0 bottom-0 opacity-10 text-8xl translate-x-4 translate-y-4"><i class="fas fa-graduation-cap"></i></div>
-              <span class="bg-white/20 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-sm">${u.kode}</span>
-              <h3 class="text-2xl font-bold mt-4 mb-1 truncate">${u.mapel}</h3>
-              <p class="text-sm text-blue-100 font-medium">${u.kelas} &bull; ${u.waktu} Menit</p>
-            </div>`;
+
+          // Ambil rekap untuk masing-masing ujian guna membangun diagram chart
+          const rekapPromises = resUjian.data.map(u => fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: u.kode }) }).then(r=>r.json()) );
+          const rekapResults = await Promise.all(rekapPromises);
+
+          resUjian.data.forEach((u, idx) => {
+            if(u.status === 'Aktif') aktif++;
+
+            // Hitung siswa di kelas ujian tsb
+            const totalSiswaKelas = siswaData.filter(s => s.kelas === u.kelas).length;
+            // Hitung siswa yg sdh ngerjakan (ada di tabel Hasil_Ujian)
+            const siswaSelesai = rekapResults[idx].data ? rekapResults[idx].data.length : 0;
+            
+            let belumSelesai = totalSiswaKelas - siswaSelesai;
+            if(belumSelesai < 0) belumSelesai = 0;
+
+            labels.push(`${u.mapel} (${u.kelas})`);
+            dataSelesai.push(siswaSelesai);
+            dataBelum.push(belumSelesai);
           });
-          document.getElementById('dashboard-mapel-container').innerHTML = htmlMapel || '<p class="text-gray-500 italic text-sm pl-2">Belum ada ujian yang dibuat oleh guru.</p>';
         } else {
-           document.getElementById('dashboard-mapel-container').innerHTML = '<p class="text-gray-500 italic text-sm pl-2">Belum ada ujian.</p>';
+           document.getElementById('dash-ujian').innerText = 0;
         }
         document.getElementById('dash-sesi').innerText = aktif;
 
+        // Merender / Refresh Diagram Chart.js
+        const ctx = document.getElementById('ujianChart');
+        if(chartInstance) chartInstance.destroy();
+        if(ctx) {
+            chartInstance = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: labels.length > 0 ? labels : ['Belum ada ujian yang dibuat'],
+                datasets: [
+                  {
+                    label: 'Selesai Mengerjakan',
+                    data: dataSelesai.length > 0 ? dataSelesai : [0],
+                    backgroundColor: '#4ade80',
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                  },
+                  {
+                    label: 'Belum Mengerjakan',
+                    data: dataBelum.length > 0 ? dataBelum : [0],
+                    backgroundColor: '#f87171',
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                  }
+                ]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                plugins: {
+                  legend: { position: 'bottom' }
+                }
+              }
+            });
+        }
       } catch(e) { console.log("Gagal memuat metrik dashboard"); }
       hideLoader();
     }
     // Load pertama kali
     loadDashboard();
 
-    // ================= CRUD SISWA (Via Tab & Modal) =================
+    // ================= CRUD SISWA (Via Tab, Modal & Info Kelas) =================
     async function simpanSiswaBaru() {
       let fileInput = document.getElementById('tambah-foto-siswa'); let base64Foto = ""; if (fileInput.files.length > 0) base64Foto = await getBase64(fileInput.files[0]);
       const data = { nis: document.getElementById('tambah-nis-siswa').value, nama: document.getElementById('tambah-nama-siswa').value, kelas: document.getElementById('tambah-kelas-siswa').value, password: document.getElementById('tambah-pass-siswa').value, foto: base64Foto };
@@ -485,8 +544,32 @@
       const tbody = document.getElementById('tabel-rekap-siswa'); showLoader('Menarik Data Siswa...');
       try { 
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }); const result = await res.json(); hideLoader(); 
-        if(result.data.length === 0) return tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">Belum ada data siswa.</td></tr>`; 
-        let html = ''; result.data.forEach((s, i) => { 
+        
+        // --- MEMBUAT WIDGET KARTU PER KELAS ---
+        const siswaData = result.data || [];
+        const kelasCount = {};
+        siswaData.forEach(s => { kelasCount[s.kelas] = (kelasCount[s.kelas] || 0) + 1; });
+        
+        let cardHtml = '';
+        const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500'];
+        let colorIdx = 0;
+        for (const [kelas, count] of Object.entries(kelasCount)) {
+            let bgColor = colors[colorIdx % colors.length];
+            cardHtml += `
+            <div class="${bgColor} rounded-xl p-5 text-white shadow-sm flex items-center justify-between hover:scale-105 transition-transform">
+               <div>
+                 <h3 class="text-xl font-bold">Kelas ${kelas}</h3>
+                 <p class="text-sm font-medium mt-1 bg-white/20 px-2 py-1 rounded inline-block">${count} Siswa</p>
+               </div>
+               <i class="fas fa-users text-4xl opacity-40"></i>
+            </div>`;
+            colorIdx++;
+        }
+        document.getElementById('kelas-cards-container').innerHTML = cardHtml || '<p class="text-gray-500 italic text-sm">Belum ada kelas yang terdaftar.</p>';
+        // --------------------------------------
+
+        if(siswaData.length === 0) return tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">Belum ada data siswa.</td></tr>`; 
+        let html = ''; siswaData.forEach((s, i) => { 
           let jsData = JSON.stringify(s).replace(/'/g, "\\'"); let urlFoto = getDirectImageUrl(s.foto);
           let imgTbl = urlFoto ? `<img src="${urlFoto}" class="h-10 w-10 object-cover rounded-full border shadow-sm mx-auto">` : '<div class="h-10 w-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center text-xs mx-auto border border-blue-100"><i class="fas fa-user"></i></div>';
           html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-center">${imgTbl}</td><td class="p-4 text-sm font-bold text-gray-800">${s.nis}</td><td class="p-4 text-sm">${s.nama}</td><td class="p-4 text-sm">${s.kelas}</td><td class="p-4 text-sm font-mono text-gray-400">${s.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditSiswa(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg hover:bg-yellow-200 transition flex items-center justify-center"><i class="fas fa-pen"></i></button> <button onclick="hapusSiswa('${s.nis}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg hover:bg-red-200 transition flex items-center justify-center"><i class="fas fa-trash"></i></button></td></tr>`; 
@@ -501,11 +584,11 @@
       const data = { old_nis: old_nis_edit, nis: document.getElementById('edit-nis-siswa').value, nama: document.getElementById('edit-nama-siswa').value, kelas: document.getElementById('edit-kelas-siswa').value, password: document.getElementById('edit-pass-siswa').value, foto: base64Foto };
       if(!data.nama || !data.kelas || !data.password || !data.nis) return Swal.fire('Oops!', 'Teks form tidak boleh kosong!', 'warning');
       showLoader('Memperbarui Data & Foto...');
-      try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editSiswa', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Berhasil!', result.pesan, 'success'); tutupModal('modal-edit-siswa'); loadRekapSiswa(); } else { Swal.fire('Gagal!', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error!','Gagal.','error'); }
+      try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editSiswa', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Berhasil!', result.pesan, 'success'); tutupModal('modal-edit-siswa'); loadRekapSiswa(); } else { Swal.fire('Gagal!', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error!','Gagal.','error');} 
     }
     function hapusSiswa(nis) { Swal.fire({ title: 'Hapus Siswa?', text: "Data tidak bisa dikembalikan.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Hapus!' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusSiswa', nis }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapSiswa(); } catch(e) { hideLoader(); } } }); }
 
-    // ================= CRUD GURU (Via Tab & Modal) =================
+    // ================= CRUD GURU =================
     async function simpanGuruBaru() {
       const data = { nip: document.getElementById('tambah-nip-guru').value, nama: document.getElementById('tambah-nama-guru').value, username: document.getElementById('tambah-user-guru').value, password: document.getElementById('tambah-pass-guru').value };
       if(!data.nip || !data.nama || !data.username || !data.password) return Swal.fire('Oops!', 'Isi semua!', 'warning');
@@ -513,11 +596,11 @@
     }
     async function loadRekapGuru() {
       const tbody = document.getElementById('tabel-rekap-guru'); showLoader('Menarik Data...');
-      try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getGuru' }) }); const result = await res.json(); hideLoader(); if(result.data.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">Kosong.</td></tr>`; let html = ''; result.data.forEach((g, i) => { let jsData = JSON.stringify(g).replace(/'/g, "\\'"); html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-sm font-bold">${g.nip}</td><td class="p-4 text-sm">${g.nama}</td><td class="p-4 text-sm">${g.username}</td><td class="p-4 text-sm font-mono text-gray-400">${g.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditGuru(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-yellow-200 transition"><i class="fas fa-pen"></i></button> <button onclick="hapusGuru('${g.nip}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button></td></tr>`; }); tbody.innerHTML = html; } catch(e) { hideLoader(); }
+      try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getGuru' }) }); const result = await res.json(); hideLoader(); if(result.data.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center">Kosong.</td></tr>`; let html = ''; result.data.forEach((g, i) => { let jsData = JSON.stringify(g).replace(/'/g, "\\'"); html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-sm font-bold">${g.nip}</td><td class="p-4 text-sm">${g.nama}</td><td class="p-4 text-sm">${g.username}</td><td class="p-4 text-sm font-mono text-gray-400">${g.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditGuru(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-yellow-200 transition"><i class="fas fa-pen"></i></button> <button onclick="hapusGuru('${g.nip}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button></td></tr>`; }); tbody.innerHTML = html; } catch(e) { hideLoader(); }
     }
     function bukaEditGuru(data) { document.getElementById('edit-nip-guru').value = data.nip; document.getElementById('edit-nama-guru').value = data.nama; document.getElementById('edit-user-guru').value = data.username; document.getElementById('edit-pass-guru').value = data.password; bukaModal('modal-edit-guru'); }
     async function simpanEditGuru() { const data = { nip: document.getElementById('edit-nip-guru').value, nama: document.getElementById('edit-nama-guru').value, username: document.getElementById('edit-user-guru').value, password: document.getElementById('edit-pass-guru').value }; showLoader('Memperbarui...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editGuru', data }) }); await res.json(); hideLoader(); tutupModal('modal-edit-guru'); loadRekapGuru(); } catch(e) { hideLoader(); } }
-    function hapusGuru(nip) { Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya!' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusGuru', nip }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapGuru(); } catch(e) { hideLoader(); } } }); }
+    function hapusGuru(nip) { Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya!' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusGuru', nip }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapGuru(); } catch(e) { hideLoader(); } } }); }
 
     // ================= KARTU UJIAN & SINKRONISASI =================
     async function loadKartuUjian() {
@@ -547,7 +630,7 @@
         }); tbody.innerHTML = html;
       } catch(e) { hideLoader(); }
     }
-    function toggleStatusUjian(kode, targetStatus) { Swal.fire({ title: 'Ubah Status?', text: `Ujian ${kode} akan menjadi ${targetStatus}.`, icon: 'question', showCancelButton: true, confirmButtonColor: targetStatus==='Aktif'?'#16a34a':'#d33', confirmButtonText: `Ya, ${targetStatus}kan!` }).then(async (result) => { if(result.isConfirmed) { let tokenBaru = targetStatus === 'Aktif' ? Math.random().toString(36).substring(2, 7).toUpperCase() : ''; showLoader('Update Status...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjian', kode, status: targetStatus, token: tokenBaru }) }); await res.json(); hideLoader(); loadManajemenUjian(); } catch(e) { hideLoader(); } } }); }
+    function toggleStatusUjian(kode, targetStatus) { Swal.fire({ title: 'Ubah Status?', text: `Ujian ${kode} akan menjadi ${targetStatus}.`, icon: 'question', showCancelButton: true, confirmButtonColor: targetStatus==='Aktif'?'#16a34a':'#d33', confirmButtonText: `Ya, ${targetStatus}kan!` }).then(async (result) => { if(result.isConfirmed) { let tokenBaru = targetStatus === 'Aktif' ? Math.random().toString(36).substring(2, 7).toUpperCase() : ''; showLoader('Update Status...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjian', kode, status: targetStatus, token: tokenBaru }) }); await res.json(); hideLoader(); loadManajemenUjian(); loadDashboard(); } catch(e) { hideLoader(); } } }); }
 
     // ================= REKAP HASIL UJIAN GLOBAL =================
     async function loadDropdownRekapAdmin() { const select = document.getElementById('select-rekap-admin'); select.innerHTML = '<option value="">Memuat Paket...</option>'; try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }); const result = await res.json(); let opts = '<option value="">-- Pilih Kode Ujian --</option>'; result.data.forEach(p => opts += `<option value="${p.kode}">${p.kode} - ${p.mapel} (${p.kelas})</option>`); select.innerHTML = opts; } catch(e) { select.innerHTML = '<option value="">Gagal</option>'; } }
