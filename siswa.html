@@ -67,7 +67,7 @@
             <tr class="border-b"><td class="py-2.5 font-bold text-gray-500">Nama Lengkap</td><td class="py-2.5 font-bold text-blue-700" id="profil-nama">...</td></tr>
             <tr class="border-b"><td class="py-2.5 font-bold text-gray-500">NISN</td><td class="py-2.5 font-bold text-gray-900" id="profil-nisn">...</td></tr>
             <tr class="border-b"><td class="py-2.5 font-bold text-gray-500">Sesi Ujian</td><td class="py-2.5 font-semibold text-gray-800">Sesi 1</td></tr>
-            <tr><td class="py-2.5 font-bold text-gray-500">Waktu Ujian</td><td class="py-2.5 font-semibold text-orange-600 text-xs italic">- (Menunggu Token)</td></tr>
+            <tr><td class="py-2.5 font-bold text-gray-500">Tanggal Ujian</td><td class="py-2.5 font-semibold text-gray-800" id="profil-tanggal">...</td></tr>
           </table>
         </div>
 
@@ -79,16 +79,16 @@
              <ul class="list-decimal list-inside text-sm text-gray-700 space-y-3 mb-6 bg-gray-50 p-5 rounded-xl border border-gray-100 leading-relaxed">
                 <li>Berdoalah sebelum mengerjakan soal ujian.</li>
                 <li>Periksa kembali kesesuaian data diri Anda pada panel <b>Profil Peserta</b>.</li>
-                <li>Masukkan <b>Token</b> ujian yang diberikan oleh Pengawas/Guru Anda ke dalam kolom di bawah.</li>
+                <li>Klik tombol <b>Mulai Ujian</b> di bawah dan masukkan Token yang diberikan oleh Pengawas.</li>
+                <li>Pilih jawaban yang menurut Anda paling benar.</li>
                 <li>Gunakan waktu sebaik-baiknya. Ujian akan otomatis terkirim saat waktu habis.</li>
              </ul>
           </div>
 
-          <div class="bg-blue-50/70 p-6 rounded-xl border border-blue-200 shadow-sm mt-auto">
-            <label class="block font-black text-blue-900 mb-2 text-sm uppercase tracking-wide text-center">🔑 Masukkan Token Ujian</label>
-            <input type="text" id="token-input" placeholder="KODE TOKEN" class="w-full text-center uppercase tracking-widest text-3xl font-black mb-4 p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition shadow-inner text-gray-800">
-            <button onclick="prosesToken()" class="w-full bg-blue-600 text-white font-bold py-3.5 rounded-lg hover:bg-blue-700 transition shadow-md text-base tracking-wide flex justify-center items-center gap-2">
-              PROSES & MULAI UJIAN
+          <div class="bg-blue-50/70 p-6 rounded-xl border border-blue-200 shadow-sm mt-auto text-center">
+            <h3 class="font-bold text-blue-900 mb-4 text-base">Silakan klik tombol di bawah jika Anda sudah siap</h3>
+            <button onclick="mintaToken()" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl hover:bg-blue-700 transition shadow-lg text-lg tracking-wide flex justify-center items-center gap-2">
+              🚀 MULAI UJIAN SEKARANG
             </button>
           </div>
         </div>
@@ -178,8 +178,12 @@
     
     document.getElementById('profil-nama').innerText = user.nama;
     document.getElementById('profil-nis').innerText = user.id;
-    // Karena Sheet Siswa belum ada NISN asli, kita mirroring NIS.
+    // Menggunakan NIS sebagai NISN default
     document.getElementById('profil-nisn').innerText = user.id; 
+
+    // Set Tanggal Ujian (Hari Ini)
+    const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('profil-tanggal').innerText = new Date().toLocaleDateString('id-ID', optionsDate);
 
     let dataUjian = null;
     let listSoal = [];
@@ -234,12 +238,37 @@
     }
 
     // ==========================================
-    // PROSES INPUT TOKEN DAN POPUP KONFIRMASI
+    // POPUP INPUT TOKEN 
     // ==========================================
-    async function prosesToken() {
-      const token = document.getElementById('token-input').value.trim().toUpperCase();
-      if (!token) return Swal.fire('Oops!', 'Masukkan Token Ujian terlebih dahulu!', 'warning');
+    function mintaToken() {
+      Swal.fire({
+        title: 'Masukkan Token',
+        text: 'Token Ujian didapatkan dari Guru/Pengawas Anda',
+        input: 'text',
+        inputPlaceholder: 'KODE TOKEN DISINI',
+        inputAttributes: {
+          style: 'text-transform: uppercase; text-align: center; font-weight: 900; font-size: 1.5rem; letter-spacing: 0.1em;'
+        },
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Verifikasi Token',
+        cancelButtonText: 'Batal',
+        preConfirm: (token) => {
+          if (!token) Swal.showValidationMessage('Token tidak boleh kosong!');
+          return token.trim().toUpperCase();
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          prosesToken(result.value);
+        }
+      });
+    }
 
+    // ==========================================
+    // PROSES VERIFIKASI TOKEN & KONFIRMASI MULAI
+    // ==========================================
+    async function prosesToken(token) {
       showLoader("Memeriksa Token & Menarik Soal dari Database...");
 
       try {
@@ -251,7 +280,6 @@
           dataUjian = result.ujian;
           
           listSoal = result.soal.map((soal, index) => { soal.original_no = index + 1; return soal; });
-          // Acak soal
           for (let i = listSoal.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [listSoal[i], listSoal[j]] = [listSoal[j], listSoal[i]]; }
 
           // POPUP KONFIRMASI MULAI UJIAN (EXAMBROWSER STYLE)
@@ -279,7 +307,6 @@
             allowOutsideClick: false
           }).then((res) => {
             if (res.isConfirmed) {
-              // Jika ditekan mulai, setup environment ujian
               document.getElementById('header-mapel').innerText = `${dataUjian.mapel} (${dataUjian.kode})`;
               document.getElementById('header-kelas').innerText = `Kelas: ${dataUjian.kelas}`;
               document.getElementById('btn-logout').classList.add('hidden'); 
@@ -434,11 +461,9 @@
         }
         totalSkorPG += skor;
 
-        // Simpan menggunakan nomor urut ASLI soal sebelum diacak
         detailJawaban.push({ no: s.original_no, jaw: jaw || '-', sk: skor });
       });
 
-      // Kembalikan ke urutan asli agar tidak tertukar di layar Penilaian Guru
       detailJawaban.sort((a, b) => a.no - b.no);
 
       const payload = { 
@@ -461,6 +486,7 @@
       }
 
       hideLoader();
+      if(!isTimeUp) Swal.fire({ title: 'Berhasil!', text: 'Jawaban Anda telah terkirim.', icon: 'success', timer: 1500, showConfirmButton: false });
       
       document.getElementById('display-skor-akhir').innerText = totalSkorPG;
       document.getElementById('btn-logout').classList.remove('hidden');
