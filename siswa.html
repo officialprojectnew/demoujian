@@ -236,10 +236,11 @@
           document.getElementById('profil-sesi').innerText = result.data.sesi;
           document.getElementById('profil-ruang').innerText = result.data.ruang;
 
-          // FITUR BARU: MUNCULKAN FOTO DI PROFIL SISWA
+          // FITUR BARU: MUNCULKAN FOTO DI PROFIL SISWA DENGAN KONVERTER
           if (result.data.foto) {
+             let urlFoto = getDirectImageUrl(result.data.foto); // <-- Perbaikan Konversi URL ada disini
              let imgContainer = document.querySelector('.bg-gray-50.rounded-xl.overflow-hidden');
-             imgContainer.innerHTML = `<img src="${result.data.foto}" class="w-full h-full object-cover">`;
+             imgContainer.innerHTML = `<img src="${urlFoto}" class="w-full h-full object-cover">`;
           }
 
         } else {
@@ -254,7 +255,6 @@
       }
     }
     fetchProfilKartu();
-
     function getDirectImageUrl(url) {
       if (!url) return '';
       let fileId = '';
