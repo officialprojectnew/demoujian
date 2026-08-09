@@ -112,7 +112,7 @@
           <div class="bg-blue-50/70 p-5 rounded-xl border border-blue-200 shadow-sm mt-auto text-center">
             <h3 class="font-bold text-blue-900 mb-3 text-sm">Silakan klik tombol di bawah jika Anda sudah siap</h3>
             <button onclick="mintaToken()" class="w-full bg-blue-600 text-white font-black py-3.5 rounded-xl hover:bg-blue-700 transition shadow-lg text-base tracking-wide flex justify-center items-center gap-2">
-              🚀 MULAI UJIAN SEKARANG
+              MULAI UJIAN
             </button>
           </div>
         </div>
@@ -166,7 +166,7 @@
             <div class="flex flex-col items-center gap-1"><span class="w-5 h-5 bg-gray-100 rounded-md shadow-sm border border-gray-300"></span>Belum</div>
           </div>
           <button onclick="konfirmasiSelesaiUjian()" class="w-full bg-green-600 text-white font-black py-4 rounded-xl hover:bg-green-700 transition shadow-lg text-sm tracking-wide">
-            🏁 SELESAI & KIRIM UJIAN
+            SELESAI
           </button>
         </div>
       </div>
@@ -180,13 +180,13 @@
         <p class="text-sm text-gray-500 mb-8 font-medium">Jawaban Anda berhasil disimpan dan akan direview oleh guru Anda.</p>
         
         <div class="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 mb-8 shadow-sm">
-          <p class="text-xs text-blue-600 uppercase font-black tracking-widest mb-2">Skor Pilihan Ganda Anda</p>
+          <p class="text-xs text-blue-600 uppercase font-black tracking-widest mb-2">Skor Pilihan Ganda</p>
           <p class="text-6xl font-black text-blue-600 drop-shadow-sm" id="display-skor-akhir">0</p>
           <p class="text-[11px] text-gray-400 mt-3 font-semibold">*Nilai soal Essai menunggu penilaian manual oleh guru.</p>
         </div>
         
         <button onclick="logoutSiswa()" class="w-full bg-gray-800 text-white font-bold py-4 rounded-xl hover:bg-gray-900 transition shadow-lg tracking-wide">
-          Keluar Ke Beranda (Logout)
+          Logout
         </button>
       </div>
     </div>
@@ -276,12 +276,12 @@
     function logoutSiswa() {
       Swal.fire({
         title: 'Logout?',
-        text: "Anda akan keluar dari portal CBT.",
+        text: "Anda yakin ingin keluar?.",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, Logout!',
+        confirmButtonText: 'Ya',
         cancelButtonText: 'Batal'
       }).then((result) => {
         if (result.isConfirmed) logout(); 
@@ -291,7 +291,7 @@
     function mintaToken() {
       Swal.fire({
         title: 'Masukkan Token Ujian',
-        text: 'Token Ujian didapatkan dari Guru/Pengawas Anda',
+        text: 'Token Ujian didapatkan dari Admin',
         input: 'text',
         inputPlaceholder: 'KODE TOKEN DISINI',
         inputAttributes: { style: 'text-transform: uppercase; text-align: center; font-weight: 900; font-size: 1.5rem; letter-spacing: 0.1em;' },
@@ -342,7 +342,7 @@
             showCancelButton: true,
             confirmButtonColor: '#16a34a',
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Mulai Ujian Sekarang',
+            confirmButtonText: 'Mulai Ujian',
             cancelButtonText: 'Batal',
             allowOutsideClick: false
           }).then((res) => {
@@ -471,7 +471,7 @@
         showCancelButton: true,
         confirmButtonColor: '#16a34a',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, Kirim Sekarang!',
+        confirmButtonText: 'Ya',
         cancelButtonText: 'Batal'
       }).then((result) => {
         if (result.isConfirmed) kirimHasilUjian(false);
