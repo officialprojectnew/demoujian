@@ -53,7 +53,7 @@
     <div id="view-token" class="flex-1 flex items-center justify-center p-4 sm:p-6">
       <div class="max-w-4xl w-full grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
 
-        <div class="md:col-span-5 bg-white p-6 md:p-7 rounded-2xl shadow-md border border-gray-200 flex flex-col justify-between h-full transform transition-all hover:shadow-lg">
+        <div class="md:col-span-5 bg-white p-6 md:p-7 rounded-2xl shadow-md border border-gray-200 flex flex-col justify-between h-full transform transition-all hover:shadow-lg overflow-hidden">
           <div>
             <h2 class="text-lg font-black text-gray-800 border-b-2 border-blue-500 pb-3 mb-5 flex items-center gap-2">
               👤 Profil Peserta
@@ -63,14 +63,35 @@
                  <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
               </div>
             </div>
-            <table class="w-full text-sm text-left border-collapse">
-              <tr class="border-b"><td class="py-2.5 font-bold text-gray-500 w-[45%]">No. Peserta</td><td class="py-2.5 font-bold text-gray-900" id="profil-nis">Memuat...</td></tr>
-              <tr class="border-b"><td class="py-2.5 font-bold text-gray-500">Nama Lengkap</td><td class="py-2.5 font-bold text-blue-700" id="profil-nama">Memuat...</td></tr>
-              <tr class="border-b"><td class="py-2.5 font-bold text-gray-500">NISN</td><td class="py-2.5 font-bold text-gray-900" id="profil-nisn">Memuat...</td></tr>
-              <tr class="border-b"><td class="py-2.5 font-bold text-gray-500">Sesi Ujian</td><td class="py-2.5 font-semibold text-gray-800" id="profil-sesi">Memuat...</td></tr>
-              <tr class="border-b"><td class="py-2.5 font-bold text-gray-500">Ruang</td><td class="py-2.5 font-semibold text-gray-800" id="profil-ruang">Memuat...</td></tr>
-              <tr><td class="py-2.5 font-bold text-gray-500">Tanggal Ujian</td><td class="py-2.5 font-semibold text-gray-800" id="profil-tanggal">Memuat...</td></tr>
-            </table>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-left border-collapse">
+                <tr class="border-b">
+                  <td class="py-3 font-bold text-gray-500 whitespace-nowrap pr-4">No. Peserta</td>
+                  <td class="py-3 font-bold text-gray-900 whitespace-nowrap" id="profil-nis">Memuat...</td>
+                </tr>
+                <tr class="border-b">
+                  <td class="py-3 font-bold text-gray-500 whitespace-nowrap pr-4">Nama Lengkap</td>
+                  <td class="py-3 font-bold text-blue-700 whitespace-nowrap truncate max-w-[150px]" id="profil-nama">Memuat...</td>
+                </tr>
+                <tr class="border-b">
+                  <td class="py-3 font-bold text-gray-500 whitespace-nowrap pr-4">NISN</td>
+                  <td class="py-3 font-bold text-gray-900 whitespace-nowrap" id="profil-nisn">Memuat...</td>
+                </tr>
+                <tr class="border-b">
+                  <td class="py-3 font-bold text-gray-500 whitespace-nowrap pr-4">Sesi Ujian</td>
+                  <td class="py-3 font-semibold text-gray-800 whitespace-nowrap" id="profil-sesi">Memuat...</td>
+                </tr>
+                <tr class="border-b">
+                  <td class="py-3 font-bold text-gray-500 whitespace-nowrap pr-4">Ruang</td>
+                  <td class="py-3 font-semibold text-gray-800 whitespace-nowrap" id="profil-ruang">Memuat...</td>
+                </tr>
+                <tr>
+                  <td class="py-3 font-bold text-gray-500 whitespace-nowrap pr-4">Tanggal Ujian</td>
+                  <td class="py-3 font-semibold text-gray-800 whitespace-nowrap" id="profil-tanggal">Memuat...</td>
+                </tr>
+              </table>
+            </div>
           </div>
         </div>
 
