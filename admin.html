@@ -138,7 +138,15 @@
 
     function showLoader(text = "Memuat...") { document.getElementById('loader-text').innerText = text; document.getElementById('global-loader').classList.remove('hidden'); document.getElementById('global-loader').classList.add('flex'); }
     function hideLoader() { document.getElementById('global-loader').classList.add('hidden'); document.getElementById('global-loader').classList.remove('flex'); }
-
+    // TAMBAHKAN KODE INI UNTUK BYPASS BLOCK GAMBAR GOOGLE DRIVE
+    function getDirectImageUrl(url) {
+      if (!url) return '';
+      let fileId = '';
+      if (url.includes('/file/d/')) { let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; }
+      else if (url.includes('id=')) { let match = url.match(/id=([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; }
+      if (fileId) return "https://lh3.googleusercontent.com/d/" + fileId;
+      return url; 
+    }
     function switchMenu(targetId) {
       document.querySelectorAll('.admin-menu').forEach(el => el.classList.replace('block', 'hidden'));
       document.querySelectorAll('[id^="btn-admin"]').forEach(btn => btn.classList.remove('menu-active'));
@@ -178,7 +186,11 @@
         if(result.data.length === 0) return tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center">Belum ada data siswa.</td></tr>`; 
         let html = ''; result.data.forEach((s, i) => { 
           let jsData = JSON.stringify(s).replace(/'/g, "\\'"); 
-          let imgTbl = s.foto ? `<img src="${s.foto}" class="h-10 w-10 object-cover rounded-full border shadow-sm">` : '<div class="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-400">No</div>';
+          
+          // MENGGUNAKAN KONVERTER URL DI SINI
+          let urlFoto = getDirectImageUrl(s.foto); 
+          let imgTbl = urlFoto ? `<img src="${urlFoto}" class="h-10 w-10 object-cover rounded-full border shadow-sm">` : '<div class="h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-400">No</div>';
+          
           html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center">${i + 1}</td><td class="p-4 flex justify-center">${imgTbl}</td><td class="p-4 font-bold text-gray-800">${s.nis}</td><td class="p-4">${s.nama}</td><td class="p-4">${s.kelas}</td><td class="p-4 font-mono text-gray-400">${s.password}</td><td class="p-4 text-center"><button onclick='bukaEditSiswa(${jsData})' class="bg-yellow-100 text-yellow-700 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-yellow-200 transition">✏️ Edit</button> <button onclick="hapusSiswa('${s.nis}')" class="bg-red-100 text-red-600 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-red-200 transition">🗑️ Hapus</button></td></tr>`; 
         }); tbody.innerHTML = html; 
       } catch(e) { hideLoader(); }
