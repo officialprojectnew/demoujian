@@ -109,27 +109,15 @@
       
       <!-- MENU 1: DASHBOARD -->
       <div id="view-dashboard" class="admin-menu block">
-        <div class="flex justify-between items-center bg-white p-5 rounded-3xl shadow-sm mb-6 border border-gray-100">
+         <div class="flex justify-between items-center bg-white p-5 rounded-3xl shadow-sm mb-6 border border-gray-100">
           <div class="pl-2"><h1 class="text-2xl font-bold text-gray-800">Selamat datang, Administrator!</h1><p class="text-sm text-gray-500 mt-1">Ini adalah ringkasan aktivitas sekolah Anda hari ini.</p></div>
-          <div class="w-12 h-12 rounded-full border-2 border-blue-500 overflow-hidden shadow-sm"><img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="Admin" class="w-full h-full object-cover"></div>
         </div>
-
-        <div class="mb-6">
-          <div class="w-full bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-6">
-            <div class="bg-blue-100 p-4 rounded-full text-blue-600"><i class="fas fa-laptop-code text-4xl w-10 text-center"></i></div>
-            <div><h2 class="text-2xl font-bold text-gray-800">Selamat Datang, Administrator!</h2><p class="text-gray-500 text-sm mt-1">Pantau progres dan kelola pengguna CBT dengan mudah.</p></div>
-          </div>
-        </div>
-
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <div class="bg-[#38bdf8] rounded-3xl p-6 text-white shadow-lg shadow-blue-200 flex flex-col justify-between hover:-translate-y-1 transition-transform">
             <i class="fas fa-users text-3xl mb-4 opacity-80"></i><div><h3 class="text-4xl font-black" id="dash-siswa">0</h3><p class="text-sm font-semibold mt-1">Total Data Siswa</p></div>
           </div>
           <div class="bg-[#a855f7] rounded-3xl p-6 text-white shadow-lg shadow-purple-200 flex flex-col justify-between hover:-translate-y-1 transition-transform">
             <i class="fas fa-briefcase text-3xl mb-4 opacity-80"></i><div><h3 class="text-4xl font-black" id="dash-guru">0</h3><p class="text-sm font-semibold mt-1">Total Data Guru</p></div>
-          </div>
-          <div class="bg-[#475569] rounded-3xl p-6 text-white shadow-lg shadow-slate-200 flex flex-col justify-between hover:-translate-y-1 transition-transform">
-            <i class="fas fa-shield-alt text-3xl mb-4 opacity-80"></i><div><h3 class="text-4xl font-black">1</h3><p class="text-sm font-semibold mt-1">Total Data Admin</p></div>
           </div>
           <div class="bg-[#4ade80] rounded-3xl p-6 text-white shadow-lg shadow-green-200 flex flex-col justify-between hover:-translate-y-1 transition-transform">
             <i class="fas fa-clipboard-check text-3xl mb-4 opacity-80"></i><div><h3 class="text-4xl font-black" id="dash-ujian">0</h3><p class="text-sm font-semibold mt-1">Total Ujian</p></div>
@@ -141,13 +129,11 @@
             <i class="fas fa-dot-circle text-3xl mb-4 opacity-80"></i><div><h3 class="text-4xl font-black" id="dash-sesi">0</h3><p class="text-sm font-semibold mt-1">Sesi Aktif</p></div>
           </div>
         </div>
-        
         <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-bold text-gray-800">Progres Penyelesaian Ujian Siswa</h2>
             <button onclick="loadDashboard()" class="text-blue-500 hover:text-blue-700 transition font-semibold text-sm"><i class="fas fa-sync-alt"></i> Refresh Diagram</button>
           </div>
-          <p class="text-sm text-gray-500 mb-4">Grafik ini membandingkan jumlah siswa yang <b class="text-green-500">Sudah Selesai</b> dan <b class="text-red-500">Belum Mengerjakan</b> berdasarkan setiap ujian yang aktif / terdaftar.</p>
           <div class="relative w-full h-80"><canvas id="ujianChart"></canvas></div>
         </div>
       </div>
@@ -209,7 +195,7 @@
         </div>
       </div>
 
-      <!-- MENU 2: MANAJEMEN USER -->
+      <!-- MENU: MANAJEMEN USER -->
       <div id="view-manajemen-user" class="admin-menu hidden">
         <h2 class="text-3xl font-bold text-gray-800 mb-6">Manajemen User</h2>
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
@@ -269,124 +255,106 @@
 
       <!-- MENU 3: BANK SOAL -->
       <div id="view-bank-soal" class="admin-menu hidden">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">Manajemen & Bank Soal</h2>
-        
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6 min-h-[500px]">
-          <div class="flex border-b border-gray-200 px-6 pt-2 gap-8">
-            <button onclick="switchTabSoal('daftar')" id="tab-btn-daftar" class="py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 transition">Daftar Paket Ujian</button>
-            <button onclick="switchTabSoal('master')" id="tab-btn-master" class="py-4 text-center font-bold text-gray-400 hover:text-blue-600 hover:border-blue-600 transition border-b-2 border-transparent">Manajemen Data Soal</button>
-          </div>
-          
-          <div id="tab-content-daftar" class="p-6 md:p-8 bg-gray-50/30">
-            <div class="flex justify-between items-center mb-6">
-              <h3 class="text-xl font-bold text-gray-800">Daftar Paket Berdasarkan Mapel</h3>
-              <button onclick="loadBankSoalGrup()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-sync-alt mr-1"></i> Refresh</button>
-            </div>
-            
-            <div id="view-kartu-mapel" class="block">
-              <div id="mapel-cards-container" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <p class="text-sm text-gray-500 italic">Memuat bank soal...</p>
-              </div>
-            </div>
-
-            <div id="view-paket-soal" class="hidden">
-              <div class="flex justify-between items-center mb-5 border-b pb-4 border-gray-200">
-                <h3 class="text-xl font-bold text-gray-800" id="title-paket-soal">Paket Soal</h3>
-                <button onclick="kembaliKeDaftarMapel()" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-xl text-sm font-bold hover:bg-gray-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
-              </div>
-              <div id="list-paket-soal-container" class="space-y-4"></div>
-            </div>
-            
-            <div id="detail-bank-soal-container" class="hidden mt-8 border-t pt-8 border-gray-200">
-               <div class="flex justify-between items-center mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100 shadow-sm">
-                  <h3 class="text-xl font-bold text-blue-800" id="title-detail-soal">Detail Paket: -</h3>
-                  <button onclick="tutupDetailBankSoal()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-times mr-2 text-red-500"></i> Tutup</button>
+         <h2 class="text-3xl font-bold text-gray-800 mb-6">Manajemen & Bank Soal</h2>
+         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden min-h-[500px]">
+           <div class="flex border-b border-gray-200 px-6 pt-2 gap-8">
+             <button onclick="switchTabSoal('daftar')" id="tab-btn-daftar" class="py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 transition">Daftar Paket Ujian</button>
+             <button onclick="switchTabSoal('master')" id="tab-btn-master" class="py-4 text-center font-bold text-gray-400 hover:text-blue-600 hover:border-blue-600 transition border-b-2 border-transparent">Manajemen Data Soal</button>
+           </div>
+           
+           <div id="tab-content-daftar" class="p-6 md:p-8 bg-gray-50/30">
+             <div class="flex justify-between items-center mb-6">
+               <h3 class="text-xl font-bold text-gray-800">Daftar Paket Berdasarkan Mapel</h3>
+               <button onclick="loadBankSoalGrup()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-sync-alt mr-1"></i> Refresh</button>
+             </div>
+             
+             <div id="view-kartu-mapel" class="block">
+               <div id="mapel-cards-container" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                 <p class="text-sm text-gray-500 italic">Memuat bank soal...</p>
                </div>
-               <div id="list-butir-soal" class="space-y-4"></div>
-            </div>
-          </div>
+             </div>
 
-          <div id="tab-content-master" class="p-6 md:p-8 hidden bg-gray-50/30">
-            <div class="flex justify-between items-center mb-6 border-b pb-4">
-              <h3 class="text-xl font-bold text-gray-800">Database Atribut Soal</h3>
-              <button onclick="loadMasterUjian()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-            <p class="text-sm text-gray-600 mb-6">Data ini akan muncul sebagai pilihan (*Dropdown*) bagi Guru saat membuat atau mengimpor soal, untuk men-generate Kode Soal Otomatis.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-                <h4 class="font-bold text-blue-700 mb-4 border-b pb-2"><i class="fas fa-book mr-2"></i>Mata Pelajaran</h4>
-                <div class="flex gap-2 mb-4">
-                  <input type="text" id="input-mapel-nama" placeholder="Nama Mapel" class="w-2/3 p-2 border rounded-lg text-sm outline-none focus:border-blue-500">
-                  <input type="text" id="input-mapel-kode" placeholder="Kode (BING)" class="w-1/3 p-2 border rounded-lg text-sm outline-none focus:border-blue-500 uppercase">
+             <div id="view-paket-soal" class="hidden">
+               <div class="flex justify-between items-center mb-5 border-b pb-4 border-gray-200">
+                 <h3 class="text-xl font-bold text-gray-800" id="title-paket-soal">Paket Soal</h3>
+                 <button onclick="kembaliKeDaftarMapel()" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-xl text-sm font-bold hover:bg-gray-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
+               </div>
+               <div id="list-paket-soal-container" class="space-y-4"></div>
+             </div>
+             
+             <div id="detail-bank-soal-container" class="hidden mt-8 border-t pt-8 border-gray-200">
+                <div class="flex justify-between items-center mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100 shadow-sm">
+                   <h3 class="text-xl font-bold text-blue-800" id="title-detail-soal">Detail Paket: -</h3>
+                   <button onclick="tutupDetailBankSoal()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-times mr-2 text-red-500"></i> Tutup</button>
                 </div>
-                <button onclick="tambahMasterUjian('Mapel')" class="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-sm mb-4 hover:bg-blue-700">Tambah</button>
-                <ul id="list-master-mapel" class="space-y-2 text-sm text-gray-700 max-h-60 overflow-y-auto pr-2"></ul>
-              </div>
-              <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-                <h4 class="font-bold text-purple-700 mb-4 border-b pb-2"><i class="fas fa-tags mr-2"></i>Kategori Ujian</h4>
-                <div class="flex gap-2 mb-4">
-                  <input type="text" id="input-kat-nama" placeholder="Nama Kategori" class="w-2/3 p-2 border rounded-lg text-sm outline-none focus:border-purple-500">
-                  <input type="text" id="input-kat-kode" placeholder="Kode (UTS)" class="w-1/3 p-2 border rounded-lg text-sm outline-none focus:border-purple-500 uppercase">
-                </div>
-                <button onclick="tambahMasterUjian('Kategori')" class="w-full bg-purple-600 text-white font-bold py-2 rounded-lg text-sm mb-4 hover:bg-purple-700">Tambah</button>
-                <ul id="list-master-kategori" class="space-y-2 text-sm text-gray-700 max-h-60 overflow-y-auto pr-2"></ul>
-              </div>
-              <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-                <h4 class="font-bold text-orange-700 mb-4 border-b pb-2"><i class="fas fa-calendar mr-2"></i>Tahun Ajaran</h4>
-                <div class="flex gap-2 mb-4">
-                  <input type="text" id="input-thn-nama" placeholder="Tahun Ajaran" class="w-2/3 p-2 border rounded-lg text-sm outline-none focus:border-orange-500">
-                  <input type="text" id="input-thn-kode" placeholder="Kode (2627)" class="w-1/3 p-2 border rounded-lg text-sm outline-none focus:border-orange-500 uppercase">
-                </div>
-                <button onclick="tambahMasterUjian('Tahun')" class="w-full bg-orange-600 text-white font-bold py-2 rounded-lg text-sm mb-4 hover:bg-orange-700">Tambah</button>
-                <ul id="list-master-tahun" class="space-y-2 text-sm text-gray-700 max-h-60 overflow-y-auto pr-2"></ul>
-              </div>
-            </div>
-          </div>
-        </div>
+                <div id="list-butir-soal" class="space-y-4"></div>
+             </div>
+           </div>
+
+           <div id="tab-content-master" class="p-6 md:p-8 hidden bg-gray-50/30">
+             <div class="flex justify-between items-center mb-6 border-b pb-4">
+               <h3 class="text-xl font-bold text-gray-800">Database Atribut Soal</h3>
+               <button onclick="loadMasterUjian()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-sync-alt"></i> Refresh</button>
+             </div>
+             <p class="text-sm text-gray-600 mb-6">Data ini akan muncul sebagai pilihan (*Dropdown*) bagi Guru saat membuat atau mengimpor soal, untuk men-generate Kode Soal Otomatis.</p>
+             
+             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+               <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                 <h4 class="font-bold text-blue-700 mb-4 border-b pb-2"><i class="fas fa-book mr-2"></i>Mata Pelajaran</h4>
+                 <div class="flex gap-2 mb-4">
+                   <input type="text" id="input-mapel-nama" placeholder="Nama Mapel" class="w-2/3 p-2 border rounded-lg text-sm outline-none focus:border-blue-500">
+                   <input type="text" id="input-mapel-kode" placeholder="Kode (BING)" class="w-1/3 p-2 border rounded-lg text-sm outline-none focus:border-blue-500 uppercase">
+                 </div>
+                 <button onclick="tambahMasterUjian('Mapel')" class="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-sm mb-4 hover:bg-blue-700">Tambah</button>
+                 <ul id="list-master-mapel" class="space-y-2 text-sm text-gray-700 max-h-60 overflow-y-auto pr-2"></ul>
+               </div>
+               <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                 <h4 class="font-bold text-purple-700 mb-4 border-b pb-2"><i class="fas fa-tags mr-2"></i>Kategori Ujian</h4>
+                 <div class="flex gap-2 mb-4">
+                   <input type="text" id="input-kat-nama" placeholder="Nama Kategori" class="w-2/3 p-2 border rounded-lg text-sm outline-none focus:border-purple-500">
+                   <input type="text" id="input-kat-kode" placeholder="Kode (UTS)" class="w-1/3 p-2 border rounded-lg text-sm outline-none focus:border-purple-500 uppercase">
+                 </div>
+                 <button onclick="tambahMasterUjian('Kategori')" class="w-full bg-purple-600 text-white font-bold py-2 rounded-lg text-sm mb-4 hover:bg-purple-700">Tambah</button>
+                 <ul id="list-master-kategori" class="space-y-2 text-sm text-gray-700 max-h-60 overflow-y-auto pr-2"></ul>
+               </div>
+               <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+                 <h4 class="font-bold text-orange-700 mb-4 border-b pb-2"><i class="fas fa-calendar mr-2"></i>Tahun Ajaran</h4>
+                 <div class="flex gap-2 mb-4">
+                   <input type="text" id="input-thn-nama" placeholder="Tahun Ajaran" class="w-2/3 p-2 border rounded-lg text-sm outline-none focus:border-orange-500">
+                   <input type="text" id="input-thn-kode" placeholder="Kode (2627)" class="w-1/3 p-2 border rounded-lg text-sm outline-none focus:border-orange-500 uppercase">
+                 </div>
+                 <button onclick="tambahMasterUjian('Tahun')" class="w-full bg-orange-600 text-white font-bold py-2 rounded-lg text-sm mb-4 hover:bg-orange-700">Tambah</button>
+                 <ul id="list-master-tahun" class="space-y-2 text-sm text-gray-700 max-h-60 overflow-y-auto pr-2"></ul>
+               </div>
+             </div>
+           </div>
+         </div>
       </div>
 
       <!-- MENU 4: TOKEN UJIAN -->
       <div id="view-token-ujian" class="admin-menu hidden">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold text-gray-800">Manajemen & Token Ujian</h2>
-            <button onclick="loadManajemenUjian()" class="bg-orange-100 text-orange-700 font-bold px-5 py-2.5 rounded-xl hover:bg-orange-200 transition shadow-sm text-sm"><i class="fas fa-sync-alt mr-2"></i> Muat Ulang</button>
-          </div>
-          <p class="text-sm text-gray-600 mb-6 border-l-4 border-orange-500 pl-4 bg-orange-50/50 py-3 rounded-r-xl">Halaman untuk <b>Membuka (Aktifkan)</b> akses ujian siswa dan menghasilkan Token. Ujian yang tidak diaktifkan tidak akan bisa diakses oleh siswa manapun.</p>
+          <h2 class="text-3xl font-bold text-gray-800 mb-6">Manajemen & Token Ujian</h2>
+          <button onclick="loadManajemenUjian()" class="bg-orange-100 text-orange-700 font-bold px-5 py-2.5 rounded-xl mb-4 text-sm">🔄 Muat Ulang</button>
           <div class="overflow-x-auto border border-gray-200 rounded-xl">
             <table class="w-full text-left border-collapse whitespace-nowrap">
-              <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">Kode Soal</th><th class="p-4 border-b font-semibold">Mata Pelajaran (Kelas)</th><th class="p-4 border-b text-center font-semibold">Status</th><th class="p-4 border-b text-center font-semibold">Token</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
-              <tbody id="tabel-manajemen-ujian"><tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">Memuat data...</td></tr></tbody>
+              <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase"><th class="p-4 border-b">Kode Soal</th><th class="p-4 border-b">Mapel (Kelas)</th><th class="p-4 border-b text-center">Status</th><th class="p-4 border-b text-center">Token</th><th class="p-4 border-b text-center">Aksi</th></tr></thead>
+              <tbody id="tabel-manajemen-ujian"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- MENU 5: CETAK KARTU SISWA -->
+      <!-- MENU 5: CETAK KARTU -->
       <div id="view-cetak-kartu" class="admin-menu hidden">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold text-gray-800">Cetak Kartu Siswa</h2>
-            <button onclick="loadKartuUjian()" class="bg-purple-100 text-purple-700 font-bold px-5 py-2.5 rounded-xl hover:bg-purple-200 transition shadow-sm text-sm"><i class="fas fa-sync-alt mr-2"></i> Muat Ulang Kartu</button>
-          </div>
-          <p class="text-sm text-gray-600 mb-6 border-l-4 border-purple-500 pl-4 bg-purple-50/50 py-3 rounded-r-xl">Data ini yang akan muncul secara visual di halaman Dashboard Ujian Siswa (Foto, NISN, Sesi, Ruang). Klik Generate Otomatis untuk menyinkronkan dengan data siswa terbaru.</p>
-          
-          <div class="flex flex-wrap gap-3 mb-6 bg-gray-50 p-4 border rounded-xl items-center">
-            <button onclick="generateKartuOtomatis()" class="bg-green-600 text-white font-bold px-5 py-2.5 rounded-lg text-sm hover:bg-green-700 shadow transition"><i class="fas fa-magic mr-2"></i> Generate Otomatis</button>
-            <div class="w-px h-6 bg-gray-300 mx-2 hidden md:block"></div>
-            <input type="file" id="file-import-kartu" accept=".xlsx, .xls" class="text-sm border p-1.5 rounded-lg bg-white w-full md:w-auto">
-            <button onclick="importExcelKartu()" class="bg-blue-600 text-white font-bold px-5 py-2.5 rounded-lg text-sm hover:bg-blue-700 shadow transition"><i class="fas fa-file-excel mr-2"></i> Import Excel</button>
-            <button onclick="downloadTemplateKartu()" class="text-blue-600 text-sm font-bold underline hover:text-blue-800 ml-2">Unduh Format</button>
-            <div class="ml-auto w-full md:w-auto mt-3 md:mt-0">
-              <button onclick="hapusSemuaKartu()" class="bg-red-50 text-red-600 font-bold px-4 py-2.5 rounded-lg hover:bg-red-100 transition border border-red-200 text-sm w-full md:w-auto"><i class="fas fa-trash-alt mr-2"></i> Kosongkan Kartu</button>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto border border-gray-200 rounded-xl">
+           <h2 class="text-3xl font-bold text-gray-800 mb-6">Cetak Kartu Siswa</h2>
+           <button onclick="generateKartuOtomatis()" class="bg-green-600 text-white font-bold px-4 py-2 rounded-lg text-sm mb-4">✨ Generate Otomatis dari Siswa</button>
+           <button onclick="loadKartuUjian()" class="bg-blue-100 text-blue-700 font-bold px-4 py-2 rounded-lg text-sm mb-4 ml-2">🔄 Muat Ulang</button>
+           <div class="overflow-x-auto border border-gray-200 rounded-xl">
             <table class="w-full text-left border-collapse whitespace-nowrap">
-              <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">No. Peserta (NIS)</th><th class="p-4 border-b font-semibold">Nama Lengkap</th><th class="p-4 border-b text-center font-semibold">Foto</th><th class="p-4 border-b font-semibold">NISN</th><th class="p-4 border-b font-semibold">Sesi</th><th class="p-4 border-b font-semibold">Ruang</th></tr></thead>
-              <tbody id="tabel-kartu-ujian"><tr><td colspan="7" class="p-8 text-center text-gray-500 text-sm">Memuat data kartu...</td></tr></tbody>
+              <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase"><th class="p-4 border-b">NIS</th><th class="p-4 border-b">Nama</th><th class="p-4 border-b">NISN</th><th class="p-4 border-b">Password</th></tr></thead>
+              <tbody id="tabel-kartu-ujian"></tbody>
             </table>
           </div>
         </div>
@@ -395,23 +363,15 @@
       <!-- MENU 6: REKAPITULASI NILAI -->
       <div id="view-rekap-nilai" class="admin-menu hidden">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold text-gray-800">Rekapitulasi Nilai</h2>
-            <button onclick="loadDropdownRekapAdmin()" class="bg-blue-100 text-blue-700 font-bold px-5 py-2.5 rounded-xl hover:bg-blue-200 transition shadow-sm text-sm"><i class="fas fa-sync-alt mr-2"></i> Muat Pilihan Paket</button>
-          </div>
-          
-          <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-200 flex flex-col md:flex-row items-end gap-4 shadow-sm">
-            <div class="flex-1 w-full">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Paket Ujian yang Tersedia:</label>
-              <select id="select-rekap-admin" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih Kode Soal --</option></select>
-            </div>
-            <button onclick="tampilkanRekapAdmin()" class="bg-blue-600 text-white w-full md:w-auto px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-search mr-2"></i> Tampilkan Nilai</button>
-          </div>
-
-          <div class="overflow-x-auto border border-gray-200 rounded-xl">
+           <h2 class="text-3xl font-bold text-gray-800 mb-6">Rekapitulasi Nilai</h2>
+           <div class="flex gap-2 mb-4">
+              <select id="select-rekap-admin" class="p-2 border rounded-lg outline-none focus:border-blue-500"><option value="">-- Pilih Soal --</option></select>
+              <button onclick="tampilkanRekapAdmin()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold">Tampilkan</button>
+           </div>
+           <div class="overflow-x-auto border border-gray-200 rounded-xl">
             <table class="w-full text-left border-collapse whitespace-nowrap">
-              <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIS</th><th class="p-4 border-b font-semibold">Nama Siswa</th><th class="p-4 border-b text-center font-semibold">Nilai PG</th><th class="p-4 border-b text-center font-semibold">Nilai Essay</th><th class="p-4 border-b text-center font-bold text-gray-800">Total Nilai</th></tr></thead>
-              <tbody id="tabel-rekap-nilai-admin"><tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">Pilih paket dan klik tampilkan.</td></tr></tbody>
+              <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase"><th class="p-4 border-b">NIS</th><th class="p-4 border-b">Nama</th><th class="p-4 border-b">PG</th><th class="p-4 border-b">Essay</th><th class="p-4 border-b">Total</th></tr></thead>
+              <tbody id="tabel-rekap-nilai-admin"></tbody>
             </table>
           </div>
         </div>
@@ -420,78 +380,65 @@
     </div>
   </div>
 
-  <!-- ================= KUMPULAN POPUP MODAL ================= -->
-  
+  <!-- KUMPULAN MODAL (Siswa & Guru) -->
   <div id="modal-tambah-siswa" class="fixed inset-0 modal-overlay hidden z-50 flex justify-center items-center p-4">
-    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md transform transition-transform duration-200">
-      <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Tambah Siswa Baru</h3>
-      <div class="space-y-4">
-        <div><label class="text-sm font-semibold text-gray-700">NIS</label><input type="text" id="tambah-nis-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="tambah-nama-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div><label class="text-sm font-semibold text-gray-700">NISN</label><input type="text" id="tambah-nisn-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Kelas</label><input type="text" id="tambah-kelas-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="password" id="tambah-pass-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
+    <div class="bg-white p-8 rounded-3xl w-full max-w-md" id="content-tambah-siswa">
+      <h3 class="text-2xl font-black mb-5">Tambah Siswa Baru</h3>
+      <div class="space-y-3">
+        <input type="text" id="tambah-nis-siswa" placeholder="NIS" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="tambah-nama-siswa" placeholder="Nama Lengkap" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="tambah-nisn-siswa" placeholder="NISN" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="tambah-kelas-siswa" placeholder="Kelas" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="tambah-pass-siswa" placeholder="Password" class="w-full p-2 border rounded outline-none focus:border-blue-500">
         <div class="p-3 border rounded-xl bg-gray-50">
           <label class="text-sm font-semibold block mb-2 text-gray-700"><i class="fas fa-camera mr-2 text-blue-500"></i>Foto Siswa (Opsional)</label>
           <input type="file" id="tambah-foto-siswa" accept="image/*" class="w-full text-xs">
         </div>
-        <div class="pt-4 flex gap-3">
-          <button onclick="tutupModal('modal-tambah-siswa')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
-          <button onclick="simpanSiswaBaru()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Simpan Data</button>
-        </div>
+        <div class="flex gap-2 mt-4"><button onclick="tutupModal('modal-tambah-siswa')" class="flex-1 bg-gray-200 p-2 rounded font-bold">Batal</button><button onclick="simpanSiswaBaru()" class="flex-1 bg-blue-600 text-white p-2 rounded font-bold">Simpan</button></div>
       </div>
     </div>
   </div>
 
   <div id="modal-edit-siswa" class="fixed inset-0 modal-overlay hidden z-50 flex justify-center items-center p-4">
-    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md transform transition-transform duration-200">
-      <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Edit Data Siswa</h3>
-      <div class="space-y-4">
-        <div><label class="text-sm font-semibold text-gray-700">NIS (Bisa Diubah)</label><input type="text" id="edit-nis-siswa" class="w-full mt-1.5 p-3 border rounded-xl font-bold text-blue-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="edit-nama-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
-        <div><label class="text-sm font-semibold text-gray-700">NISN</label><input type="text" id="edit-nisn-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Kelas</label><input type="text" id="edit-kelas-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="text" id="edit-pass-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
+    <div class="bg-white p-8 rounded-3xl w-full max-w-md">
+      <h3 class="text-2xl font-black mb-5">Edit Siswa</h3>
+      <div class="space-y-3">
+        <input type="text" id="edit-nis-siswa" placeholder="NIS" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="edit-nama-siswa" placeholder="Nama Lengkap" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="edit-nisn-siswa" placeholder="NISN" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="edit-kelas-siswa" placeholder="Kelas" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="edit-pass-siswa" placeholder="Password" class="w-full p-2 border rounded outline-none focus:border-blue-500">
         <div class="p-3 border rounded-xl bg-gray-50">
           <label class="text-sm font-semibold block mb-2 text-gray-700"><i class="fas fa-camera mr-2 text-blue-500"></i>Update Foto Baru (Opsional)</label>
           <input type="file" id="edit-foto-siswa" accept="image/*" class="w-full text-xs">
         </div>
-        <div class="pt-4 flex gap-3">
-          <button onclick="tutupModal('modal-edit-siswa')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
-          <button onclick="simpanEditSiswa()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Update Data</button>
-        </div>
+        <div class="flex gap-2 mt-4"><button onclick="tutupModal('modal-edit-siswa')" class="flex-1 bg-gray-200 p-2 rounded font-bold">Batal</button><button onclick="simpanEditSiswa()" class="flex-1 bg-blue-600 text-white p-2 rounded font-bold">Update</button></div>
       </div>
     </div>
   </div>
 
   <div id="modal-tambah-guru" class="fixed inset-0 modal-overlay hidden z-50 flex justify-center items-center p-4">
-    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md transform transition-transform duration-200">
-      <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Tambah Guru Baru</h3>
-      <div class="space-y-4">
-        <div><label class="text-sm font-semibold text-gray-700">NIP/ID Guru</label><input type="text" id="tambah-nip-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="tambah-nama-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Username Login</label><input type="text" id="tambah-user-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="password" id="tambah-pass-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div class="pt-4 flex gap-3">
-          <button onclick="tutupModal('modal-tambah-guru')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
-          <button onclick="simpanGuruBaru()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Simpan Data</button>
-        </div>
+    <div class="bg-white p-8 rounded-3xl w-full max-w-md">
+      <h3 class="text-2xl font-black mb-5">Tambah Guru</h3>
+      <div class="space-y-3">
+        <input type="text" id="tambah-nip-guru" placeholder="NIP/ID" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="tambah-nama-guru" placeholder="Nama Lengkap" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="tambah-user-guru" placeholder="Username" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="tambah-pass-guru" placeholder="Password" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <div class="flex gap-2 mt-4"><button onclick="tutupModal('modal-tambah-guru')" class="flex-1 bg-gray-200 p-2 rounded font-bold">Batal</button><button onclick="simpanGuruBaru()" class="flex-1 bg-blue-600 text-white p-2 rounded font-bold">Simpan</button></div>
       </div>
     </div>
   </div>
 
   <div id="modal-edit-guru" class="fixed inset-0 modal-overlay hidden z-50 flex justify-center items-center p-4">
-    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md transform transition-transform duration-200">
-      <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Edit Data Guru</h3>
-      <div class="space-y-4">
-        <div><label class="text-sm font-semibold text-gray-700">NIP/ID (Terkunci)</label><input type="text" id="edit-nip-guru" disabled class="w-full mt-1.5 p-3 bg-gray-100 text-gray-500 border rounded-xl cursor-not-allowed"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="edit-nama-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Username</label><input type="text" id="edit-user-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="text" id="edit-pass-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div class="pt-4 flex gap-3">
-          <button onclick="tutupModal('modal-edit-guru')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
-          <button onclick="simpanEditGuru()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Update Data</button>
-        </div>
+    <div class="bg-white p-8 rounded-3xl w-full max-w-md">
+      <h3 class="text-2xl font-black mb-5">Edit Guru</h3>
+      <div class="space-y-3">
+        <input type="text" id="edit-nip-guru" placeholder="NIP/ID" disabled class="w-full p-2 border rounded bg-gray-100">
+        <input type="text" id="edit-nama-guru" placeholder="Nama Lengkap" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="edit-user-guru" placeholder="Username" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <input type="text" id="edit-pass-guru" placeholder="Password" class="w-full p-2 border rounded outline-none focus:border-blue-500">
+        <div class="flex gap-2 mt-4"><button onclick="tutupModal('modal-edit-guru')" class="flex-1 bg-gray-200 p-2 rounded font-bold">Batal</button><button onclick="simpanEditGuru()" class="flex-1 bg-blue-600 text-white p-2 rounded font-bold">Update</button></div>
       </div>
     </div>
   </div>
@@ -499,33 +446,26 @@
   <script src="script.js"></script>
   <script>
     const user = checkAuth('admin');
-    let chartInstance = null;
-    let allSiswaData = [];
-    let currentSelectedKelas = "";
-    let bankSoalData = [];
-
-    // UTILITIES
-    function getBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); reader.onerror = error => reject(error); }); }
-    function showLoader(text = "Memuat Data...") { document.getElementById('loader-text').innerText = text; document.getElementById('global-loader').classList.remove('hidden'); document.getElementById('global-loader').classList.add('flex'); }
-    function hideLoader() { document.getElementById('global-loader').classList.add('hidden'); document.getElementById('global-loader').classList.remove('flex'); }
-    function getDirectImageUrl(url) { if (!url) return ''; let fileId = ''; if (url.includes('/file/d/')) { let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; } else if (url.includes('id=')) { let match = url.match(/id=([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; } if (fileId) return "https://lh3.googleusercontent.com/d/" + fileId; return url; }
-
-    function comingSoon() { Swal.fire('Fitur Segera Hadir!', 'Menu ini akan tersedia pada pembaruan aplikasi berikutnya.', 'info'); }
-    function logoutAdmin() { Swal.fire({ title: 'Keluar Aplikasi?', text: "Anda akan logout dari panel administrator.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#94a3b8', confirmButtonText: 'Ya, Keluar' }).then((res) => { if (res.isConfirmed) logout(); }); }
     
-    // TAB MANAGEMENT & MENU SWITCHING
+    // Core Functions
+    function showLoader(text="Memuat Data...") { document.getElementById('loader-text').innerText=text; document.getElementById('global-loader').classList.remove('hidden'); document.getElementById('global-loader').classList.add('flex'); }
+    function hideLoader() { document.getElementById('global-loader').classList.add('hidden'); document.getElementById('global-loader').classList.remove('flex'); }
+    function logoutAdmin() { Swal.fire({ title:'Keluar?', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33', confirmButtonText:'Ya' }).then(r => { if(r.isConfirmed) logout(); }); }
+    
+    function getDirectImageUrl(url) {
+      if (!url) return '';
+      let fileId = '';
+      if (url.includes('/file/d/')) { let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; } 
+      else if (url.includes('id=')) { let match = url.match(/id=([a-zA-Z0-9_-]+)/); if (match) fileId = match[1]; }
+      if (fileId) return "https://lh3.googleusercontent.com/d/" + fileId;
+      return url;
+    }
+
     function switchMenu(targetId) {
       document.querySelectorAll('.admin-menu').forEach(el => el.classList.replace('block', 'hidden'));
-      document.querySelectorAll('.sidebar-item').forEach(btn => {
-        btn.classList.remove('sidebar-active');
-        btn.classList.remove('bg-blue-600', 'text-white');
-      });
+      document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.remove('sidebar-active', 'bg-blue-600', 'text-white'));
       document.getElementById(targetId).classList.replace('hidden', 'block');
-      
-      let activeBtn = document.getElementById('btn-' + targetId);
-      if(activeBtn) {
-          activeBtn.classList.add('sidebar-active');
-      }
+      let btn = document.getElementById('btn-' + targetId); if(btn) btn.classList.add('sidebar-active');
 
       if(targetId === 'view-dashboard') loadDashboard();
       if(targetId === 'view-manajemen-user') { loadRekapSiswa(); loadRekapGuru(); }
@@ -536,24 +476,13 @@
       if(targetId === 'view-cetak-kartu') loadKartuUjian();
       if(targetId === 'view-rekap-nilai') loadDropdownRekapAdmin();
     }
-
+    
     function switchTabUser(type) {
-      document.getElementById('tab-content-siswa').classList.add('hidden');
-      document.getElementById('tab-content-guru').classList.add('hidden');
-      document.getElementById('tab-btn-siswa').classList.replace('text-blue-600', 'text-gray-400');
-      document.getElementById('tab-btn-siswa').classList.replace('border-blue-600', 'border-transparent');
-      document.getElementById('tab-btn-guru').classList.replace('text-blue-600', 'text-gray-400');
-      document.getElementById('tab-btn-guru').classList.replace('border-blue-600', 'border-transparent');
-
-      if(type === 'siswa') {
-        document.getElementById('tab-content-siswa').classList.remove('hidden');
-        document.getElementById('tab-btn-siswa').classList.replace('text-gray-400', 'text-blue-600');
-        document.getElementById('tab-btn-siswa').classList.replace('border-transparent', 'border-blue-600');
-      } else {
-        document.getElementById('tab-content-guru').classList.remove('hidden');
-        document.getElementById('tab-btn-guru').classList.replace('text-gray-400', 'text-blue-600');
-        document.getElementById('tab-btn-guru').classList.replace('border-transparent', 'border-blue-600');
-      }
+      document.getElementById('tab-content-siswa').classList.add('hidden'); document.getElementById('tab-content-guru').classList.add('hidden');
+      document.getElementById('tab-btn-siswa').classList.replace('text-blue-600', 'text-gray-400'); document.getElementById('tab-btn-siswa').classList.replace('border-blue-600', 'border-transparent');
+      document.getElementById('tab-btn-guru').classList.replace('text-blue-600', 'text-gray-400'); document.getElementById('tab-btn-guru').classList.replace('border-blue-600', 'border-transparent');
+      if(type === 'siswa') { document.getElementById('tab-content-siswa').classList.remove('hidden'); document.getElementById('tab-btn-siswa').classList.replace('text-gray-400', 'text-blue-600'); document.getElementById('tab-btn-siswa').classList.replace('border-transparent', 'border-blue-600'); } 
+      else { document.getElementById('tab-content-guru').classList.remove('hidden'); document.getElementById('tab-btn-guru').classList.replace('text-gray-400', 'text-blue-600'); document.getElementById('tab-btn-guru').classList.replace('border-transparent', 'border-blue-600'); }
     }
 
     function switchTabSoal(type) {
@@ -578,14 +507,10 @@
     function bukaModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
     function tutupModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
 
-    function bukaModalTambahSiswa() { 
-      ['tambah-nis-siswa','tambah-nama-siswa','tambah-nisn-siswa','tambah-kelas-siswa','tambah-pass-siswa','tambah-foto-siswa'].forEach(i => document.getElementById(i).value=''); 
-      if(currentSelectedKelas !== "") { document.getElementById('tambah-kelas-siswa').value = currentSelectedKelas; }
-      bukaModal('modal-tambah-siswa'); 
-    }
-    function bukaModalTambahGuru() { ['tambah-nip-guru','tambah-nama-guru','tambah-user-guru','tambah-pass-guru'].forEach(i => document.getElementById(i).value=''); bukaModal('modal-tambah-guru'); }
-
-    // ================= FITUR DASHBOARD DENGAN CHART.JS =================
+    // ==========================================
+    // LOGIKA DASHBOARD DENGAN DIAGRAM
+    // ==========================================
+    let chartInstance = null;
     async function loadDashboard() {
       showLoader('Menyinkronkan Dashboard & Chart...');
       try {
@@ -644,9 +569,19 @@
       } catch(e) { console.log("Gagal memuat metrik dashboard"); }
       hideLoader();
     }
-    loadDashboard();
 
-    // ================= CRUD SISWA =================
+    // ==========================================
+    // LOGIKA SISWA & KELAS 
+    // ==========================================
+    let allSiswaData = [];
+    let currentSelectedKelas = "";
+
+    function bukaModalTambahSiswa() { 
+      ['tambah-nis-siswa','tambah-nama-siswa','tambah-nisn-siswa','tambah-kelas-siswa','tambah-pass-siswa','tambah-foto-siswa'].forEach(i => document.getElementById(i).value=''); 
+      if(currentSelectedKelas !== "") { document.getElementById('tambah-kelas-siswa').value = currentSelectedKelas; }
+      bukaModal('modal-tambah-siswa'); 
+    }
+
     async function simpanSiswaBaru() {
       let fileInput = document.getElementById('tambah-foto-siswa'); let base64Foto = ""; if (fileInput.files.length > 0) base64Foto = await getBase64(fileInput.files[0]);
       const data = { 
@@ -768,6 +703,7 @@
     function hapusSiswa(nis) { Swal.fire({ title: 'Hapus Siswa?', text: "Data tidak bisa dikembalikan.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Hapus!' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusSiswa', nis }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapSiswa(); } catch(e) { hideLoader(); } } }); }
 
     // ================= CRUD GURU =================
+    function bukaModalTambahGuru() { ['tambah-nip-guru','tambah-nama-guru','tambah-user-guru','tambah-pass-guru'].forEach(i => document.getElementById(i).value=''); bukaModal('modal-tambah-guru'); }
     async function simpanGuruBaru() {
       const data = { nip: document.getElementById('tambah-nip-guru').value, nama: document.getElementById('tambah-nama-guru').value, username: document.getElementById('tambah-user-guru').value, password: document.getElementById('tambah-pass-guru').value };
       if(!data.nip || !data.nama || !data.username || !data.password) return Swal.fire('Oops!', 'Isi semua!', 'warning');
@@ -781,7 +717,7 @@
     async function simpanEditGuru() { const data = { nip: document.getElementById('edit-nip-guru').value, nama: document.getElementById('edit-nama-guru').value, username: document.getElementById('edit-user-guru').value, password: document.getElementById('edit-pass-guru').value }; showLoader('Memperbarui...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editGuru', data }) }); await res.json(); hideLoader(); tutupModal('modal-edit-guru'); loadRekapGuru(); } catch(e) { hideLoader(); } }
     function hapusGuru(nip) { Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya!' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusGuru', nip }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapGuru(); } catch(e) { hideLoader(); } } }); }
 
-    // ================= MENU BARU: DATABASE ATRIBUT SOAL =================
+    // ================= MENU: DATABASE ATRIBUT SOAL =================
     async function loadMasterUjian() {
       try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getMasterUjian' }) });
@@ -832,8 +768,8 @@
       } catch (e) { hideLoader(); }
     }
 
-
     // ================= BANK SOAL (KUMPULAN SOAL DATABASE WIDGET) =================
+    let bankSoalData = [];
     async function loadBankSoalGrup() {
       showLoader('Menarik Data Bank Soal...');
       try {
@@ -938,10 +874,10 @@
             if(s.tipe.includes('PG')) {
               opsiHtml = `
                 <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
-                  <div class="bg-gray-50 border border-gray-100 p-3 rounded-lg flex gap-3 ${s.kunci.includes('A') ? 'ring-2 ring-green-400 bg-green-50' : ''}"><b class="text-gray-900">A.</b> <span>${s.a}</span></div>
-                  <div class="bg-gray-50 border border-gray-100 p-3 rounded-lg flex gap-3 ${s.kunci.includes('B') ? 'ring-2 ring-green-400 bg-green-50' : ''}"><b class="text-gray-900">B.</b> <span>${s.b}</span></div>
-                  <div class="bg-gray-50 border border-gray-100 p-3 rounded-lg flex gap-3 ${s.kunci.includes('C') ? 'ring-2 ring-green-400 bg-green-50' : ''}"><b class="text-gray-900">C.</b> <span>${s.c}</span></div>
-                  <div class="bg-gray-50 border border-gray-100 p-3 rounded-lg flex gap-3 ${s.kunci.includes('D') ? 'ring-2 ring-green-400 bg-green-50' : ''}"><b class="text-gray-900">D.</b> <span>${s.d}</span></div>
+                  <div class="bg-gray-50 border border-gray-100 p-3 rounded-lg flex gap-3 ${s.kunci.includes('A') ? 'ring-2 ring-green-400 bg-green-50' : ''}"><b class="text-gray-900">A.</b> <span class="ql-editor p-0">${s.a}</span></div>
+                  <div class="bg-gray-50 border border-gray-100 p-3 rounded-lg flex gap-3 ${s.kunci.includes('B') ? 'ring-2 ring-green-400 bg-green-50' : ''}"><b class="text-gray-900">B.</b> <span class="ql-editor p-0">${s.b}</span></div>
+                  <div class="bg-gray-50 border border-gray-100 p-3 rounded-lg flex gap-3 ${s.kunci.includes('C') ? 'ring-2 ring-green-400 bg-green-50' : ''}"><b class="text-gray-900">C.</b> <span class="ql-editor p-0">${s.c}</span></div>
+                  <div class="bg-gray-50 border border-gray-100 p-3 rounded-lg flex gap-3 ${s.kunci.includes('D') ? 'ring-2 ring-green-400 bg-green-50' : ''}"><b class="text-gray-900">D.</b> <span class="ql-editor p-0">${s.d}</span></div>
                 </div>
               `;
             }
@@ -955,7 +891,7 @@
                   <span class="bg-orange-50 text-orange-600 text-xs font-bold px-3 py-1.5 rounded-lg border border-orange-200 shadow-sm">Bobot: ${s.bobot}</span>
                 </div>
               </div>
-              <div class="text-gray-800 text-base leading-relaxed font-medium">${s.pertanyaan}</div>
+              <div class="text-gray-800 text-base leading-relaxed font-medium ql-editor px-0">${s.pertanyaan}</div>
               ${imgHtml}
               ${opsiHtml}
               <div class="mt-4 pt-3 border-t border-gray-100 inline-block">
@@ -980,7 +916,9 @@
       document.getElementById('view-bank-soal').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // ================= MENU: JADWAL UJIAN (BARU) =================
+    // ==========================================
+    // FITUR JADWAL UJIAN
+    // ==========================================
     async function loadMenuJadwal() {
        showLoader('Muat Formulir Jadwal...');
        try {
@@ -1034,7 +972,9 @@
        });
     }
 
-    // ================= MENU: PEMANTAUAN WEBCAM (BARU) =================
+    // ==========================================
+    // FITUR PEMANTAUAN WEBCAM
+    // ==========================================
     async function loadFilterPemantauan() {
        showLoader('Muat Filter...');
        try {
@@ -1063,9 +1003,13 @@
            result.data.forEach(p => {
                let badge = p.status === 'Selesai' ? 'bg-green-100 text-green-700 border-green-300' : 'bg-orange-100 text-orange-700 border-orange-300 animate-pulse';
                
-               let f1 = p.foto1 ? `<img src="${p.foto1}" onclick="lihatFotoUtuh('${p.foto1}', 'Foto Saat Login')" class="w-16 h-12 object-cover rounded shadow cursor-pointer mx-auto hover:scale-110 transition border border-gray-300">` : '-';
-               let f2 = p.foto2 ? `<img src="${p.foto2}" onclick="lihatFotoUtuh('${p.foto2}', 'Foto Menit ke-20')" class="w-16 h-12 object-cover rounded shadow cursor-pointer mx-auto hover:scale-110 transition border border-gray-300">` : '-';
-               let f3 = p.foto3 ? `<img src="${p.foto3}" onclick="lihatFotoUtuh('${p.foto3}', 'Foto Saat Selesai')" class="w-16 h-12 object-cover rounded shadow cursor-pointer mx-auto hover:scale-110 transition border border-gray-300">` : '-';
+               let url1 = getDirectImageUrl(p.foto1);
+               let url2 = getDirectImageUrl(p.foto2);
+               let url3 = getDirectImageUrl(p.foto3);
+               
+               let f1 = url1 ? `<img src="${url1}" onclick="lihatFotoUtuh('${url1}', 'Foto Saat Login')" class="w-16 h-12 object-cover rounded shadow cursor-pointer mx-auto hover:scale-110 transition border border-gray-300">` : '-';
+               let f2 = url2 ? `<img src="${url2}" onclick="lihatFotoUtuh('${url2}', 'Foto Menit ke-20')" class="w-16 h-12 object-cover rounded shadow cursor-pointer mx-auto hover:scale-110 transition border border-gray-300">` : '-';
+               let f3 = url3 ? `<img src="${url3}" onclick="lihatFotoUtuh('${url3}', 'Foto Saat Selesai')" class="w-16 h-12 object-cover rounded shadow cursor-pointer mx-auto hover:scale-110 transition border border-gray-300">` : '-';
 
                html += `<tr class="border-b hover:bg-gray-50">
                   <td class="p-4">
@@ -1127,6 +1071,9 @@
     // ================= REKAP HASIL UJIAN GLOBAL =================
     async function loadDropdownRekapAdmin() { const select = document.getElementById('select-rekap-admin'); select.innerHTML = '<option value="">Memuat Paket...</option>'; try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }); const result = await res.json(); let opts = '<option value="">-- Pilih Kode Ujian --</option>'; result.data.forEach(p => opts += `<option value="${p.kode}">${p.kode} - ${p.mapel} (${p.kelas})</option>`); select.innerHTML = opts; } catch(e) { select.innerHTML = '<option value="">Gagal</option>'; } }
     async function tampilkanRekapAdmin() { const kode = document.getElementById('select-rekap-admin').value; if(!kode) return Swal.fire('Info', 'Pilih paket ujian!', 'info'); const tbody = document.getElementById('tabel-rekap-nilai-admin'); showLoader('Menarik Nilai...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }); const result = await res.json(); hideLoader(); if(result.data.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">Belum ada siswa yang ikut ujian ini.</td></tr>`; let html = ''; result.data.forEach((s, i) => { html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-sm font-semibold">${s.nis}</td><td class="p-4 text-sm font-bold text-gray-800">${s.nama}</td><td class="p-4 text-center font-bold text-blue-600">${s.nilai_pg}</td><td class="p-4 text-center font-bold text-yellow-500">${s.nilai_essay}</td><td class="p-4 text-center font-black text-green-600 text-lg">${s.total}</td></tr>`; }); tbody.innerHTML = html; } catch(e) { hideLoader(); } }
+
+    // Initialize Dashboard on load
+    loadDashboard();
   </script>
 </body>
 </html>
