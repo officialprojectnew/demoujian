@@ -49,17 +49,21 @@
         <i class="fas fa-users w-5 text-center"></i> Manajemen User
       </button>
       
-      <!-- MENU BANK SOAL (WIDGET BASED) -->
+      <!-- MENU BANK SOAL -->
       <button onclick="switchMenu('view-bank-soal')" id="btn-view-bank-soal" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
         <i class="fas fa-database w-5 text-center"></i> Bank Soal
       </button>
       
-      <button onclick="comingSoon()" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
+      <!-- MENU JADWAL UJIAN -->
+      <button onclick="switchMenu('view-jadwal-ujian')" id="btn-view-jadwal-ujian" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
         <i class="fas fa-calendar-alt w-5 text-center"></i> Jadwal Ujian
       </button>
-      <button onclick="comingSoon()" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
+
+      <!-- MENU PEMANTAUAN UJIAN -->
+      <button onclick="switchMenu('view-pemantauan-ujian')" id="btn-view-pemantauan-ujian" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
         <i class="fas fa-eye w-5 text-center"></i> Pemantauan Ujian
       </button>
+      
       <button onclick="comingSoon()" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
         <i class="fas fa-file-signature w-5 text-center"></i> Berita Acara & Absen
       </button>
@@ -148,6 +152,63 @@
         </div>
       </div>
 
+      <!-- MENU: JADWAL UJIAN -->
+      <div id="view-jadwal-ujian" class="admin-menu hidden">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Penjadwalan Ujian</h2>
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6 p-6 md:p-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+             <div><label class="text-sm font-bold text-gray-700">Tanggal Ujian</label><input type="date" id="jadwal-tanggal" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500"></div>
+             <div><label class="text-sm font-bold text-gray-700">Jam Mulai</label><input type="time" id="jadwal-mulai" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500"></div>
+             <div><label class="text-sm font-bold text-gray-700">Jam Selesai</label><input type="time" id="jadwal-selesai" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500"></div>
+             <div>
+                <label class="text-sm font-bold text-gray-700">Pilih Paket Soal</label>
+                <select id="jadwal-soal" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500"><option value="">-- Loading --</option></select>
+             </div>
+             <div><label class="text-sm font-bold text-gray-700">Kelas / Ruang</label><input type="text" id="jadwal-kelas" placeholder="Cth: 10 IPA 1" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500 uppercase"></div>
+          </div>
+          <button onclick="simpanJadwalBaru()" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-blue-700 shadow-sm w-full md:w-auto"><i class="fas fa-save mr-2"></i> Simpan Jadwal</button>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden p-6 md:p-8">
+           <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-3">Daftar Jadwal Tersimpan</h3>
+           <div class="overflow-x-auto">
+             <table class="w-full text-left border-collapse whitespace-nowrap">
+               <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b">Tanggal</th><th class="p-4 border-b">Waktu</th><th class="p-4 border-b font-bold text-blue-600">Kode Soal</th><th class="p-4 border-b">Kelas</th><th class="p-4 border-b text-center">Aksi</th></tr></thead>
+               <tbody id="tabel-jadwal"><tr><td colspan="5" class="p-8 text-center text-gray-500">Loading...</td></tr></tbody>
+             </table>
+           </div>
+        </div>
+      </div>
+
+      <!-- MENU: PEMANTAUAN UJIAN (WEBCAM) -->
+      <div id="view-pemantauan-ujian" class="admin-menu hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">Pemantauan Ujian (Live Cam)</h2>
+          <button onclick="loadPemantauan()" class="bg-blue-100 text-blue-700 font-bold px-4 py-2 rounded-xl text-sm"><i class="fas fa-sync-alt mr-1"></i> Refresh</button>
+        </div>
+        
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6">
+          <div class="flex flex-col md:flex-row gap-4 items-end mb-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
+             <div class="flex-1 w-full">
+               <label class="text-sm font-bold text-gray-700">Filter Paket Soal</label>
+               <select id="filter-pantau-soal" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500"><option value="">-- Loading --</option></select>
+             </div>
+             <div class="flex-1 w-full">
+               <label class="text-sm font-bold text-gray-700">Filter Kelas</label>
+               <input type="text" id="filter-pantau-kelas" value="Semua" placeholder="Cth: 10 IPA 1 atau 'Semua'" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500 uppercase">
+             </div>
+             <button onclick="loadPemantauan()" class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-700 shadow-sm w-full md:w-auto"><i class="fas fa-search mr-2"></i> Pantau</button>
+          </div>
+
+          <div class="overflow-x-auto">
+             <table class="w-full text-left border-collapse whitespace-nowrap">
+               <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b">Peserta</th><th class="p-4 border-b text-center">Status</th><th class="p-4 border-b text-center">Foto Login</th><th class="p-4 border-b text-center">Foto 20 Menit</th><th class="p-4 border-b text-center">Foto Selesai</th></tr></thead>
+               <tbody id="tabel-pemantauan"><tr><td colspan="5" class="p-8 text-center text-gray-500">Pilih filter dan klik Pantau.</td></tr></tbody>
+             </table>
+          </div>
+        </div>
+      </div>
+
       <!-- MENU 2: MANAJEMEN USER -->
       <div id="view-manajemen-user" class="admin-menu hidden">
         <h2 class="text-3xl font-bold text-gray-800 mb-6">Manajemen User</h2>
@@ -156,20 +217,24 @@
             <button onclick="switchTabUser('siswa')" id="tab-btn-siswa" class="py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 transition">Data Siswa / Manajemen Kelas</button>
             <button onclick="switchTabUser('guru')" id="tab-btn-guru" class="py-4 text-center font-bold text-gray-400 hover:text-blue-600 hover:border-blue-600 transition border-b-2 border-transparent">Data Guru</button>
           </div>
+          
+          <!-- TAB SISWA -->
           <div id="tab-content-siswa" class="p-6 bg-gray-50/30 min-h-[400px]">
             <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 border-b pb-4 border-gray-200">
                <h3 class="text-xl font-bold text-gray-800" id="title-manajemen-siswa">Manajemen Kelas</h3>
                <div class="flex items-center gap-3 w-full md:w-auto">
                  <div class="relative w-full md:w-64">
                    <i class="fas fa-search absolute left-4 top-3 text-gray-400"></i>
-                   <input type="text" id="search-siswa" oninput="cariSiswa()" placeholder="Cari Nama atau NIS..." class="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-sm transition">
+                   <input type="text" id="search-siswa" oninput="cariSiswa()" placeholder="Cari Nama atau NISN..." class="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-sm transition">
                  </div>
                  <button onclick="loadRekapSiswa()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-sync-alt"></i></button>
                </div>
             </div>
+            
             <div id="view-kartu-kelas" class="block">
               <div id="kelas-cards-container" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4"><p class="text-sm text-gray-500 italic">Memuat data kelas...</p></div>
             </div>
+            
             <div id="view-tabel-siswa" class="hidden">
               <div class="flex justify-between items-center mb-5">
                 <button onclick="kembaliKeDaftarKelas()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
@@ -177,12 +242,13 @@
               </div>
               <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
                 <table class="w-full text-left border-collapse whitespace-nowrap">
-                  <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b text-center font-semibold">Foto</th><th class="p-4 border-b font-semibold">NIS</th><th class="p-4 border-b font-semibold">Nama Lengkap</th><th class="p-4 border-b font-semibold">Kelas</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
-                  <tbody id="tabel-rekap-siswa"><tr><td colspan="7" class="p-8 text-center text-gray-500 text-sm">Pilih kelas terlebih dahulu.</td></tr></tbody>
+                  <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b text-center font-semibold">Foto</th><th class="p-4 border-b font-semibold">NIS</th><th class="p-4 border-b font-semibold">Nama Lengkap</th><th class="p-4 border-b font-semibold">NISN</th><th class="p-4 border-b font-semibold">Kelas</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+                  <tbody id="tabel-rekap-siswa"><tr><td colspan="8" class="p-8 text-center text-gray-500 text-sm">Pilih kelas terlebih dahulu.</td></tr></tbody>
                 </table>
               </div>
             </div>
           </div>
+
           <div id="tab-content-guru" class="p-6 hidden bg-gray-50/30">
             <div class="flex justify-between items-center mb-6 border-b pb-4 border-gray-200">
               <h3 class="text-xl font-bold text-gray-800">Daftar Rekap Guru</h3>
@@ -201,18 +267,16 @@
         </div>
       </div>
 
-      <!-- MENU 3: BANK SOAL (MANAJEMEN MASTER & KUMPULAN SOAL) -->
+      <!-- MENU 3: BANK SOAL -->
       <div id="view-bank-soal" class="admin-menu hidden">
         <h2 class="text-3xl font-bold text-gray-800 mb-6">Manajemen & Bank Soal</h2>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6 min-h-[500px]">
-          <!-- TABS -->
           <div class="flex border-b border-gray-200 px-6 pt-2 gap-8">
             <button onclick="switchTabSoal('daftar')" id="tab-btn-daftar" class="py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 transition">Daftar Paket Ujian</button>
             <button onclick="switchTabSoal('master')" id="tab-btn-master" class="py-4 text-center font-bold text-gray-400 hover:text-blue-600 hover:border-blue-600 transition border-b-2 border-transparent">Manajemen Data Soal</button>
           </div>
           
-          <!-- TAB: DAFTAR PAKET UJIAN -->
           <div id="tab-content-daftar" class="p-6 md:p-8 bg-gray-50/30">
             <div class="flex justify-between items-center mb-6">
               <h3 class="text-xl font-bold text-gray-800">Daftar Paket Berdasarkan Mapel</h3>
@@ -233,7 +297,6 @@
               <div id="list-paket-soal-container" class="space-y-4"></div>
             </div>
             
-            <!-- VIEW RINCIAN SOAL -->
             <div id="detail-bank-soal-container" class="hidden mt-8 border-t pt-8 border-gray-200">
                <div class="flex justify-between items-center mb-6 bg-blue-50 p-4 rounded-xl border border-blue-100 shadow-sm">
                   <h3 class="text-xl font-bold text-blue-800" id="title-detail-soal">Detail Paket: -</h3>
@@ -243,7 +306,6 @@
             </div>
           </div>
 
-          <!-- TAB: MANAJEMEN DATA SOAL (MAPEL, KATEGORI, TAHUN) -->
           <div id="tab-content-master" class="p-6 md:p-8 hidden bg-gray-50/30">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
               <h3 class="text-xl font-bold text-gray-800">Database Atribut Soal</h3>
@@ -252,7 +314,6 @@
             <p class="text-sm text-gray-600 mb-6">Data ini akan muncul sebagai pilihan (*Dropdown*) bagi Guru saat membuat atau mengimpor soal, untuk men-generate Kode Soal Otomatis.</p>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <!-- Kolom MAPEL -->
               <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                 <h4 class="font-bold text-blue-700 mb-4 border-b pb-2"><i class="fas fa-book mr-2"></i>Mata Pelajaran</h4>
                 <div class="flex gap-2 mb-4">
@@ -262,7 +323,6 @@
                 <button onclick="tambahMasterUjian('Mapel')" class="w-full bg-blue-600 text-white font-bold py-2 rounded-lg text-sm mb-4 hover:bg-blue-700">Tambah</button>
                 <ul id="list-master-mapel" class="space-y-2 text-sm text-gray-700 max-h-60 overflow-y-auto pr-2"></ul>
               </div>
-              <!-- Kolom KATEGORI -->
               <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                 <h4 class="font-bold text-purple-700 mb-4 border-b pb-2"><i class="fas fa-tags mr-2"></i>Kategori Ujian</h4>
                 <div class="flex gap-2 mb-4">
@@ -272,7 +332,6 @@
                 <button onclick="tambahMasterUjian('Kategori')" class="w-full bg-purple-600 text-white font-bold py-2 rounded-lg text-sm mb-4 hover:bg-purple-700">Tambah</button>
                 <ul id="list-master-kategori" class="space-y-2 text-sm text-gray-700 max-h-60 overflow-y-auto pr-2"></ul>
               </div>
-              <!-- Kolom TAHUN AJARAN -->
               <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
                 <h4 class="font-bold text-orange-700 mb-4 border-b pb-2"><i class="fas fa-calendar mr-2"></i>Tahun Ajaran</h4>
                 <div class="flex gap-2 mb-4">
@@ -369,6 +428,7 @@
       <div class="space-y-4">
         <div><label class="text-sm font-semibold text-gray-700">NIS</label><input type="text" id="tambah-nis-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="tambah-nama-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
+        <div><label class="text-sm font-semibold text-gray-700">NISN</label><input type="text" id="tambah-nisn-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Kelas</label><input type="text" id="tambah-kelas-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="password" id="tambah-pass-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div class="p-3 border rounded-xl bg-gray-50">
@@ -389,6 +449,7 @@
       <div class="space-y-4">
         <div><label class="text-sm font-semibold text-gray-700">NIS (Bisa Diubah)</label><input type="text" id="edit-nis-siswa" class="w-full mt-1.5 p-3 border rounded-xl font-bold text-blue-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="edit-nama-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
+        <div><label class="text-sm font-semibold text-gray-700">NISN</label><input type="text" id="edit-nisn-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
         <div><label class="text-sm font-semibold text-gray-700">Kelas</label><input type="text" id="edit-kelas-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="text" id="edit-pass-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
         <div class="p-3 border rounded-xl bg-gray-50">
@@ -452,6 +513,7 @@
     function comingSoon() { Swal.fire('Fitur Segera Hadir!', 'Menu ini akan tersedia pada pembaruan aplikasi berikutnya.', 'info'); }
     function logoutAdmin() { Swal.fire({ title: 'Keluar Aplikasi?', text: "Anda akan logout dari panel administrator.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#94a3b8', confirmButtonText: 'Ya, Keluar' }).then((res) => { if (res.isConfirmed) logout(); }); }
     
+    // TAB MANAGEMENT & MENU SWITCHING
     function switchMenu(targetId) {
       document.querySelectorAll('.admin-menu').forEach(el => el.classList.replace('block', 'hidden'));
       document.querySelectorAll('.sidebar-item').forEach(btn => {
@@ -461,15 +523,16 @@
       document.getElementById(targetId).classList.replace('hidden', 'block');
       
       let activeBtn = document.getElementById('btn-' + targetId);
-      if(activeBtn) activeBtn.classList.add('sidebar-active');
+      if(activeBtn) {
+          activeBtn.classList.add('sidebar-active');
+      }
 
       if(targetId === 'view-dashboard') loadDashboard();
       if(targetId === 'view-manajemen-user') { loadRekapSiswa(); loadRekapGuru(); }
-      
-      // Update pemanggilan menu
       if(targetId === 'view-bank-soal') { loadBankSoalGrup(); loadMasterUjian(); switchTabSoal('daftar'); }
+      if(targetId === 'view-jadwal-ujian') loadMenuJadwal();
+      if(targetId === 'view-pemantauan-ujian') loadFilterPemantauan();
       if(targetId === 'view-token-ujian') loadManajemenUjian();
-      
       if(targetId === 'view-cetak-kartu') loadKartuUjian();
       if(targetId === 'view-rekap-nilai') loadDropdownRekapAdmin();
     }
@@ -516,7 +579,7 @@
     function tutupModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
 
     function bukaModalTambahSiswa() { 
-      ['tambah-nis-siswa','tambah-nama-siswa','tambah-kelas-siswa','tambah-pass-siswa','tambah-foto-siswa'].forEach(i => document.getElementById(i).value=''); 
+      ['tambah-nis-siswa','tambah-nama-siswa','tambah-nisn-siswa','tambah-kelas-siswa','tambah-pass-siswa','tambah-foto-siswa'].forEach(i => document.getElementById(i).value=''); 
       if(currentSelectedKelas !== "") { document.getElementById('tambah-kelas-siswa').value = currentSelectedKelas; }
       bukaModal('modal-tambah-siswa'); 
     }
@@ -586,8 +649,15 @@
     // ================= CRUD SISWA =================
     async function simpanSiswaBaru() {
       let fileInput = document.getElementById('tambah-foto-siswa'); let base64Foto = ""; if (fileInput.files.length > 0) base64Foto = await getBase64(fileInput.files[0]);
-      const data = { nis: document.getElementById('tambah-nis-siswa').value, nama: document.getElementById('tambah-nama-siswa').value, kelas: document.getElementById('tambah-kelas-siswa').value, password: document.getElementById('tambah-pass-siswa').value, foto: base64Foto };
-      if(!data.nis || !data.nama || !data.kelas || !data.password) return Swal.fire('Oops!','Harap isi semua kolom Teks!','warning');
+      const data = { 
+        nis: document.getElementById('tambah-nis-siswa').value, 
+        nama: document.getElementById('tambah-nama-siswa').value, 
+        nisn: document.getElementById('tambah-nisn-siswa').value,
+        kelas: document.getElementById('tambah-kelas-siswa').value, 
+        password: document.getElementById('tambah-pass-siswa').value, 
+        foto: base64Foto 
+      };
+      if(!data.nis || !data.nama || !data.kelas || !data.password || !data.nisn) return Swal.fire('Oops!','Harap isi semua kolom Teks!','warning');
       showLoader('Menyimpan Data...');
       try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanSiswa', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Berhasil!', result.pesan, 'success'); tutupModal('modal-tambah-siswa'); loadRekapSiswa(); } else { Swal.fire('Gagal!', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error!','Gagal.','error'); }
     }
@@ -653,28 +723,45 @@
         if (query === "") { if (currentSelectedKelas !== "") { showKelasDetail(currentSelectedKelas); } else { kembaliKeDaftarKelas(); } return; }
         let filteredData = allSiswaData;
         if (currentSelectedKelas !== "") { filteredData = filteredData.filter(s => s.kelas === currentSelectedKelas); }
-        filteredData = filteredData.filter(s => s.nama.toLowerCase().includes(query) || s.nis.toLowerCase().includes(query));
+        filteredData = filteredData.filter(s => s.nama.toLowerCase().includes(query) || s.nis.toLowerCase().includes(query) || (s.nisn && s.nisn.toLowerCase().includes(query)));
         document.getElementById('view-kartu-kelas').classList.add('hidden'); document.getElementById('view-tabel-siswa').classList.remove('hidden');
         renderTabelSiswa(filteredData);
     }
 
     function renderTabelSiswa(dataArray) {
         const tbody = document.getElementById('tabel-rekap-siswa');
-        if(dataArray.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">Tidak ada data siswa ditemukan.</td></tr>`; return; }
+        if(dataArray.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">Tidak ada data siswa ditemukan.</td></tr>`; return; }
         let html = ''; 
         dataArray.forEach((s, i) => { 
           let jsData = JSON.stringify(s).replace(/'/g, "\\'"); let urlFoto = getDirectImageUrl(s.foto);
           let imgTbl = urlFoto ? `<img src="${urlFoto}" class="h-10 w-10 object-cover rounded-full border shadow-sm mx-auto">` : `<div class="h-10 w-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center text-xs mx-auto border border-blue-100"><i class="fas fa-user"></i></div>`;
-          html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-center">${imgTbl}</td><td class="p-4 text-sm font-bold text-gray-800">${s.nis}</td><td class="p-4 text-sm">${s.nama}</td><td class="p-4 text-sm">${s.kelas}</td><td class="p-4 text-sm font-mono text-gray-400">${s.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditSiswa(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg hover:bg-yellow-200 transition flex items-center justify-center"><i class="fas fa-pen"></i></button> <button onclick="hapusSiswa('${s.nis}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg hover:bg-red-200 transition flex items-center justify-center"><i class="fas fa-trash"></i></button></td></tr>`; 
+          html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-center">${imgTbl}</td><td class="p-4 text-sm font-bold text-gray-800">${s.nis}</td><td class="p-4 text-sm">${s.nama}</td><td class="p-4 text-sm">${s.nisn || '-'}</td><td class="p-4 text-sm">${s.kelas}</td><td class="p-4 text-sm font-mono text-gray-400">${s.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditSiswa(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg hover:bg-yellow-200 transition flex items-center justify-center"><i class="fas fa-pen"></i></button> <button onclick="hapusSiswa('${s.nis}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg hover:bg-red-200 transition flex items-center justify-center"><i class="fas fa-trash"></i></button></td></tr>`; 
         }); tbody.innerHTML = html;
     }
 
     let old_nis_edit = "";
-    function bukaEditSiswa(data) { old_nis_edit = data.nis; document.getElementById('edit-nis-siswa').value = data.nis; document.getElementById('edit-nama-siswa').value = data.nama; document.getElementById('edit-kelas-siswa').value = data.kelas; document.getElementById('edit-pass-siswa').value = data.password; document.getElementById('edit-foto-siswa').value = ''; bukaModal('modal-edit-siswa'); }
+    function bukaEditSiswa(data) { 
+        old_nis_edit = data.nis; 
+        document.getElementById('edit-nis-siswa').value = data.nis; 
+        document.getElementById('edit-nama-siswa').value = data.nama; 
+        document.getElementById('edit-nisn-siswa').value = data.nisn || '';
+        document.getElementById('edit-kelas-siswa').value = data.kelas; 
+        document.getElementById('edit-pass-siswa').value = data.password; 
+        document.getElementById('edit-foto-siswa').value = ''; 
+        bukaModal('modal-edit-siswa'); 
+    }
     async function simpanEditSiswa() {
       let fileInput = document.getElementById('edit-foto-siswa'); let base64Foto = ""; if (fileInput.files.length > 0) base64Foto = await getBase64(fileInput.files[0]);
-      const data = { old_nis: old_nis_edit, nis: document.getElementById('edit-nis-siswa').value, nama: document.getElementById('edit-nama-siswa').value, kelas: document.getElementById('edit-kelas-siswa').value, password: document.getElementById('edit-pass-siswa').value, foto: base64Foto };
-      if(!data.nama || !data.kelas || !data.password || !data.nis) return Swal.fire('Oops!', 'Teks form tidak boleh kosong!', 'warning');
+      const data = { 
+        old_nis: old_nis_edit, 
+        nis: document.getElementById('edit-nis-siswa').value, 
+        nama: document.getElementById('edit-nama-siswa').value, 
+        nisn: document.getElementById('edit-nisn-siswa').value,
+        kelas: document.getElementById('edit-kelas-siswa').value, 
+        password: document.getElementById('edit-pass-siswa').value, 
+        foto: base64Foto 
+      };
+      if(!data.nama || !data.kelas || !data.password || !data.nis || !data.nisn) return Swal.fire('Oops!', 'Teks form tidak boleh kosong!', 'warning');
       showLoader('Memperbarui Data & Foto...');
       try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editSiswa', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Berhasil!', result.pesan, 'success'); tutupModal('modal-edit-siswa'); loadRekapSiswa(); } else { Swal.fire('Gagal!', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error!','Gagal.','error');} 
     }
@@ -693,7 +780,6 @@
     function bukaEditGuru(data) { document.getElementById('edit-nip-guru').value = data.nip; document.getElementById('edit-nama-guru').value = data.nama; document.getElementById('edit-user-guru').value = data.username; document.getElementById('edit-pass-guru').value = data.password; bukaModal('modal-edit-guru'); }
     async function simpanEditGuru() { const data = { nip: document.getElementById('edit-nip-guru').value, nama: document.getElementById('edit-nama-guru').value, username: document.getElementById('edit-user-guru').value, password: document.getElementById('edit-pass-guru').value }; showLoader('Memperbarui...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editGuru', data }) }); await res.json(); hideLoader(); tutupModal('modal-edit-guru'); loadRekapGuru(); } catch(e) { hideLoader(); } }
     function hapusGuru(nip) { Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya!' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusGuru', nip }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapGuru(); } catch(e) { hideLoader(); } } }); }
-
 
     // ================= MENU BARU: DATABASE ATRIBUT SOAL =================
     async function loadMasterUjian() {
@@ -892,6 +978,120 @@
       document.getElementById('detail-bank-soal-container').classList.add('hidden');
       document.getElementById('list-butir-soal').innerHTML = '';
       document.getElementById('view-bank-soal').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ================= MENU: JADWAL UJIAN (BARU) =================
+    async function loadMenuJadwal() {
+       showLoader('Muat Formulir Jadwal...');
+       try {
+           const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) });
+           const result = await res.json();
+           let opts = '<option value="">-- Pilih Paket Soal --</option>';
+           result.data.forEach(p => opts += `<option value="${p.kode}">${p.kode} - ${p.mapel}</option>`);
+           document.getElementById('jadwal-soal').innerHTML = opts;
+           
+           loadDaftarJadwal();
+       } catch(e) { hideLoader(); }
+    }
+
+    async function loadDaftarJadwal() {
+       try {
+           const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) });
+           const result = await res.json();
+           hideLoader();
+           let html = '';
+           result.data.forEach(j => {
+               html += `<tr class="border-b hover:bg-gray-50"><td class="p-4">${j.tanggal}</td><td class="p-4">${j.jam_mulai} - ${j.jam_selesai}</td><td class="p-4 font-bold text-blue-600">${j.kode_soal}</td><td class="p-4 uppercase">${j.kelas}</td><td class="p-4 text-center"><button onclick="hapusJadwal('${j.id}')" class="text-red-600 font-bold bg-red-50 px-3 py-1 rounded border border-red-200 shadow-sm hover:bg-red-100 transition">Hapus</button></td></tr>`;
+           });
+           document.getElementById('tabel-jadwal').innerHTML = html || `<tr><td colspan="5" class="p-8 text-center text-gray-500">Belum ada jadwal tersimpan.</td></tr>`;
+       } catch(e) { hideLoader(); }
+    }
+
+    async function simpanJadwalBaru() {
+       const tgl = document.getElementById('jadwal-tanggal').value;
+       const jMulai = document.getElementById('jadwal-mulai').value;
+       const jSelesai = document.getElementById('jadwal-selesai').value;
+       const soal = document.getElementById('jadwal-soal').value;
+       const kelas = document.getElementById('jadwal-kelas').value.toUpperCase();
+       
+       if(!tgl || !jMulai || !jSelesai || !soal || !kelas) return Swal.fire('Oops', 'Lengkapi semua form jadwal!', 'warning');
+
+       showLoader('Menyimpan Jadwal...');
+       try {
+           await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanJadwal', data: { tanggal: tgl, jam_mulai: jMulai, jam_selesai: jSelesai, kode_soal: soal, kelas: kelas } }) });
+           document.getElementById('jadwal-tanggal').value = ''; document.getElementById('jadwal-mulai').value = ''; document.getElementById('jadwal-selesai').value = ''; document.getElementById('jadwal-soal').value = ''; document.getElementById('jadwal-kelas').value = '';
+           loadDaftarJadwal();
+       } catch(e) { hideLoader(); }
+    }
+
+    function hapusJadwal(id) {
+       Swal.fire({title: 'Hapus Jadwal?', icon: 'warning', showCancelButton: true}).then(async r => {
+           if(r.isConfirmed) {
+               showLoader('Menghapus...');
+               await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusJadwal', id: id }) });
+               loadDaftarJadwal();
+           }
+       });
+    }
+
+    // ================= MENU: PEMANTAUAN WEBCAM (BARU) =================
+    async function loadFilterPemantauan() {
+       showLoader('Muat Filter...');
+       try {
+           const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) });
+           const result = await res.json();
+           hideLoader();
+           let opts = '<option value="">-- Pilih Paket Soal Dulu --</option>';
+           result.data.forEach(p => opts += `<option value="${p.kode}">${p.kode} - ${p.mapel}</option>`);
+           document.getElementById('filter-pantau-soal').innerHTML = opts;
+       } catch(e) { hideLoader(); }
+    }
+
+    async function loadPemantauan() {
+       const kode = document.getElementById('filter-pantau-soal').value;
+       const kelas = document.getElementById('filter-pantau-kelas').value.toUpperCase();
+       
+       if(!kode) return Swal.fire('Pilih', 'Pilih paket soal terlebih dahulu untuk memantau.', 'info');
+       
+       showLoader('Menarik data pemantauan...');
+       try {
+           const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getPemantauan', kode_soal: kode, kelas: kelas }) });
+           const result = await res.json();
+           hideLoader();
+           
+           let html = '';
+           result.data.forEach(p => {
+               let badge = p.status === 'Selesai' ? 'bg-green-100 text-green-700 border-green-300' : 'bg-orange-100 text-orange-700 border-orange-300 animate-pulse';
+               
+               let f1 = p.foto1 ? `<img src="${p.foto1}" onclick="lihatFotoUtuh('${p.foto1}', 'Foto Saat Login')" class="w-16 h-12 object-cover rounded shadow cursor-pointer mx-auto hover:scale-110 transition border border-gray-300">` : '-';
+               let f2 = p.foto2 ? `<img src="${p.foto2}" onclick="lihatFotoUtuh('${p.foto2}', 'Foto Menit ke-20')" class="w-16 h-12 object-cover rounded shadow cursor-pointer mx-auto hover:scale-110 transition border border-gray-300">` : '-';
+               let f3 = p.foto3 ? `<img src="${p.foto3}" onclick="lihatFotoUtuh('${p.foto3}', 'Foto Saat Selesai')" class="w-16 h-12 object-cover rounded shadow cursor-pointer mx-auto hover:scale-110 transition border border-gray-300">` : '-';
+
+               html += `<tr class="border-b hover:bg-gray-50">
+                  <td class="p-4">
+                     <p class="font-bold text-gray-800">${p.nama}</p>
+                     <p class="text-xs text-gray-500">NIS: ${p.nis} | Kls: <span class="font-semibold">${p.kelas}</span></p>
+                  </td>
+                  <td class="p-4 text-center"><span class="px-3 py-1 text-xs font-bold rounded-full border ${badge}">${p.status}</span></td>
+                  <td class="p-4 text-center">${f1}</td>
+                  <td class="p-4 text-center">${f2}</td>
+                  <td class="p-4 text-center">${f3}</td>
+               </tr>`;
+           });
+           
+           document.getElementById('tabel-pemantauan').innerHTML = html || `<tr><td colspan="5" class="p-8 text-center text-gray-500">Tidak ada data peserta yang cocok.</td></tr>`;
+       } catch(e) { hideLoader(); document.getElementById('tabel-pemantauan').innerHTML = `<tr><td colspan="5" class="p-8 text-center text-red-500">Gagal menarik data.</td></tr>`; }
+    }
+
+    function lihatFotoUtuh(url, title) {
+        Swal.fire({
+            title: title,
+            imageUrl: url,
+            imageWidth: 400,
+            imageAlt: 'Foto Pemantauan',
+            confirmButtonColor: '#2563eb',
+            confirmButtonText: 'Tutup'
+        });
     }
 
     // ================= MENU TOKEN UJIAN (MANAJEMEN LAMA) =================
