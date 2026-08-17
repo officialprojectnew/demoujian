@@ -73,12 +73,9 @@
       <button onclick="comingSoon()" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
         <i class="fas fa-file-signature w-5 text-center"></i> Berita Acara & Absen
       </button>
-      
-      <!-- MENU CETAK KARTU SISWA -->
       <button onclick="switchMenu('view-cetak-kartu')" id="btn-view-cetak-kartu" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
-        <i class="fas fa-id-card w-5 text-center"></i> Cetak Kartu Siswa
+        <i class="fas fa-print w-5 text-center"></i> Cetak Kartu Siswa
       </button>
-
       <button onclick="switchMenu('view-rekap-nilai')" id="btn-view-rekap-nilai" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
         <i class="fas fa-check-circle w-5 text-center"></i> Rekapitulasi Nilai
       </button>
@@ -140,14 +137,20 @@
           </div>
         </div>
         
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-gray-800">Status Pengerjaan (Ujian Aktif)</h2>
-            <button onclick="loadDashboard()" class="text-blue-500 hover:text-blue-700 transition font-semibold text-sm"><i class="fas fa-sync-alt"></i> Refresh Diagram</button>
-          </div>
-          <p class="text-sm text-gray-500 mb-4">Diagram Pie ini menampilkan proporsi siswa yang <b class="text-green-500">Sudah</b> dan <b class="text-red-500">Belum</b> mengerjakan pada ujian yang sedang aktif. <i>(Arahkan kursor ke area diagram untuk melihat daftar nama siswa)</i>.</p>
-          <div class="relative w-full h-80 flex justify-center"><canvas id="ujianChart"></canvas></div>
+        <!-- DASHBOARD CHARTS: MULTIPLE PIE CHARTS -->
+        <div class="mb-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+           <div>
+               <h2 class="text-xl font-bold text-gray-800">Status Pengerjaan (Ujian Aktif)</h2>
+               <p class="text-sm text-gray-500 mt-1">Pantau progres siswa per-paket soal. Arahkan kursor ke diagram untuk melihat nama.</p>
+           </div>
+           <div class="flex gap-2 w-full md:w-auto">
+             <input type="text" id="dash-filter-kelas" oninput="renderDashboardCharts()" placeholder="Filter Kelas..." class="w-full md:w-48 p-2 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm shadow-sm">
+             <button onclick="loadDashboard()" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded-xl transition font-semibold text-sm shadow-sm whitespace-nowrap"><i class="fas fa-sync-alt"></i> Refresh</button>
+           </div>
         </div>
+        <!-- Grid untuk menampung diagram per paket soal -->
+        <div id="dashboard-charts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"></div>
+
       </div>
 
       <!-- MENU: JADWAL UJIAN -->
@@ -376,7 +379,10 @@
           <div id="token-exams-container" class="hidden">
              <div class="mb-4 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-gray-800">Daftar Paket Ujian</h3>
-                <button id="btn-aktifkan-semua" onclick="aktifkanSemuaToken()" class="bg-green-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow hover:bg-green-700 transition"><i class="fas fa-bolt mr-2"></i>Aktifkan Sesi Ini</button>
+                <div class="flex gap-2">
+                  <button id="btn-nonaktifkan-semua" onclick="nonaktifkanSemuaToken()" class="bg-red-100 text-red-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-red-200 transition border border-red-200"><i class="fas fa-ban mr-1"></i>Nonaktifkan Sesi</button>
+                  <button id="btn-aktifkan-semua" onclick="aktifkanSemuaToken()" class="bg-green-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow hover:bg-green-700 transition"><i class="fas fa-bolt mr-2"></i>Aktifkan Sesi Ini</button>
+                </div>
              </div>
              <div class="overflow-x-auto border border-gray-200 rounded-xl">
                <table class="w-full text-left border-collapse whitespace-nowrap">
@@ -408,11 +414,10 @@
             <h2 class="text-3xl font-bold text-gray-800">Cetak Kartu Siswa (A4)</h2>
             <button onclick="loadKartuUjian()" class="bg-purple-100 text-purple-700 font-bold px-5 py-2.5 rounded-xl hover:bg-purple-200 transition shadow-sm text-sm"><i class="fas fa-sync-alt mr-2"></i> Muat Ulang Kartu</button>
           </div>
-          <p class="text-sm text-gray-600 mb-6 border-l-4 border-purple-500 pl-4 bg-purple-50/50 py-3 rounded-r-xl">Pastikan <b>Konfigurasi Sekolah</b> (Logo dan Nama Sekolah) dan <b>Jadwal Ujian</b> sudah diisi sebelum melakukan pencetakan. Klik <b>Cetak Semua Kartu (A4)</b> untuk print.</p>
+          <p class="text-sm text-gray-600 mb-6 border-l-4 border-purple-500 pl-4 bg-purple-50/50 py-3 rounded-r-xl">Pastikan <b>Konfigurasi Sekolah</b> (Logo dan Nama Sekolah) dan <b>Jadwal Ujian</b> sudah diisi sebelum melakukan pencetakan.</p>
           
           <div class="flex flex-wrap gap-3 mb-6 bg-gray-50 p-4 border rounded-xl items-center justify-between">
             <div class="flex gap-3 items-center">
-                <!-- FITUR BARU: Buka Modal Generate -->
                 <button onclick="bukaModalGenerateKartu()" class="bg-blue-600 text-white font-bold px-5 py-2.5 rounded-lg text-sm hover:bg-blue-700 shadow transition"><i class="fas fa-magic mr-2"></i> Generate dari Master</button>
                 <div class="w-px h-6 bg-gray-300 mx-2 hidden md:block"></div>
                 <input type="file" id="file-import-kartu" accept=".xlsx, .xls" class="text-sm border p-1.5 rounded-lg bg-white w-full md:w-auto">
@@ -421,14 +426,14 @@
             
             <div class="flex gap-3 items-center">
                <button onclick="hapusSemuaKartu()" class="bg-red-50 text-red-600 font-bold px-4 py-2.5 rounded-lg hover:bg-red-100 transition border border-red-200 text-sm"><i class="fas fa-trash-alt"></i></button>
-               <button onclick="cetakKartuA4()" class="bg-green-600 text-white font-black px-6 py-2.5 rounded-lg text-sm hover:bg-green-700 shadow-lg transition shadow-green-500/30 tracking-wide"><i class="fas fa-print mr-2"></i> CETAK SEMUA KARTU (A4)</button>
+               <button onclick="bukaModalCetakKartu()" class="bg-green-600 text-white font-black px-6 py-2.5 rounded-lg text-sm hover:bg-green-700 shadow-lg transition shadow-green-500/30 tracking-wide"><i class="fas fa-print mr-2"></i> CETAK KARTU (A4)</button>
             </div>
           </div>
 
           <div class="overflow-x-auto border border-gray-200 rounded-xl">
             <table class="w-full text-left border-collapse whitespace-nowrap">
-              <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">No. Peserta (NIS)</th><th class="p-4 border-b font-semibold">Nama Lengkap</th><th class="p-4 border-b text-center font-semibold">Foto</th><th class="p-4 border-b font-semibold">NISN</th><th class="p-4 border-b font-semibold">Sesi</th><th class="p-4 border-b font-semibold">Ruang</th></tr></thead>
-              <tbody id="tabel-kartu-ujian"><tr><td colspan="7" class="p-8 text-center text-gray-500 text-sm">Memuat data kartu...</td></tr></tbody>
+              <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">No. Peserta (NIS)</th><th class="p-4 border-b font-semibold">Nama Lengkap</th><th class="p-4 border-b text-center font-semibold">Foto</th><th class="p-4 border-b font-semibold">NISN</th><th class="p-4 border-b font-semibold">Sesi</th><th class="p-4 border-b font-semibold">Ruang</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+              <tbody id="tabel-kartu-ujian"><tr><td colspan="8" class="p-8 text-center text-gray-500 text-sm">Memuat data kartu...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -504,7 +509,45 @@
     </div>
   </div>
 
-  <!-- KUMPULAN MODAL (Siswa, Guru & Generate Kartu) -->
+  <!-- KUMPULAN MODAL (Siswa, Guru, Jadwal & Generate Kartu) -->
+  
+  <div id="modal-edit-jadwal" class="fixed inset-0 modal-overlay hidden z-50 flex justify-center items-center p-4">
+    <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-lg transform transition-transform duration-200">
+      <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Edit Jadwal Ujian</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div><label class="text-sm font-bold text-gray-700">Tanggal</label><input type="date" id="edit-jadwal-tanggal" class="w-full mt-1 p-2 border rounded-lg focus:border-blue-500 outline-none"></div>
+          <div><label class="text-sm font-bold text-gray-700">Jam Mulai</label><input type="time" id="edit-jadwal-mulai" class="w-full mt-1 p-2 border rounded-lg focus:border-blue-500 outline-none"></div>
+          <div><label class="text-sm font-bold text-gray-700">Jam Selesai</label><input type="time" id="edit-jadwal-selesai" class="w-full mt-1 p-2 border rounded-lg focus:border-blue-500 outline-none"></div>
+          <div>
+            <label class="text-sm font-bold text-gray-700">Paket Soal</label>
+            <select id="edit-jadwal-soal" class="w-full mt-1 p-2 border rounded-lg focus:border-blue-500 outline-none"></select>
+          </div>
+          <div><label class="text-sm font-bold text-gray-700">Sesi</label><input type="text" id="edit-jadwal-sesi" class="w-full mt-1 p-2 border rounded-lg focus:border-blue-500 outline-none uppercase"></div>
+          <div><label class="text-sm font-bold text-gray-700">Ruang</label><input type="text" id="edit-jadwal-ruang" class="w-full mt-1 p-2 border rounded-lg focus:border-blue-500 outline-none uppercase"></div>
+      </div>
+      <div class="flex gap-2 mt-4"><button onclick="tutupModal('modal-edit-jadwal')" class="flex-1 bg-gray-200 p-3 rounded-xl font-bold">Batal</button><button onclick="simpanEditJadwal()" class="flex-1 bg-blue-600 text-white p-3 rounded-xl font-bold">Update Jadwal</button></div>
+    </div>
+  </div>
+
+  <div id="modal-edit-kartu" class="fixed inset-0 modal-overlay hidden z-50 flex justify-center items-center p-4">
+    <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-md transform transition-transform duration-200">
+      <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Edit Kartu Siswa</h3>
+      <div class="space-y-3">
+        <div><label class="text-sm font-semibold">NIS (Terkunci)</label><input type="text" id="edit-kartu-nis" disabled class="w-full mt-1 p-2 border rounded bg-gray-100"></div>
+        <div><label class="text-sm font-semibold">Nama Lengkap</label><input type="text" id="edit-kartu-nama" class="w-full mt-1 p-2 border rounded focus:border-blue-500 outline-none"></div>
+        <div><label class="text-sm font-semibold">NISN</label><input type="text" id="edit-kartu-nisn" class="w-full mt-1 p-2 border rounded focus:border-blue-500 outline-none"></div>
+        <div><label class="text-sm font-semibold">Sesi</label><input type="text" id="edit-kartu-sesi" class="w-full mt-1 p-2 border rounded focus:border-blue-500 outline-none uppercase"></div>
+        <div><label class="text-sm font-semibold">Ruang</label><input type="text" id="edit-kartu-ruang" class="w-full mt-1 p-2 border rounded focus:border-blue-500 outline-none uppercase"></div>
+        <div><label class="text-sm font-semibold">Password</label><input type="text" id="edit-kartu-pass" class="w-full mt-1 p-2 border rounded focus:border-blue-500 outline-none"></div>
+        <div><label class="text-sm font-semibold">Update Foto (Opsional)</label><input type="file" id="edit-kartu-foto" accept="image/*" class="w-full mt-1 text-sm border p-1 rounded"></div>
+      </div>
+      <div class="flex gap-2 mt-5 border-t pt-4">
+         <button onclick="tutupModal('modal-edit-kartu')" class="flex-1 bg-gray-100 p-2.5 rounded-xl font-bold">Batal</button>
+         <button onclick="simpanEditKartu()" class="flex-1 bg-blue-600 text-white p-2.5 rounded-xl font-bold shadow-md">Update Kartu</button>
+      </div>
+    </div>
+  </div>
+
   <div id="modal-generate-kartu" class="fixed inset-0 modal-overlay hidden z-50 flex justify-center items-center p-4">
     <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-3xl transform transition-transform duration-200 max-h-[90vh] flex flex-col">
       <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Generate Kartu Siswa</h3>
@@ -548,6 +591,46 @@
       <div class="pt-5 mt-4 border-t flex gap-3">
         <button onclick="tutupModal('modal-generate-kartu')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-200 transition border border-gray-200">Batal</button>
         <button onclick="prosesGenerateKartuPilihan()" class="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 shadow-lg shadow-green-500/30 transition">Generate & Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CETAK KARTU (PILIHAN) -->
+  <div id="modal-cetak-kartu-filter" class="fixed inset-0 modal-overlay hidden z-50 flex justify-center items-center p-4">
+    <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-3xl transform transition-transform duration-200 max-h-[90vh] flex flex-col">
+      <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Cetak Kartu Siswa</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="text-sm font-semibold text-gray-700">Filter Sesi</label>
+          <select id="cetak-filter-sesi" onchange="renderSiswaCetakKartu()" class="w-full mt-1 p-2 border rounded-xl focus:border-blue-500 outline-none">
+            <option value="">Semua Sesi</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-gray-700">Filter Ruang</label>
+          <select id="cetak-filter-ruang" onchange="renderSiswaCetakKartu()" class="w-full mt-1 p-2 border rounded-xl focus:border-blue-500 outline-none">
+            <option value="">Semua Ruang</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mb-2">
+          <label class="flex items-center gap-2 text-sm font-bold text-gray-700 cursor-pointer">
+              <input type="checkbox" id="chk-all-cetak-siswa" onchange="toggleCheckAllCetakKartu()" class="w-4 h-4 accent-blue-600 cursor-pointer"> Pilih Semua Siswa Tertampil
+          </label>
+          <span id="cetak-count-selected" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-200">0 Terpilih</span>
+      </div>
+
+      <div class="overflow-y-auto flex-1 border border-gray-200 rounded-xl bg-gray-50 p-2">
+         <table class="w-full text-left border-collapse text-sm">
+             <tbody id="list-cetak-siswa"></tbody>
+         </table>
+      </div>
+
+      <div class="pt-5 mt-4 border-t flex gap-3">
+        <button onclick="tutupModal('modal-cetak-kartu-filter')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-200 transition border border-gray-200">Batal</button>
+        <button onclick="cetakKartuA4Terpilih()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition"><i class="fas fa-print mr-2"></i> Cetak Terpilih (A4)</button>
       </div>
     </div>
   </div>
@@ -645,7 +728,6 @@
       return url;
     }
 
-    // Fungsi Kompresi Cerdas untuk mengatasi batas payload Google Apps Script
     function compressImage(file, maxDim = 800) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -672,7 +754,6 @@
             reader.onerror = error => reject(error);
         });
     }
-
     function getBase64(file) { return compressImage(file); }
 
     function switchMenu(targetId) {
@@ -723,10 +804,12 @@
     function tutupModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
 
     // ==========================================
-    // LOGIKA DASHBOARD DENGAN DIAGRAM PIE (Ujian Aktif)
+    // LOGIKA DASHBOARD DENGAN DIAGRAM PIE
     // ==========================================
-    let chartInstance = null;
-    let globalUjianData = []; 
+    let dashChartInstances = [];
+    let globalDashSiswa = [];
+    let globalDashUjian = [];
+    let globalDashRekap = [];
     
     async function loadDashboard() {
       showLoader('Menyinkronkan Dashboard & Chart...');
@@ -737,94 +820,99 @@
           fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }).then(r=>r.json())
         ]);
 
-        const siswaData = resSiswa.data || [];
-        document.getElementById('dash-siswa').innerText = siswaData.length;
+        globalDashSiswa = resSiswa.data || [];
+        document.getElementById('dash-siswa').innerText = globalDashSiswa.length;
         document.getElementById('dash-guru').innerText = resGuru.data ? resGuru.data.length : 0;
         
         let kelasUnik = new Set();
-        siswaData.forEach(s => { if(s.kelas) kelasUnik.add(s.kelas); });
+        globalDashSiswa.forEach(s => { if(s.kelas) kelasUnik.add(s.kelas); });
         document.getElementById('dash-kelas').innerText = kelasUnik.size;
 
-        globalUjianData = resUjian.data || [];
-        document.getElementById('dash-ujian').innerText = globalUjianData.length;
+        globalDashUjian = resUjian.data || [];
+        document.getElementById('dash-ujian').innerText = globalDashUjian.length;
         
-        let activeExams = globalUjianData.filter(u => u.status === 'Aktif');
+        let activeExams = globalDashUjian.filter(u => u.status === 'Aktif');
         document.getElementById('dash-sesi').innerText = activeExams.length;
-
-        let listSudah = [];
-        let listBelum = [];
 
         if(activeExams.length > 0) {
           const rekapPromises = activeExams.map(u => fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: u.kode }) }).then(r=>r.json()) );
-          const rekapResults = await Promise.all(rekapPromises);
-
-          activeExams.forEach((u, idx) => {
-            const rekapData = rekapResults[idx].data || [];
-            const sudahNames = rekapData.map(r => r.nama);
-            const targetSiswa = siswaData.filter(s => s.kelas === u.kelas);
-            const belumNames = targetSiswa.filter(s => !sudahNames.includes(s.nama)).map(s => `${s.nama} (${u.mapel})`);
-            
-            listSudah.push(...sudahNames.map(n => `${n} (${u.mapel})`));
-            listBelum.push(...belumNames);
-          });
+          globalDashRekap = await Promise.all(rekapPromises);
+        } else {
+          globalDashRekap = [];
         }
 
-        let dataPie = [listSudah.length, listBelum.length];
-        let bgColor = ['#4ade80', '#f87171'];
-        let labelsPie = ['Sudah Mengerjakan', 'Belum Mengerjakan'];
-        
-        if (activeExams.length === 0) {
-           dataPie = [1];
-           bgColor = ['#cbd5e1'];
-           labelsPie = ['Tidak ada Ujian Aktif'];
-        }
-
-        const ctx = document.getElementById('ujianChart');
-        if(chartInstance) chartInstance.destroy();
-        if(ctx) {
-            chartInstance = new Chart(ctx, {
-              type: 'pie',
-              data: {
-                labels: labelsPie,
-                datasets: [{
-                  data: dataPie,
-                  backgroundColor: bgColor,
-                  borderWidth: 1
-                }]
-              },
-              options: { 
-                responsive: true, 
-                maintainAspectRatio: false,
-                plugins: { 
-                  legend: { position: 'bottom' },
-                  tooltip: {
-                      callbacks: {
-                          label: function(context) {
-                              if (activeExams.length === 0) return ' Tidak ada Ujian Aktif';
-                              return ` ${context.label}: ${context.parsed} Siswa`;
-                          },
-                          afterLabel: function(context) {
-                              if (activeExams.length === 0) return null;
-                              let names = [];
-                              if (labelsPie[context.dataIndex] === 'Sudah Mengerjakan') {
-                                  names = listSudah;
-                              } else if (labelsPie[context.dataIndex] === 'Belum Mengerjakan') {
-                                  names = listBelum;
-                              }
-                              
-                              if(names.length === 0) return '  Tidak ada data';
-                              let displayNames = names.slice(0, 15).map(n => '  • ' + n);
-                              if(names.length > 15) displayNames.push(`  ...dan ${names.length - 15} siswa lainnya`);
-                              return displayNames;
-                          }
-                      }
-                  }
-                } 
-              }
-            });
-        }
+        renderDashboardCharts();
       } catch(e) { console.log("Gagal memuat metrik dashboard"); }
       hideLoader();
+    }
+
+    function renderDashboardCharts() {
+        dashChartInstances.forEach(c => c.destroy());
+        dashChartInstances = [];
+
+        let filterKelas = document.getElementById('dash-filter-kelas').value.toLowerCase().trim();
+        let container = document.getElementById('dashboard-charts-container');
+        container.innerHTML = '';
+
+        let activeExams = globalDashUjian.filter(u => u.status === 'Aktif');
+        if (filterKelas !== "") {
+            activeExams = activeExams.filter(u => u.kelas.toLowerCase().includes(filterKelas));
+        }
+
+        if (activeExams.length === 0) {
+            container.innerHTML = `<p class="text-gray-500 col-span-full text-center p-8 bg-gray-50 rounded-xl border border-dashed">Tidak ada ujian aktif yang cocok.</p>`;
+            return;
+        }
+
+        activeExams.forEach((u) => {
+            let originalIdx = globalDashUjian.filter(ex => ex.status === 'Aktif').findIndex(ex => ex.kode === u.kode);
+            
+            let rekapData = (globalDashRekap[originalIdx] && globalDashRekap[originalIdx].data) ? globalDashRekap[originalIdx].data : [];
+            let sudahNames = rekapData.map(r => r.nama);
+            let targetSiswa = globalDashSiswa.filter(s => s.kelas === u.kelas);
+            let belumNames = targetSiswa.filter(s => !sudahNames.includes(s.nama)).map(s => s.nama);
+
+            let chartDiv = document.createElement('div');
+            chartDiv.className = 'bg-white border border-gray-200 p-4 rounded-2xl shadow-sm text-center';
+            chartDiv.innerHTML = `
+                <h3 class="font-bold text-gray-800 text-sm mb-1">${u.mapel}</h3>
+                <p class="text-xs text-blue-600 mb-3 font-semibold bg-blue-50 inline-block px-2 py-1 rounded border border-blue-100">Kelas: ${u.kelas}</p>
+                <div class="relative w-full h-48 flex justify-center"><canvas id="chart-pie-${originalIdx}"></canvas></div>
+            `;
+            container.appendChild(chartDiv);
+
+            const ctx = document.getElementById(`chart-pie-${originalIdx}`);
+            let pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Sudah Mengerjakan', 'Belum Mengerjakan'],
+                    datasets: [{
+                        data: [sudahNames.length, belumNames.length],
+                        backgroundColor: ['#4ade80', '#f87171'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: {size: 10} } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return ` ${context.label}: ${context.parsed} Siswa`; },
+                                afterLabel: function(context) {
+                                    let names = context.label === 'Sudah Mengerjakan' ? sudahNames : belumNames;
+                                    if(names.length === 0) return '  Tidak ada data';
+                                    let displayNames = names.slice(0, 10).map(n => '  • ' + n);
+                                    if(names.length > 10) displayNames.push(`  ...dan ${names.length - 10} lainnya`);
+                                    return displayNames;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            dashChartInstances.push(pieChart);
+        });
     }
 
     // ==========================================
@@ -1187,6 +1275,7 @@
            let opts = '<option value="">-- Pilih Paket Soal --</option>';
            globalUjianData.forEach(p => opts += `<option value="${p.kode}">${p.kode} - ${p.mapel}</option>`);
            document.getElementById('jadwal-soal').innerHTML = opts;
+           document.getElementById('edit-jadwal-soal').innerHTML = opts;
            
            loadDaftarJadwal();
        } catch(e) { hideLoader(); }
@@ -1200,7 +1289,8 @@
            globalJadwalData = result.data || [];
            let html = '';
            globalJadwalData.forEach(j => {
-               html += `<tr class="border-b hover:bg-gray-50"><td class="p-4">${j.tanggal}</td><td class="p-4">${j.jam_mulai} - ${j.jam_selesai}</td><td class="p-4 font-bold text-blue-600">${j.kode_soal}</td><td class="p-4 uppercase">${j.ruang}</td><td class="p-4 uppercase">${j.sesi}</td><td class="p-4 text-center"><button onclick="hapusJadwal('${j.id}')" class="text-red-600 font-bold bg-red-50 px-3 py-1 rounded border border-red-200 shadow-sm hover:bg-red-100 transition">Hapus</button></td></tr>`;
+               let jsData = JSON.stringify(j).replace(/'/g, "\\'"); 
+               html += `<tr class="border-b hover:bg-gray-50"><td class="p-4">${j.tanggal}</td><td class="p-4">${j.jam_mulai} - ${j.jam_selesai}</td><td class="p-4 font-bold text-blue-600">${j.kode_soal}</td><td class="p-4 uppercase">${j.ruang}</td><td class="p-4 uppercase">${j.sesi}</td><td class="p-4 text-center"><button onclick='bukaEditJadwal(${jsData})' class="text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded border border-blue-200 shadow-sm hover:bg-blue-100 transition mr-2">Edit</button><button onclick="hapusJadwal('${j.id}')" class="text-red-600 font-bold bg-red-50 px-3 py-1 rounded border border-red-200 shadow-sm hover:bg-red-100 transition">Hapus</button></td></tr>`;
            });
            document.getElementById('tabel-jadwal').innerHTML = html || `<tr><td colspan="6" class="p-8 text-center text-gray-500">Belum ada jadwal tersimpan.</td></tr>`;
        } catch(e) { hideLoader(); }
@@ -1214,12 +1304,43 @@
        const sesi = document.getElementById('jadwal-sesi').value.toUpperCase();
        const ruang = document.getElementById('jadwal-ruang').value.toUpperCase();
        
-       if(!tgl || !jMulai || !jSelesai || !soal || !sesi || !ruang) return Swal.fire('Oops', 'Lengkapi semua form jadwal (termasuk Sesi & Ruang)!', 'warning');
+       if(!tgl || !jMulai || !jSelesai || !soal || !sesi || !ruang) return Swal.fire('Oops', 'Lengkapi semua form jadwal!', 'warning');
 
        showLoader('Menyimpan Jadwal...');
        try {
            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanJadwal', data: { tanggal: tgl, jam_mulai: jMulai, jam_selesai: jSelesai, kode_soal: soal, ruang: ruang, sesi: sesi } }) });
            document.getElementById('jadwal-tanggal').value = ''; document.getElementById('jadwal-mulai').value = ''; document.getElementById('jadwal-selesai').value = ''; document.getElementById('jadwal-soal').value = ''; document.getElementById('jadwal-sesi').value = ''; document.getElementById('jadwal-ruang').value = '';
+           loadDaftarJadwal();
+       } catch(e) { hideLoader(); }
+    }
+
+    let editJadwalId = "";
+    function bukaEditJadwal(data) {
+       editJadwalId = data.id;
+       document.getElementById('edit-jadwal-tanggal').value = data.tanggal;
+       document.getElementById('edit-jadwal-mulai').value = data.jam_mulai;
+       document.getElementById('edit-jadwal-selesai').value = data.jam_selesai;
+       document.getElementById('edit-jadwal-soal').value = data.kode_soal;
+       document.getElementById('edit-jadwal-sesi').value = data.sesi;
+       document.getElementById('edit-jadwal-ruang').value = data.ruang;
+       bukaModal('modal-edit-jadwal');
+    }
+
+    async function simpanEditJadwal() {
+       const data = {
+          id: editJadwalId,
+          tanggal: document.getElementById('edit-jadwal-tanggal').value,
+          jam_mulai: document.getElementById('edit-jadwal-mulai').value,
+          jam_selesai: document.getElementById('edit-jadwal-selesai').value,
+          kode_soal: document.getElementById('edit-jadwal-soal').value,
+          sesi: document.getElementById('edit-jadwal-sesi').value.toUpperCase(),
+          ruang: document.getElementById('edit-jadwal-ruang').value.toUpperCase()
+       };
+       if(!data.tanggal || !data.jam_mulai || !data.jam_selesai || !data.kode_soal || !data.sesi || !data.ruang) return Swal.fire('Oops', 'Lengkapi semua!', 'warning');
+       showLoader('Update Jadwal...');
+       try {
+           await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editJadwal', data: data }) });
+           tutupModal('modal-edit-jadwal');
            loadDaftarJadwal();
        } catch(e) { hideLoader(); }
     }
@@ -1305,17 +1426,14 @@
     // ==========================================
     let konfOldData = {logo: '', kop: '', ttd: ''};
     
-    // Fungsi ini dipanggil saat aplikasi dimuat untuk memperbarui Nama & Logo Sidebar
     async function loadKonfigurasiGlobal() {
         try {
             const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getKonfigurasi' }) });
             const result = await res.json();
             if(result.data) {
-                // Update UI Sidebar
                 if(result.data.nama_sekolah) document.getElementById('sidebar-school-name').innerText = result.data.nama_sekolah;
                 if(result.data.logo) document.getElementById('sidebar-school-logo').src = getDirectImageUrl(result.data.logo);
                 
-                // Simpan cache untuk menu form konfigurasi
                 document.getElementById('konf-nama-sekolah').value = result.data.nama_sekolah || '';
                 document.getElementById('konf-nama-kepsek').value = result.data.nama_kepsek || '';
                 
@@ -1331,7 +1449,6 @@
         } catch(e) {}
     }
 
-    // Dipanggil saat menu konfigurasi diklik (menggunakan cache)
     function loadKonfigurasi() {
         // Data sudah diisi oleh loadKonfigurasiGlobal()
     }
@@ -1355,7 +1472,6 @@
             let fileKop = document.getElementById('konf-kop').files[0];
             let fileTtd = document.getElementById('konf-ttd').files[0];
             
-            // Kompresi sebelum dikirim ke Google Apps Script agar tidak error timeout
             let base64Logo = fileLogo ? await compressImage(fileLogo) : "";
             let base64Kop = fileKop ? await compressImage(fileKop) : "";
             let base64Ttd = fileTtd ? await compressImage(fileTtd) : "";
@@ -1383,7 +1499,7 @@
         }
     }
 
-    // ================= MENU TOKEN UJIAN (HIERARKI CARD & AKTIFKAN MASSAL) =================
+    // ================= MENU TOKEN UJIAN =================
     let groupedTokenData = {};
     let currentTgl = "";
     let currentWkt = "";
@@ -1400,7 +1516,6 @@
         globalUjianData = resUjian.data || [];
         globalJadwalData = resJadwal.data || [];
 
-        // Mapping Data
         groupedTokenData = {};
         let examsMap = {};
         globalUjianData.forEach(u => examsMap[u.kode] = u);
@@ -1494,10 +1609,17 @@
         let times = Object.keys(groupedTokenData[tgl]).sort();
 
         times.forEach(wkt => {
-            let totalUjian = Object.keys(groupedTokenData[tgl][wkt]).length;
+            let examsInTime = Object.values(groupedTokenData[tgl][wkt]);
+            let totalUjian = examsInTime.length;
+            
+            let isActive = examsInTime.some(u => u.status === 'Aktif');
+            
+            let bgColor = isActive ? 'bg-green-50 border-green-200 text-green-800 hover:bg-green-100' : 'bg-red-50 border-red-200 text-red-800 hover:bg-red-100';
+            let iconColor = isActive ? 'text-green-600' : 'text-red-600';
+
             html += `
-            <div onclick="renderTokenExams('${tgl}', '${wkt}')" class="bg-blue-50 border border-blue-200 text-blue-800 p-5 rounded-2xl cursor-pointer hover:bg-blue-100 transition shadow-sm flex flex-col items-start gap-3 group">
-                <div class="p-3 bg-white rounded-xl shadow-sm text-lg group-hover:scale-110 transition text-blue-600"><i class="fas fa-clock opacity-80"></i></div>
+            <div onclick="renderTokenExams('${tgl}', '${wkt}')" class="${bgColor} border p-5 rounded-2xl cursor-pointer transition shadow-sm flex flex-col items-start gap-3 group">
+                <div class="p-3 bg-white rounded-xl shadow-sm text-lg group-hover:scale-110 transition ${iconColor}"><i class="fas fa-clock opacity-80"></i></div>
                 <div>
                    <h3 class="font-black text-lg">${wkt}</h3>
                    <p class="text-xs font-semibold opacity-70 mt-1">${totalUjian} Paket Soal Ujian</p>
@@ -1587,6 +1709,23 @@
         });
     }
 
+    async function nonaktifkanSemuaToken() {
+        let examsToDeactivate = Object.values(groupedTokenData[currentTgl][currentWkt]);
+        let activeExams = examsToDeactivate.filter(u => u.status === 'Aktif');
+
+        if(activeExams.length === 0) return Swal.fire('Info', 'Semua ujian di sesi ini sudah Nonaktif!', 'info');
+
+        let payload = activeExams.map(u => ({ kode: u.kode, status: 'Nonaktif', token: '' }));
+
+        Swal.fire({ title: 'Nonaktifkan Semua?', text: `${payload.length} paket soal akan dinonaktifkan dan token akan dihapus.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Nonaktifkan!' }).then(async r => {
+            if(r.isConfirmed) {
+                showLoader('Menonaktifkan Ujian...');
+                try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjianMassal', data: payload }) }); hideLoader(); Swal.fire('Berhasil', 'Semua ujian di sesi ini dinonaktifkan', 'success'); loadManajemenUjian(); } 
+                catch(e) { hideLoader(); Swal.fire('Error', 'Gagal update massal', 'error'); }
+            }
+        });
+    }
+
     function toggleStatusUjian(kode, targetStatus) { Swal.fire({ title: 'Ubah Status?', text: `Ujian ${kode} akan menjadi ${targetStatus}.`, icon: 'question', showCancelButton: true, confirmButtonColor: targetStatus==='Aktif'?'#16a34a':'#d33', confirmButtonText: `Ya, ${targetStatus}kan!` }).then(async (result) => { if(result.isConfirmed) { let tokenBaru = targetStatus === 'Aktif' ? Math.random().toString(36).substring(2, 7).toUpperCase() : ''; showLoader('Update Status...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjian', kode, status: targetStatus, token: tokenBaru }) }); await res.json(); hideLoader(); loadManajemenUjian(); loadDashboard(); } catch(e) { hideLoader(); } } }); }
 
     // ================= KARTU UJIAN & SINKRONISASI (Cetak A4 & Generate Modal) =================
@@ -1601,58 +1740,176 @@
         
         globalKartuData = result.data || [];
         
-        if(globalKartuData.length === 0) return tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">Belum ada kartu di-generate.</td></tr>`;
+        if(globalKartuData.length === 0) return tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">Belum ada kartu di-generate.</td></tr>`;
         
         let html = ''; 
         globalKartuData.forEach((k, i) => { 
             let urlFoto = getDirectImageUrl(k.foto); 
             let imgTbl = urlFoto ? `<img src="${urlFoto}" class="h-10 w-10 object-cover rounded-full border shadow-sm mx-auto">` : '<div class="h-10 w-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center text-xs mx-auto border border-blue-100"><i class="fas fa-user"></i></div>'; 
-            html += `<tr class="hover:bg-gray-50 border-b"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-sm font-bold">${k.nis}</td><td class="p-4 text-sm">${k.nama}</td><td class="p-4 text-center">${imgTbl}</td><td class="p-4 text-sm font-bold text-gray-700">${k.nisn}</td><td class="p-4 text-sm">${k.sesi}</td><td class="p-4 text-sm">${k.ruang}</td></tr>`; 
+            let jsData = JSON.stringify(k).replace(/'/g, "\\'");
+            
+            html += `<tr class="hover:bg-gray-50 border-b">
+                <td class="p-4 text-center text-sm">${i + 1}</td>
+                <td class="p-4 text-sm font-bold">${k.nis}</td>
+                <td class="p-4 text-sm">${k.nama}</td>
+                <td class="p-4 text-center">${imgTbl}</td>
+                <td class="p-4 text-sm font-bold text-gray-700">${k.nisn}</td>
+                <td class="p-4 text-sm">${k.sesi}</td>
+                <td class="p-4 text-sm">${k.ruang}</td>
+                <td class="p-4 text-center flex justify-center gap-2">
+                    <button onclick='bukaEditKartu(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg hover:bg-yellow-200 transition flex items-center justify-center"><i class="fas fa-pen"></i></button>
+                    <button onclick="hapusKartuIndividu('${k.nis}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg hover:bg-red-200 transition flex items-center justify-center"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`; 
         }); 
         tbody.innerHTML = html;
       } catch(e) { hideLoader(); }
     }
 
-    async function cetakKartuA4() {
-        if(globalKartuData.length === 0) return Swal.fire('Kosong', 'Generate kartu terlebih dahulu.', 'warning');
+    function bukaEditKartu(data) {
+        document.getElementById('edit-kartu-nis').value = data.nis;
+        document.getElementById('edit-kartu-nama').value = data.nama;
+        document.getElementById('edit-kartu-nisn').value = data.nisn;
+        document.getElementById('edit-kartu-sesi').value = data.sesi;
+        document.getElementById('edit-kartu-ruang').value = data.ruang;
+        document.getElementById('edit-kartu-pass').value = data.password;
+        document.getElementById('edit-kartu-foto').value = '';
+        bukaModal('modal-edit-kartu');
+    }
+
+    async function simpanEditKartu() {
+        let fileInput = document.getElementById('edit-kartu-foto'); 
+        let base64Foto = ""; 
+        if (fileInput.files.length > 0) base64Foto = await compressImage(fileInput.files[0]);
+
+        const data = {
+            nis: document.getElementById('edit-kartu-nis').value,
+            nama: document.getElementById('edit-kartu-nama').value,
+            nisn: document.getElementById('edit-kartu-nisn').value,
+            sesi: document.getElementById('edit-kartu-sesi').value.toUpperCase(),
+            ruang: document.getElementById('edit-kartu-ruang').value.toUpperCase(),
+            password: document.getElementById('edit-kartu-pass').value,
+            foto: base64Foto
+        };
+
+        if(!data.nama || !data.nisn) return Swal.fire('Oops', 'Form harus diisi', 'warning');
+
+        showLoader('Menyimpan Perubahan...');
+        try {
+            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editKartuIndividu', data: data }) });
+            hideLoader();
+            tutupModal('modal-edit-kartu');
+            loadKartuUjian();
+        } catch(e) { hideLoader(); }
+    }
+
+    function hapusKartuIndividu(nis) {
+        Swal.fire({title: 'Hapus Kartu?', icon: 'warning', showCancelButton: true}).then(async r => {
+            if(r.isConfirmed) {
+                showLoader('Menghapus...');
+                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusKartuIndividu', nis: nis }) });
+                loadKartuUjian();
+            }
+        });
+    }
+
+    // MODAL UNTUK CETAK KARTU
+    function bukaModalCetakKartu() {
+        if(globalKartuData.length === 0) return Swal.fire('Kosong', 'Generate kartu terlebih dahulu sebelum mencetak.', 'warning');
+        
+        let ruangSet = new Set();
+        let sesiSet = new Set();
+        
+        globalKartuData.forEach(k => {
+            if(k.ruang) ruangSet.add(k.ruang);
+            if(k.sesi) sesiSet.add(k.sesi);
+        });
+        
+        let optRuang = '<option value="">Semua Ruang</option>';
+        [...ruangSet].sort().forEach(r => optRuang += `<option value="${r}">${r}</option>`);
+        document.getElementById('cetak-filter-ruang').innerHTML = optRuang;
+
+        let optSesi = '<option value="">Semua Sesi</option>';
+        [...sesiSet].sort().forEach(s => optSesi += `<option value="${s}">${s}</option>`);
+        document.getElementById('cetak-filter-sesi').innerHTML = optSesi;
+
+        renderSiswaCetakKartu();
+        bukaModal('modal-cetak-kartu-filter');
+    }
+
+    function renderSiswaCetakKartu() {
+        const ruangFilter = document.getElementById('cetak-filter-ruang').value;
+        const sesiFilter = document.getElementById('cetak-filter-sesi').value;
+        const tbody = document.getElementById('list-cetak-siswa');
+        
+        let filtered = globalKartuData;
+        if(ruangFilter) filtered = filtered.filter(k => k.ruang === ruangFilter);
+        if(sesiFilter) filtered = filtered.filter(k => k.sesi === sesiFilter);
+
+        if(filtered.length === 0) {
+            tbody.innerHTML = `<tr><td class="p-4 text-center text-gray-500">Tidak ada kartu siswa dengan kriteria tersebut.</td></tr>`;
+            updateCetakCount();
+            return;
+        }
+
+        let html = '';
+        filtered.forEach(k => {
+            html += `
+            <tr class="border-b border-gray-200 bg-white hover:bg-blue-50">
+                <td class="p-2 w-10 text-center">
+                    <input type="checkbox" value="${k.nis}" checked onchange="updateCetakCount()" class="chk-cetak-siswa w-4 h-4 accent-blue-600 cursor-pointer">
+                </td>
+                <td class="p-2 font-medium text-gray-800">${k.nama} <br><span class="text-xs text-gray-500">NIS: ${k.nis} | R: ${k.ruang} | S: ${k.sesi}</span></td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+        document.getElementById('chk-all-cetak-siswa').checked = true;
+        updateCetakCount();
+    }
+
+    function toggleCheckAllCetakKartu() {
+        let isChecked = document.getElementById('chk-all-cetak-siswa').checked;
+        document.querySelectorAll('.chk-cetak-siswa').forEach(chk => chk.checked = isChecked);
+        updateCetakCount();
+    }
+
+    function updateCetakCount() {
+        let count = document.querySelectorAll('.chk-cetak-siswa:checked').length;
+        document.getElementById('cetak-count-selected').innerText = `${count} Terpilih`;
+        
+        let total = document.querySelectorAll('.chk-cetak-siswa').length;
+        if(total > 0 && count === total) document.getElementById('chk-all-cetak-siswa').checked = true;
+        else document.getElementById('chk-all-cetak-siswa').checked = false;
+    }
+
+    async function cetakKartuA4Terpilih() {
+        let checkboxes = document.querySelectorAll('.chk-cetak-siswa:checked');
+        let selectedNis = Array.from(checkboxes).map(c => c.value);
+        
+        if(selectedNis.length === 0) return Swal.fire('Oops', 'Pilih minimal 1 siswa untuk dicetak!', 'warning');
 
         showLoader('Menyiapkan dokumen cetak...');
 
-        // Pastikan Master Ujian dan Jadwal diload agar Nama Mapel terbaca
         if(!globalUjianData || globalUjianData.length === 0) {
-           try {
-               const resUjian = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) });
-               const resU = await resUjian.json();
-               globalUjianData = resU.data || [];
-           } catch(e) {}
+           try { const resUjian = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }); const resU = await resUjian.json(); globalUjianData = resU.data || []; } catch(e) {}
         }
-
         if(!globalJadwalData || globalJadwalData.length === 0) {
-           try {
-               const resJadwal = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) });
-               const resJ = await resJadwal.json();
-               globalJadwalData = resJ.data || [];
-           } catch(e) {}
+           try { const resJadwal = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) }); const resJ = await resJadwal.json(); globalJadwalData = resJ.data || []; } catch(e) {}
         }
-        
         if(allSiswaData.length === 0) {
-           try {
-               const resSiswa = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) });
-               const resS = await resSiswa.json();
-               allSiswaData = resS.data || [];
-           } catch(e) {}
+           try { const resSiswa = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }); const resS = await resSiswa.json(); allSiswaData = resS.data || []; } catch(e) {}
         }
 
         let namaSekolah = document.getElementById('konf-nama-sekolah').value || 'NAMA SEKOLAH';
         let logoSekolah = document.getElementById('preview-konf-logo').src;
-        if(!logoSekolah || logoSekolah.includes('hidden')) {
-            logoSekolah = 'https://i.ibb.co.com/d4jMLcQk/Gemini-Generated-Image-kfq5nlkfq5nlkfq5-removebg-preview.png';
-        }
+        if(!logoSekolah || logoSekolah.includes('hidden')) logoSekolah = 'https://i.ibb.co.com/d4jMLcQk/Gemini-Generated-Image-kfq5nlkfq5nlkfq5-removebg-preview.png';
 
         let printArea = document.getElementById('print-area');
         let html = '';
 
-        globalKartuData.forEach((siswa) => {
+        let targetCards = globalKartuData.filter(k => selectedNis.includes(k.nis));
+
+        targetCards.forEach((siswa) => {
             let siswaDb = allSiswaData.find(s => s.nis === siswa.nis) || {};
             let kelasSiswa = siswaDb.kelas || '-';
 
@@ -1662,7 +1919,7 @@
             if(jadwalSiswa.length > 0) {
                 jadwalSiswa.forEach(j => {
                     let ujianObj = globalUjianData.find(u => u.kode === j.kode_soal);
-                    let namaMapel = ujianObj ? ujianObj.mapel : j.kode_soal; // Konversi kode jadi Nama Mapel
+                    let namaMapel = ujianObj ? ujianObj.mapel : j.kode_soal; 
                     
                     tabelJadwalHtml += `
                     <tr style="border-bottom: 1px solid #ccc; font-size: 10px;">
@@ -1738,29 +1995,28 @@
 
         printArea.innerHTML = html;
         hideLoader();
+        tutupModal('modal-cetak-kartu-filter');
 
         setTimeout(() => {
             window.print();
         }, 800);
     }
 
-    // MODAL GENERATE KARTU PILIHAN
+    // Modal Generate Master Database
     async function bukaModalGenerateKartu() {
         showLoader('Menyiapkan Data...');
-        if(allSiswaData.length === 0) {
-            try {
-                const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) });
-                const result = await res.json();
-                allSiswaData = result.data || [];
-            } catch(e){}
-        }
-        if(!globalJadwalData || globalJadwalData.length === 0) {
-           try {
-               const resJadwal = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) });
-               const resJ = await resJadwal.json();
-               globalJadwalData = resJ.data || [];
-           } catch(e) {}
-        }
+        try {
+            if(!allSiswaData || allSiswaData.length === 0) {
+                const resSiswa = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) });
+                const jsonSiswa = await resSiswa.json();
+                allSiswaData = jsonSiswa.data || [];
+            }
+            if(!globalJadwalData || globalJadwalData.length === 0) {
+                const resJadwal = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) });
+                const jsonJadwal = await resJadwal.json();
+                globalJadwalData = jsonJadwal.data || [];
+            }
+        } catch(e) { console.error(e); }
         hideLoader();
         
         let kelasSet = new Set();
@@ -1798,15 +2054,13 @@
         
         if(!kls) {
             tbody.innerHTML = `<tr><td class="p-4 text-center text-gray-500">Pilih kelas terlebih dahulu.</td></tr>`;
-            updateGenCount();
-            return;
+            updateGenCount(); return;
         }
         
         let filtered = allSiswaData.filter(s => s.kelas === kls);
         if(filtered.length === 0) {
             tbody.innerHTML = `<tr><td class="p-4 text-center text-gray-500">Tidak ada siswa di kelas ini.</td></tr>`;
-            updateGenCount();
-            return;
+            updateGenCount(); return;
         }
         
         let html = '';
@@ -1814,12 +2068,13 @@
             html += `
             <tr class="border-b border-gray-200 bg-white hover:bg-blue-50">
                 <td class="p-2 w-10 text-center">
-                    <input type="checkbox" value="${s.nis}" onchange="updateGenCount()" class="chk-gen-siswa w-4 h-4 accent-blue-600 cursor-pointer">
+                    <input type="checkbox" value="${s.nis}" checked onchange="updateGenCount()" class="chk-gen-siswa w-4 h-4 accent-blue-600 cursor-pointer">
                 </td>
                 <td class="p-2 font-medium text-gray-800">${s.nama} <br><span class="text-xs text-gray-500">NIS: ${s.nis}</span></td>
             </tr>`;
         });
         tbody.innerHTML = html;
+        document.getElementById('chk-all-gen-siswa').checked = true;
         updateGenCount();
     }
 
@@ -1832,7 +2087,6 @@
     function updateGenCount() {
         let count = document.querySelectorAll('.chk-gen-siswa:checked').length;
         document.getElementById('gen-count-selected').innerText = `${count} Terpilih`;
-        
         let total = document.querySelectorAll('.chk-gen-siswa').length;
         if(total > 0 && count === total) document.getElementById('chk-all-gen-siswa').checked = true;
         else document.getElementById('chk-all-gen-siswa').checked = false;
@@ -1849,28 +2103,11 @@
 
         showLoader('Memproses Kartu...');
         try {
-            const res = await fetch(GAS_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ 
-                    action: 'generateKartuPilihan', 
-                    data: { nis_list: nis_list, sesi: sesi, ruang: ruang } 
-                }) 
-            });
+            const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'generateKartuPilihan', data: { nis_list: nis_list, sesi: sesi, ruang: ruang } }) });
             const r = await res.json();
-            hideLoader();
-            Swal.fire('Berhasil', r.pesan, 'success');
-            tutupModal('modal-generate-kartu');
-            loadKartuUjian();
-        } catch(e) {
-            hideLoader();
-            Swal.fire('Error', 'Gagal memproses kartu.', 'error');
-        }
+            hideLoader(); Swal.fire('Berhasil', r.pesan, 'success'); tutupModal('modal-generate-kartu'); loadKartuUjian();
+        } catch(e) { hideLoader(); Swal.fire('Error', 'Gagal memproses kartu.', 'error'); }
     }
-
-    async function generateKartuOtomatis() { Swal.fire({ title: 'Sinkronisasi Otomatis?', text: "Menarik data Siswa terbaru (termasuk Foto/Password) untuk dijadikan Kartu Ujian.", icon: 'info', showCancelButton: true, confirmButtonColor: '#2563eb', confirmButtonText: 'Ya, Sinkronkan!' }).then(async (result) => { if(result.isConfirmed) { showLoader('Mensinkronkan Kartu...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'generateKartuOtomatis' }) }); const r = await res.json(); hideLoader(); Swal.fire('Berhasil', r.pesan, 'success'); loadKartuUjian(); } catch(e) { hideLoader(); } } }); }
-    function downloadTemplateKartu() { const ws = XLSX.utils.aoa_to_sheet([["NIS", "Nama", "NISN", "Sesi", "Ruang", "Password"], ["12345", "Ahmad", "0012345", "Sesi 1", "Ruang A", "12345"]]); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template_Kartu"); XLSX.writeFile(wb, "Template_Kartu_Ujian.xlsx"); }
-    async function importExcelKartu() { const fileInput = document.getElementById('file-import-kartu'); if(!fileInput.files[0]) return Swal.fire('Oops!', 'Pilih Excel!', 'warning'); const reader = new FileReader(); reader.onload = async function(e) { const data = new Uint8Array(e.target.result); const workbook = XLSX.read(data, {type: 'array'}); const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1}); const dataArray = json.slice(1).filter(row => row.length > 0); if(dataArray.length === 0) return Swal.fire('Kosong', 'Excel kosong!', 'warning'); showLoader('Menyimpan Kartu...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'importKartuUjian', data: dataArray }) }); const r = await res.json(); hideLoader(); Swal.fire('Sukses', r.pesan, 'success'); loadKartuUjian(); fileInput.value=''; } catch(err) { hideLoader(); } }; reader.readAsArrayBuffer(fileInput.files[0]); }
-    async function hapusSemuaKartu() { Swal.fire({ title: 'Kosongkan Kartu?', text: "Dihapus permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Hapus!' }).then(async (result) => { if(result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusSemuaKartu' }) }); hideLoader(); loadKartuUjian(); } catch(e) { hideLoader(); } } }); }
 
     // ================= REKAP HASIL UJIAN GLOBAL =================
     async function loadDropdownRekapAdmin() { const select = document.getElementById('select-rekap-admin'); select.innerHTML = '<option value="">Memuat Paket...</option>'; try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }); const result = await res.json(); let opts = '<option value="">-- Pilih Kode Ujian --</option>'; result.data.forEach(p => opts += `<option value="${p.kode}">${p.kode} - ${p.mapel} (${p.kelas})</option>`); select.innerHTML = opts; } catch(e) { select.innerHTML = '<option value="">Gagal</option>'; } }
@@ -1878,7 +2115,7 @@
 
     // Init Config Global pada saat muat awal halaman
     loadKonfigurasiGlobal();
-
+    switchMenu('view-dashboard'); // Tampilkan Dashboard di Awal & Sinkronkan Data
   </script>
 </body>
 </html>
