@@ -542,7 +542,7 @@
               <h2 class="text-3xl font-bold text-gray-800">Analisa Soal</h2>
               <p class="text-sm text-gray-500 mt-1">Analisis tingkat ketuntasan setiap butir soal secara klasikal.</p>
             </div>
-            <button onclick="cetakArea('area-cetak-soal', 'landscape')" class="bg-green-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><i class="fas fa-print mr-2"></i> Cetak A4</button>
+            <button onclick="cetakArea('area-cetak-soal', 'landscape')" class="bg-green-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><i class="fas fa-print mr-2"></i>Print</button>
           </div>
           
           <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm">
@@ -580,7 +580,7 @@
               <h2 class="text-3xl font-bold text-gray-800">Analisa Jawaban (Ulangan Harian)</h2>
               <p class="text-sm text-gray-500 mt-1">Analisis ketuntasan siswa perorangan dan ketuntasan kelas.</p>
             </div>
-            <button onclick="cetakArea('area-cetak-jawaban', 'landscape')" class="bg-green-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><i class="fas fa-print mr-2"></i> Cetak A4</button>
+            <button onclick="cetakArea('area-cetak-jawaban', 'landscape')" class="bg-green-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><i class="fas fa-print mr-2"></i>Print</button>
           </div>
           
           <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
@@ -2105,7 +2105,7 @@
             }
         });
     }
-    // ================= KARTU UJIAN & SINKRONISASI (Cetak A4 & Generate Modal) =================
+    // ================= KARTU UJIAN & SINKRONISASI (Print & Generate Modal) =================
     let globalKartuData = [];
 
     async function loadKartuUjian() {
