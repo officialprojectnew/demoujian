@@ -326,14 +326,20 @@
          <h2 class="text-3xl font-bold text-gray-800 mb-6">Manajemen & Bank Soal</h2>
          <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden min-h-[500px]">
            <div class="flex border-b border-gray-200 px-6 pt-2 gap-8">
-             <button onclick="switchTabSoal('daftar')" id="tab-btn-daftar" class="py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 transition">Daftar Paket Ujian</button>
+             <button onclick="switchTabSoal('daftar')" id="tab-btn-daftar" class="py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 transition">Daftar Soal Ujian</button>
              <button onclick="switchTabSoal('master')" id="tab-btn-master" class="py-4 text-center font-bold text-gray-400 hover:text-blue-600 hover:border-blue-600 transition border-b-2 border-transparent">Manajemen Data Soal</button>
            </div>
            
            <div id="tab-content-daftar" class="p-6 md:p-8 bg-gray-50/30">
-             <div class="flex justify-between items-center mb-6">
-               <h3 class="text-xl font-bold text-gray-800">Daftar Paket Berdasarkan Mapel</h3>
-               <button onclick="loadBankSoalGrup()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-sync-alt mr-1"></i> Refresh</button>
+             <!-- HEADER UTAMA (Disatukan) -->
+             <div class="flex justify-between items-center mb-6 border-b pb-4 border-gray-200">
+               <h3 class="text-xl font-bold text-gray-800" id="title-paket-soal">Daftar Soal Berdasarkan Mapel</h3>
+               
+               <!-- GROPING TOMBOL SEJAJAR -->
+               <div class="flex items-center gap-2">
+                 <button id="btn-kembali-banksoal" onclick="kembaliKeDaftarMapel()" class="hidden bg-gray-200 text-gray-700 px-5 py-2 rounded-xl text-sm font-bold hover:bg-gray-300 transition items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
+                 <button onclick="loadBankSoalGrup()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-sync-alt mr-1"></i> Refresh</button>
+               </div>
              </div>
              
              <div id="view-kartu-mapel" class="block">
@@ -343,10 +349,7 @@
              </div>
 
              <div id="view-paket-soal" class="hidden">
-               <div class="flex justify-between items-center mb-5 border-b pb-4 border-gray-200">
-                 <h3 class="text-xl font-bold text-gray-800" id="title-paket-soal">Paket Soal</h3>
-                 <button onclick="kembaliKeDaftarMapel()" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-xl text-sm font-bold hover:bg-gray-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
-               </div>
+               <!-- Header sub-menu lama sudah dihapus dan dipindah ke atas -->
                <div id="list-paket-soal-container" class="space-y-4"></div>
              </div>
              
@@ -430,7 +433,7 @@
           
           <div id="token-exams-container" class="hidden">
              <div class="mb-4 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-gray-800">Daftar Paket Ujian</h3>
+                <h3 class="text-lg font-bold text-gray-800">Daftar Soal Ujian</h3>
                 <div class="flex gap-2">
                   <button id="btn-nonaktifkan-semua" onclick="nonaktifkanSemuaToken()" class="bg-red-100 text-red-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-red-200 transition border border-red-200">Nonaktifkan</button>
                   <button id="btn-aktifkan-semua" onclick="aktifkanSemuaToken()" class="bg-green-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow hover:bg-green-700 transition">Aktifkan</button>
@@ -1474,11 +1477,11 @@
             cardHtml += `
             <div onclick="showMapelDetail('${mapel}')" class="${bgColor} rounded-xl p-5 text-white shadow-sm flex flex-col justify-between hover:scale-105 transition-transform cursor-pointer group">
                <div>
-                 <h3 class="text-xl font-bold mb-1 group-hover:underline truncate" title="${mapel}">${mapel}</h3>
+                 <h3 class="text-xl font-bold mb-1 truncate" title="${mapel}">${mapel}</h3>
                  <p class="text-sm font-medium mb-4 text-white/90 bg-white/20 px-2 py-1 rounded inline-block">${pakets.length} Paket Soal</p>
                </div>
                <div class="text-sm font-medium border-t border-white/20 pt-3 flex items-center justify-between">
-                 <span>Lihat Paket <i class="fas fa-arrow-right ml-1"></i></span>
+                 <span>Lihat Soal <i class="fas fa-arrow-right ml-1"></i></span>
                  <i class="fas fa-book opacity-40 text-3xl"></i>
                </div>
             </div>`;
@@ -1490,7 +1493,11 @@
     function showMapelDetail(mapel) {
         document.getElementById('view-kartu-mapel').classList.add('hidden');
         document.getElementById('view-paket-soal').classList.remove('hidden');
-        document.getElementById('title-paket-soal').innerText = `Daftar Paket Soal: ${mapel}`;
+        
+        // Ubah Teks Judul dan Munculkan Tombol Kembali
+        document.getElementById('title-paket-soal').innerText = `Daftar Soal: ${mapel}`;
+        document.getElementById('btn-kembali-banksoal').classList.remove('hidden');
+        document.getElementById('btn-kembali-banksoal').classList.add('flex');
         
         tutupDetailBankSoal();
 
@@ -1517,6 +1524,12 @@
     function kembaliKeDaftarMapel() {
         document.getElementById('view-kartu-mapel').classList.remove('hidden');
         document.getElementById('view-paket-soal').classList.add('hidden');
+        
+        // Kembalikan Teks Judul dan Sembunyikan Tombol Kembali
+        document.getElementById('title-paket-soal').innerText = `Daftar Soal Berdasarkan Mapel`;
+        document.getElementById('btn-kembali-banksoal').classList.add('hidden');
+        document.getElementById('btn-kembali-banksoal').classList.remove('flex');
+        
         tutupDetailBankSoal();
     }
 
