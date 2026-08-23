@@ -853,7 +853,7 @@
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md transform transition-transform duration-200">
       <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Tambah Guru Baru</h3>
       <div class="space-y-4">
-        <div><label class="text-sm font-semibold text-gray-700">NIP</label><input type="text" id="tambah-nip-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
+        <div><label class="text-sm font-semibold text-gray-700">NIP</label><input type="text" id="tambah-nip-guru" maxlength="18" oninput="this.value = this.value.replace(/[^0-9]/g, '');" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="tambah-nama-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Username Login</label><input type="text" id="tambah-user-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="password" id="tambah-pass-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
@@ -1231,6 +1231,7 @@
     async function simpanGuruBaru() {
       const data = { nip: document.getElementById('tambah-nip-guru').value, nama: document.getElementById('tambah-nama-guru').value, username: document.getElementById('tambah-user-guru').value, password: document.getElementById('tambah-pass-guru').value };
       if(!data.nip || !data.nama || !data.username || !data.password) return Swal.fire('Oops!', 'Isi semua!', 'warning');
+      if(data.nip.length !== 18) return Swal.fire('Oops!', 'NIP harus berjumlah tepat 18 angka!', 'warning');
       showLoader('Menyimpan Guru...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanGuru', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Sukses!', result.pesan, 'success'); tutupModal('modal-tambah-guru'); loadRekapGuru(); } else Swal.fire('Gagal!', result.pesan, 'error'); } catch(e) { hideLoader(); }
     }
     async function loadRekapGuru() {
