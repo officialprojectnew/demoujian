@@ -261,8 +261,20 @@
             </div>
             
             <div id="view-tabel-siswa" class="hidden">
-              <div class="flex justify-between items-center mb-5">
+              <div class="flex flex-wrap justify-between items-center mb-5 gap-3">
                 <button onclick="kembaliKeDaftarKelas()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
+                
+                <!-- DROPDOWN LIMIT DATA SISWA -->
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold text-gray-700">Tampilkan:</span>
+                    <select id="limit-siswa" onchange="changeLimitSiswa()" class="p-2 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm shadow-sm bg-white cursor-pointer">
+                        <option value="10">10 Baris</option>
+                        <option value="25">25 Baris</option>
+                        <option value="50">50 Baris</option>
+                        <option value="all">Semua</option>
+                    </select>
+                </div>
+
                 <button onclick="bukaModalTambahSiswa()" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 shadow-sm transition flex items-center gap-2"><i class="fas fa-plus"></i> Tambah Siswa</button>
               </div>
               <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
@@ -271,6 +283,9 @@
                   <tbody id="tabel-rekap-siswa"><tr><td colspan="8" class="p-8 text-center text-gray-500 text-sm">Pilih kelas terlebih dahulu.</td></tr></tbody>
                 </table>
               </div>
+              
+              <!-- CONTAINER TOMBOL PAGINASI SISWA -->
+              <div id="paginasi-siswa" class="flex flex-col md:flex-row justify-between items-center mt-4 gap-3"></div>
             </div>
           </div>
 
@@ -282,12 +297,29 @@
                 <button onclick="bukaModalTambahGuru()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 shadow-sm transition"><i class="fas fa-plus mr-1"></i> Tambah Guru</button>
               </div>
             </div>
+
+            <!-- DROPDOWN LIMIT DATA GURU -->
+            <div class="flex justify-between items-center mb-3">
+              <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold text-gray-700">Tampilkan:</span>
+                  <select id="limit-guru" onchange="changeLimitGuru()" class="p-2 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm shadow-sm bg-white cursor-pointer">
+                      <option value="10">10 Baris</option>
+                      <option value="25">25 Baris</option>
+                      <option value="50">50 Baris</option>
+                      <option value="all">Semua</option>
+                  </select>
+              </div>
+            </div>
+
             <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
               <table class="w-full text-left border-collapse whitespace-nowrap">
-                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIP</th><th class="p-4 border-b font-semibold">Nama Guru</th><th class="p-4 border-b font-semibold">Username</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIP/ID</th><th class="p-4 border-b font-semibold">Nama Guru</th><th class="p-4 border-b font-semibold">Username</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
                 <tbody id="tabel-rekap-guru"><tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">Klik Refresh Data...</td></tr></tbody>
               </table>
             </div>
+
+            <!-- CONTAINER TOMBOL PAGINASI GURU -->
+            <div id="paginasi-guru" class="flex flex-col md:flex-row justify-between items-center mt-4 gap-3"></div>
           </div>
         </div>
       </div>
@@ -1186,16 +1218,126 @@
         renderTabelSiswa(filteredData);
     }
 
+    // ================= PAGINASI SISWA =================
+    let currentPageSiswa = 1;
+    let limitDataSiswa = 10;
+    let currentDataSiswa = [];
+
+    function changeLimitSiswa() {
+        let val = document.getElementById('limit-siswa').value;
+        limitDataSiswa = val === 'all' ? currentDataSiswa.length : parseInt(val);
+        currentPageSiswa = 1;
+        renderTabelSiswaPaginated();
+    }
+
     function renderTabelSiswa(dataArray) {
+        currentDataSiswa = dataArray;
+        currentPageSiswa = 1;
+        changeLimitSiswa(); 
+    }
+
+    function renderTabelSiswaPaginated() {
         const tbody = document.getElementById('tabel-rekap-siswa');
-        if(dataArray.length === 0) { tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">Tidak ada data siswa ditemukan.</td></tr>`; return; }
+        if(currentDataSiswa.length === 0) { 
+            tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">Tidak ada data siswa ditemukan.</td></tr>`; 
+            document.getElementById('paginasi-siswa').innerHTML = '';
+            return; 
+        }
+
+        let totalPages = Math.ceil(currentDataSiswa.length / limitDataSiswa);
+        if(currentPageSiswa > totalPages) currentPageSiswa = totalPages;
+
+        let start = (currentPageSiswa - 1) * limitDataSiswa;
+        let end = start + limitDataSiswa;
+        let paginatedData = currentDataSiswa.slice(start, end);
+
         let html = ''; 
-        dataArray.forEach((s, i) => { 
+        paginatedData.forEach((s, index) => { 
+          let i = start + index; // Agar nomor urut tidak kembali ke 1
           let jsData = JSON.stringify(s).replace(/'/g, "\\'"); let urlFoto = getDirectImageUrl(s.foto);
           let imgTbl = urlFoto ? `<img src="${urlFoto}" class="h-10 w-10 object-cover rounded-full border shadow-sm mx-auto">` : `<div class="h-10 w-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center text-xs mx-auto border border-blue-100"><i class="fas fa-user"></i></div>`;
           html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-center">${imgTbl}</td><td class="p-4 text-sm font-bold text-gray-800">${s.nis}</td><td class="p-4 text-sm">${s.nama}</td><td class="p-4 text-sm">${s.nisn || '-'}</td><td class="p-4 text-sm">${s.kelas}</td><td class="p-4 text-sm font-mono text-gray-400">${s.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditSiswa(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg hover:bg-yellow-200 transition flex items-center justify-center"><i class="fas fa-pen"></i></button> <button onclick="hapusSiswa('${s.nis}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg hover:bg-red-200 transition flex items-center justify-center"><i class="fas fa-trash"></i></button></td></tr>`; 
-        }); tbody.innerHTML = html;
+        }); 
+        tbody.innerHTML = html;
+
+        // Render Tombol UI Paginasi
+        let info = `<span class="text-sm text-gray-600 font-semibold bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">Menampilkan ${start + 1} - ${Math.min(end, currentDataSiswa.length)} dari ${currentDataSiswa.length} Data</span>`;
+        let buttons = `<div class="flex gap-2">
+            <button onclick="prevPageSiswa()" class="px-4 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition" ${currentPageSiswa === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left mr-1"></i> Prev</button>
+            <button onclick="nextPageSiswa()" class="px-4 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition" ${currentPageSiswa === totalPages || totalPages === 0 ? 'disabled' : ''}>Next <i class="fas fa-chevron-right ml-1"></i></button>
+        </div>`;
+        document.getElementById('paginasi-siswa').innerHTML = `${info} ${buttons}`;
     }
+    function prevPageSiswa() { if(currentPageSiswa > 1) { currentPageSiswa--; renderTabelSiswaPaginated(); } }
+    function nextPageSiswa() { if(currentPageSiswa < Math.ceil(currentDataSiswa.length / limitDataSiswa)) { currentPageSiswa++; renderTabelSiswaPaginated(); } }
+
+
+    // ================= PAGINASI GURU =================
+    let currentPageGuru = 1;
+    let limitDataGuru = 10;
+    let allDataGuru = []; // Variabel global untuk menyimpan semua data guru
+
+    function changeLimitGuru() {
+        let val = document.getElementById('limit-guru').value;
+        // Tangani kasus 'all' saat data masih kosong
+        let totalData = allDataGuru ? allDataGuru.length : 0;
+        limitDataGuru = val === 'all' ? (totalData > 0 ? totalData : 1) : parseInt(val);
+        currentPageGuru = 1;
+        renderTabelGuruPaginated();
+    }
+
+    // Timpa loadRekapGuru lama
+    async function loadRekapGuru() {
+      const tbody = document.getElementById('tabel-rekap-guru'); 
+      showLoader('Menarik Data Guru...');
+      try { 
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getGuru' }) }); 
+        const result = await res.json(); 
+        hideLoader(); 
+        
+        allDataGuru = result.data || []; // Isi variabel global dengan data baru
+        changeLimitGuru(); // Trigger render tabel
+      } catch(e) { 
+        hideLoader(); 
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Gagal menarik data guru.</td></tr>`;
+      }
+    }
+
+    function renderTabelGuruPaginated() {
+        const tbody = document.getElementById('tabel-rekap-guru');
+        
+        // Pengecekan keamanan array
+        if(!allDataGuru || allDataGuru.length === 0) { 
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">Belum ada data guru terdaftar.</td></tr>`; 
+            document.getElementById('paginasi-guru').innerHTML = '';
+            return; 
+        }
+
+        let totalPages = Math.ceil(allDataGuru.length / limitDataGuru);
+        if(currentPageGuru > totalPages) currentPageGuru = totalPages;
+
+        let start = (currentPageGuru - 1) * limitDataGuru;
+        let end = start + limitDataGuru;
+        let paginatedData = allDataGuru.slice(start, end);
+
+        let html = ''; 
+        paginatedData.forEach((g, index) => { 
+          let i = start + index;
+          let jsData = JSON.stringify(g).replace(/'/g, "\\'"); 
+          html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-sm font-bold">${g.nip}</td><td class="p-4 text-sm">${g.nama}</td><td class="p-4 text-sm">${g.username}</td><td class="p-4 text-sm font-mono text-gray-400">${g.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditGuru(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-yellow-200 transition"><i class="fas fa-pen"></i></button> <button onclick="hapusGuru('${g.nip}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button></td></tr>`; 
+        }); 
+        tbody.innerHTML = html;
+
+        let info = `<span class="text-sm text-gray-600 font-semibold bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">Menampilkan ${start + 1} - ${Math.min(end, allDataGuru.length)} dari ${allDataGuru.length} Data</span>`;
+        let buttons = `<div class="flex gap-2">
+            <button onclick="prevPageGuru()" class="px-4 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition" ${currentPageGuru === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left mr-1"></i> Prev</button>
+            <button onclick="nextPageGuru()" class="px-4 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition" ${currentPageGuru === totalPages || totalPages === 0 ? 'disabled' : ''}>Next <i class="fas fa-chevron-right ml-1"></i></button>
+        </div>`;
+        document.getElementById('paginasi-guru').innerHTML = `${info} ${buttons}`;
+    }
+    
+    function prevPageGuru() { if(currentPageGuru > 1) { currentPageGuru--; renderTabelGuruPaginated(); } }
+    function nextPageGuru() { if(currentPageGuru < Math.ceil(allDataGuru.length / limitDataGuru)) { currentPageGuru++; renderTabelGuruPaginated(); } }
 
     let old_nis_edit = "";
     function bukaEditSiswa(data) { 
@@ -1234,10 +1376,7 @@
       if(data.nip.length !== 18) return Swal.fire('Oops!', 'NIP harus berjumlah tepat 18 angka!', 'warning');
       showLoader('Menyimpan Guru...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanGuru', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Sukses!', result.pesan, 'success'); tutupModal('modal-tambah-guru'); loadRekapGuru(); } else Swal.fire('Gagal!', result.pesan, 'error'); } catch(e) { hideLoader(); }
     }
-    async function loadRekapGuru() {
-      const tbody = document.getElementById('tabel-rekap-guru'); showLoader('Menarik Data...');
-      try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getGuru' }) }); const result = await res.json(); hideLoader(); if(result.data.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">Kosong.</td></tr>`; let html = ''; result.data.forEach((g, i) => { let jsData = JSON.stringify(g).replace(/'/g, "\\'"); html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-sm font-bold">${g.nip}</td><td class="p-4 text-sm">${g.nama}</td><td class="p-4 text-sm">${g.username}</td><td class="p-4 text-sm font-mono text-gray-400">${g.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditGuru(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-yellow-200 transition"><i class="fas fa-pen"></i></button> <button onclick="hapusGuru('${g.nip}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button></td></tr>`; }); tbody.innerHTML = html; } catch(e) { hideLoader(); }
-    }
+    
     function bukaEditGuru(data) { document.getElementById('edit-nip-guru').value = data.nip; document.getElementById('edit-nama-guru').value = data.nama; document.getElementById('edit-user-guru').value = data.username; document.getElementById('edit-pass-guru').value = data.password; bukaModal('modal-edit-guru'); }
     async function simpanEditGuru() { const data = { nip: document.getElementById('edit-nip-guru').value, nama: document.getElementById('edit-nama-guru').value, username: document.getElementById('edit-user-guru').value, password: document.getElementById('edit-pass-guru').value }; showLoader('Memperbarui...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editGuru', data }) }); await res.json(); hideLoader(); tutupModal('modal-edit-guru'); loadRekapGuru(); } catch(e) { hideLoader(); } }
     function hapusGuru(nip) { Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya!' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusGuru', nip }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapGuru(); } catch(e) { hideLoader(); } } }); }
