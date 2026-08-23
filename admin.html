@@ -284,7 +284,7 @@
             </div>
             <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
               <table class="w-full text-left border-collapse whitespace-nowrap">
-                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIP/ID</th><th class="p-4 border-b font-semibold">Nama Guru</th><th class="p-4 border-b font-semibold">Username</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIP</th><th class="p-4 border-b font-semibold">Nama Guru</th><th class="p-4 border-b font-semibold">Username</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
                 <tbody id="tabel-rekap-guru"><tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">Klik Refresh Data...</td></tr></tbody>
               </table>
             </div>
@@ -813,7 +813,7 @@
       <div class="space-y-4">
         <div><label class="text-sm font-semibold text-gray-700">NIS</label><input type="text" id="tambah-nis-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="tambah-nama-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
-        <div><label class="text-sm font-semibold text-gray-700">NISN</label><input type="text" id="tambah-nisn-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
+        <div><label class="text-sm font-semibold text-gray-700">NISN</label><input type="text" id="tambah-nisn-siswa" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Kelas</label><input type="text" id="tambah-kelas-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="password" id="tambah-pass-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div class="p-3 border rounded-xl bg-gray-50">
@@ -832,18 +832,18 @@
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md transform transition-transform duration-200">
       <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Edit Data Siswa</h3>
       <div class="space-y-4">
-        <div><label class="text-sm font-semibold text-gray-700">NIS (Bisa Diubah)</label><input type="text" id="edit-nis-siswa" class="w-full mt-1.5 p-3 border rounded-xl font-bold text-blue-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
+        <div><label class="text-sm font-semibold text-gray-700">NIS</label><input type="text" id="edit-nis-siswa" class="w-full mt-1.5 p-3 border rounded-xl font-bold text-blue-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="edit-nama-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
-        <div><label class="text-sm font-semibold text-gray-700">NISN</label><input type="text" id="edit-nisn-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
+        <div><label class="text-sm font-semibold text-gray-700">NISN</label><input type="text" id="edit-nisn-siswa" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
         <div><label class="text-sm font-semibold text-gray-700">Kelas</label><input type="text" id="edit-kelas-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="text" id="edit-pass-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
         <div class="p-3 border rounded-xl bg-gray-50">
-          <label class="text-sm font-semibold block mb-2 text-gray-700"><i class="fas fa-camera mr-2 text-blue-500"></i>Update Foto Baru</label>
+          <label class="text-sm font-semibold block mb-2 text-gray-700"><i class="fas fa-camera mr-2 text-blue-500"></i>Update Foto</label>
           <input type="file" id="edit-foto-siswa" accept="image/*" class="w-full text-xs">
         </div>
         <div class="pt-4 flex gap-3">
           <button onclick="tutupModal('modal-edit-siswa')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
-          <button onclick="simpanEditSiswa()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Update Data</button>
+          <button onclick="simpanEditSiswa()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Update</button>
         </div>
       </div>
     </div>
@@ -853,7 +853,7 @@
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md transform transition-transform duration-200">
       <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Tambah Guru Baru</h3>
       <div class="space-y-4">
-        <div><label class="text-sm font-semibold text-gray-700">NIP/ID Guru</label><input type="text" id="tambah-nip-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
+        <div><label class="text-sm font-semibold text-gray-700">NIP</label><input type="text" id="tambah-nip-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="tambah-nama-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Username Login</label><input type="text" id="tambah-user-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="password" id="tambah-pass-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
@@ -869,7 +869,7 @@
     <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md transform transition-transform duration-200">
       <h3 class="text-2xl font-black text-gray-800 border-b pb-4 mb-5">Edit Data Guru</h3>
       <div class="space-y-4">
-        <div><label class="text-sm font-semibold text-gray-700">NIP/ID (Terkunci)</label><input type="text" id="edit-nip-guru" disabled class="w-full mt-1.5 p-3 bg-gray-100 text-gray-500 border rounded-xl cursor-not-allowed"></div>
+        <div><label class="text-sm font-semibold text-gray-700">NIP</label><input type="text" id="edit-nip-guru" disabled class="w-full mt-1.5 p-3 bg-gray-100 text-gray-500 border rounded-xl cursor-not-allowed"></div>
         <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="edit-nama-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Username</label><input type="text" id="edit-user-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="text" id="edit-pass-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
@@ -1115,6 +1115,7 @@
         foto: base64Foto 
       };
       if(!data.nis || !data.nama || !data.kelas || !data.password || !data.nisn) return Swal.fire('Oops!','Harap isi semua kolom Teks!','warning');
+      if(data.nisn.length !== 10) return Swal.fire('Oops!', 'NISN harus berjumlah tepat 10 angka!', 'warning');
       showLoader('Menyimpan Data...');
       try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanSiswa', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Berhasil!', result.pesan, 'success'); tutupModal('modal-tambah-siswa'); loadRekapSiswa(); } else { Swal.fire('Gagal!', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error!','Gagal.','error'); }
     }
@@ -1219,10 +1220,11 @@
         foto: base64Foto 
       };
       if(!data.nama || !data.kelas || !data.password || !data.nis || !data.nisn) return Swal.fire('Oops!', 'Teks form tidak boleh kosong!', 'warning');
+      if(data.nisn.length !== 10) return Swal.fire('Oops!', 'NISN harus berjumlah tepat 10 angka!', 'warning');
       showLoader('Memperbarui Data & Foto...');
       try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editSiswa', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Berhasil!', result.pesan, 'success'); tutupModal('modal-edit-siswa'); loadRekapSiswa(); } else { Swal.fire('Gagal!', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error!','Gagal.','error');} 
     }
-    function hapusSiswa(nis) { Swal.fire({ title: 'Hapus Siswa?', text: "Data tidak bisa dikembalikan.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Hapus!' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusSiswa', nis }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapSiswa(); } catch(e) { hideLoader(); } } }); }
+    function hapusSiswa(nis) { Swal.fire({ title: 'Hapus Siswa?', text: "Data tidak bisa dikembalikan.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusSiswa', nis }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapSiswa(); } catch(e) { hideLoader(); } } }); }
 
     // ================= CRUD GURU =================
     function bukaModalTambahGuru() { ['tambah-nip-guru','tambah-nama-guru','tambah-user-guru','tambah-pass-guru'].forEach(i => document.getElementById(i).value=''); bukaModal('modal-tambah-guru'); }
