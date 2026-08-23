@@ -3040,16 +3040,11 @@
                 html += `
                 <div style="page-break-after: always; padding: 10px 30px; font-family: 'Times New Roman', Times, serif; color: #000; background-color: #fff;">
                     ${kopSekolahStr}
-                    <h3 style="text-align:center; font-size:16px; margin:0 0 5px 0; text-decoration:underline;">BERITA ACARA</h3>
+                    <h3 style="text-align:center; font-size:16px; margin:0 0 5px 0;">BERITA ACARA</h3>
                     <h4 style="text-align:center; font-size:14px; margin:0 0 30px 0;">PELAKSANAAN UJIAN BERBASIS KOMPUTER (CBT)<br>TAHUN PELAJARAN ${thnObj}</h4>
                     
                     <p style="font-size: 13px; text-align: justify; line-height: 1.6; margin-bottom: 20px;">
-                        Pada hari ini <b>${tglFormatted.split(',')[0]}</b> tanggal <b>${tglFormatted.split(',')[1]}</b>
-                    </p>
-                    
-                    <ol style="font-size: 13px; text-align: justify; line-height: 1.8; margin-bottom: 20px; padding-left: 15px;" type="a">
-                        <li>
-                            Telah diselenggarakan Ujian Berbasis Komputer (CBT) pada pukul <b>${j.jam_mulai}</b> s/d <b>${j.jam_selesai}</b><br>
+                        Pada hari ini <b>${tglFormatted.split(',')[0]}</b> tanggal <b>${tglFormatted.split(',')[1]}</b>, Telah diselenggarakan Ujian Berbasis Test (CBT) pada pukul <b>${j.jam_mulai}</b> s/d <b>${j.jam_selesai}</b><br>
                             <table style="width: 100%; border:none; margin-top: 5px; font-size: 13px;">
                                 <tr><td style="width: 180px; padding: 2px 0;">Pada Sekolah</td><td style="width: 15px; padding: 2px 0;">:</td><td style="padding: 2px 0;"><b>${namaSekolah}</b></td></tr>
                                 <tr><td style="padding: 2px 0;">Ruang / Sesi</td><td style="padding: 2px 0;">:</td><td style="padding: 2px 0;"><b>${j.ruang} / ${j.sesi}</b></td></tr>
@@ -3058,11 +3053,11 @@
                                 <tr><td style="padding: 2px 0;">Jumlah Peserta Hadir</td><td style="padding: 2px 0;">:</td><td style="padding: 2px 0;">.......... Orang</td></tr>
                             </table>
                         </li>
-                        <li style="margin-top: 10px;">
-                            Telah diaktifkan Token Ujian Berbasis Komputer untuk mata pelajaran <b>${mapelName}</b> dengan kode ujian <b>${j.kode_soal}</b> di ruang ujian dengan disaksikan oleh para peserta ujian.
+                        <li style="margin-top: 10px; font-size: 13px; text-align: justify; line-height: 1.6; margin-bottom: 20px;">
+                            Telah diaktifkan Token Ujian Berbasis Test untuk mata pelajaran <b>${mapelName}</b> dengan kode ujian <b>${j.kode_soal}</b> di ruang ujian dengan disaksikan oleh para peserta ujian.
                         </li>
-                        <li style="margin-top: 10px;">
-                            Catatan selama Ujian Berbasis Komputer berlangsung:<br>
+                        <li style="margin-top: 10px; font-size: 13px; text-align: justify; line-height: 1.6; margin-bottom: 20px;">
+                            Catatan selama Ujian Berbasis Test berlangsung:<br>
                             <div style="border-bottom: 1px dotted #000; width: 100%; margin-top: 25px;"></div>
                             <div style="border-bottom: 1px dotted #000; width: 100%; margin-top: 25px;"></div>
                             <div style="border-bottom: 1px dotted #000; width: 100%; margin-top: 25px;"></div>
