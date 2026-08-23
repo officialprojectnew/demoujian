@@ -151,7 +151,7 @@
            </div>
            <div class="flex gap-2 w-full md:w-auto">
              <input type="text" id="dash-filter-kelas" oninput="renderDashboardCharts()" placeholder="Filter Kelas..." class="w-full md:w-48 p-2 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm shadow-sm">
-             <button onclick="loadDashboard()" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded-xl transition font-semibold text-sm shadow-sm whitespace-nowrap"><i class="fas fa-sync-alt"></i> Refresh</button>
+             <button onclick="loadDashboard()" class="bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded-xl transition font-semibold text-sm shadow-sm whitespace-nowrap"><i class="fas fa-sync-alt"></i></button>
            </div>
         </div>
         <!-- Grid untuk menampung diagram per paket soal -->
@@ -178,12 +178,29 @@
         </div>
 
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden p-6 md:p-8">
-           <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-3">Daftar Jadwal Ujian</h3>
-           <div class="overflow-x-auto">
+           <div class="mb-4 border-b pb-3">
+               <h3 class="text-xl font-bold text-gray-800">Daftar Jadwal</h3>
+           </div>
+           
+           <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
              <table class="w-full text-left border-collapse whitespace-nowrap">
                <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b">Tanggal</th><th class="p-4 border-b">Waktu</th><th class="p-4 border-b font-bold text-blue-600">Kode Soal</th><th class="p-4 border-b">Ruang</th><th class="p-4 border-b">Sesi</th><th class="p-4 border-b text-center">Aksi</th></tr></thead>
                <tbody id="tabel-jadwal"><tr><td colspan="6" class="p-8 text-center text-gray-500">Loading...</td></tr></tbody>
              </table>
+           </div>
+
+           <!-- CONTAINER PAGINASI & DROPDOWN JADWAL (Di Bawah) -->
+           <div class="flex flex-col md:flex-row justify-between items-center mt-4 gap-3">
+               <div class="flex items-center gap-2">
+                   <span class="text-sm font-bold text-gray-700">Tampilkan:</span>
+                   <select id="limit-jadwal" onchange="changeLimitJadwal()" class="p-2 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm shadow-sm bg-white cursor-pointer">
+                       <option value="10">10</option>
+                       <option value="25">25</option>
+                       <option value="50">50</option>
+                       <option value="all">Semua</option>
+                   </select>
+               </div>
+               <div id="paginasi-jadwal" class="flex flex-col md:flex-row items-center gap-3"></div>
            </div>
         </div>
       </div>
@@ -192,13 +209,13 @@
       <div id="view-pemantauan-ujian" class="admin-menu hidden">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-3xl font-bold text-gray-800">Pemantauan Ujian (Live Cam)</h2>
-          <button onclick="loadPemantauan()" class="bg-blue-100 text-blue-700 font-bold px-4 py-2 rounded-xl text-sm"><i class="fas fa-sync-alt mr-1"></i> Refresh</button>
+          <button onclick="loadPemantauan()" class="bg-blue-100 text-blue-700 font-bold px-4 py-2 rounded-xl text-sm"><i class="fas fa-sync-alt mr-1"></i></button>
         </div>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6">
           <div class="flex flex-col md:flex-row gap-4 items-end mb-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
              <div class="flex-1 w-full">
-               <label class="text-sm font-bold text-gray-700">Filter Paket Soal</label>
+               <label class="text-sm font-bold text-gray-700">Filter Soal</label>
                <select id="filter-pantau-soal" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500"><option value="">-- Loading --</option></select>
              </div>
              <div class="flex-1 w-full">
@@ -225,7 +242,7 @@
                <h2 class="text-3xl font-bold text-gray-800">Berita Acara & Daftar Hadir</h2>
                <p class="text-sm text-gray-500 mt-1">Pilih tanggal ujian di bawah ini untuk mencetak Daftar Hadir atau Berita Acara.</p>
             </div>
-            <button onclick="loadBeritaAbsen()" class="bg-blue-100 text-blue-700 font-bold px-4 py-2.5 rounded-xl hover:bg-blue-200 transition shadow-sm text-sm"><i class="fas fa-sync-alt mr-1"></i> Refresh Jadwal</button>
+            <button onclick="loadBeritaAbsen()" class="bg-blue-100 text-blue-700 font-bold px-4 py-2.5 rounded-xl hover:bg-blue-200 transition shadow-sm text-sm"><i class="fas fa-sync-alt mr-1"></i></button>
           </div>
           
           <div id="ba-dates-container" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 min-h-[300px]">
@@ -262,7 +279,7 @@
             
             <div id="view-tabel-siswa" class="hidden">
               <div class="flex flex-wrap justify-between items-center mb-5 gap-3">
-                <button onclick="kembaliKeDaftarKelas()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
+                <button onclick="kembaliKeDaftarKelas()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-300 transition flex items-center gap-2">Kembali</button>
                 <button onclick="bukaModalTambahSiswa()" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 shadow-sm transition flex items-center gap-2"><i class="fas fa-plus"></i> Tambah Siswa</button>
               </div>
               <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
@@ -337,8 +354,8 @@
                
                <!-- GROPING TOMBOL SEJAJAR -->
                <div class="flex items-center gap-2">
-                 <button id="btn-kembali-banksoal" onclick="kembaliKeDaftarMapel()" class="hidden bg-gray-200 text-gray-700 px-5 py-2 rounded-xl text-sm font-bold hover:bg-gray-300 transition items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
-                 <button onclick="loadBankSoalGrup()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-sync-alt mr-1"></i> Refresh</button>
+                 <button id="btn-kembali-banksoal" onclick="kembaliKeDaftarMapel()" class="hidden bg-gray-200 text-gray-700 px-5 py-2 rounded-xl text-sm font-bold hover:bg-gray-300 transition items-center gap-2">Kembali</button>
+                 <button onclick="loadBankSoalGrup()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-sync-alt mr-1"></i></button>
                </div>
              </div>
              
@@ -365,7 +382,7 @@
            <div id="tab-content-master" class="p-6 md:p-8 hidden bg-gray-50/30">
              <div class="flex justify-between items-center mb-6 border-b pb-4">
                <h3 class="text-xl font-bold text-gray-800">Database Atribut Soal</h3>
-               <button onclick="loadMasterUjian()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-sync-alt"></i> Refresh</button>
+               <button onclick="loadMasterUjian()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-100 transition shadow-sm"><i class="fas fa-sync-alt"></i></button>
              </div>
              <p class="text-sm text-gray-600 mb-6">Data ini akan muncul sebagai pilihan (*Dropdown*) bagi Guru saat membuat atau mengimpor soal, untuk men-generate Kode Soal Otomatis.</p>
              
@@ -412,7 +429,7 @@
             </div>
             <div class="flex gap-2 w-full md:w-auto">
               <input type="text" id="search-token" oninput="cariTokenUjian()" placeholder="Cari Kode/Mapel..." class="w-full md:w-auto p-2 border border-gray-200 rounded-xl outline-none focus:border-orange-500 text-sm">
-              <button onclick="loadManajemenUjian()" class="bg-orange-100 text-orange-700 font-bold px-4 py-2.5 rounded-xl hover:bg-orange-200 transition shadow-sm text-sm whitespace-nowrap"><i class="fas fa-sync-alt mr-1"></i> Refresh</button>
+              <button onclick="loadManajemenUjian()" class="bg-orange-100 text-orange-700 font-bold px-4 py-2.5 rounded-xl hover:bg-orange-200 transition shadow-sm text-sm whitespace-nowrap"><i class="fas fa-sync-alt mr-1"></i></button>
             </div>
           </div>
           
@@ -723,7 +740,7 @@
           <div><label class="text-sm font-bold text-gray-700">Jam Mulai</label><input type="time" id="edit-jadwal-mulai" class="w-full mt-1 p-2 border rounded-lg focus:border-blue-500 outline-none"></div>
           <div><label class="text-sm font-bold text-gray-700">Jam Selesai</label><input type="time" id="edit-jadwal-selesai" class="w-full mt-1 p-2 border rounded-lg focus:border-blue-500 outline-none"></div>
           <div>
-            <label class="text-sm font-bold text-gray-700">Paket Soal</label>
+            <label class="text-sm font-bold text-gray-700">Soal</label>
             <select id="edit-jadwal-soal" class="w-full mt-1 p-2 border rounded-lg focus:border-blue-500 outline-none"></select>
           </div>
           <div><label class="text-sm font-bold text-gray-700">Sesi</label><input type="text" id="edit-jadwal-sesi" class="w-full mt-1 p-2 border rounded-lg focus:border-blue-500 outline-none uppercase"></div>
@@ -1185,7 +1202,7 @@
                  <p class="text-sm font-medium mb-4 text-white/90">${count} Siswa</p>
                </div>
                <div class="text-sm font-medium border-t border-white/20 pt-3 flex items-center justify-between">
-                 <span>Lihat Detail <i class="fas fa-arrow-right ml-1"></i></span>
+                 <span>Lihat Detail</span>
                  <i class="fas fa-users opacity-40 text-2xl"></i>
                </div>
             </div>`;
@@ -1478,10 +1495,10 @@
             <div onclick="showMapelDetail('${mapel}')" class="${bgColor} rounded-xl p-5 text-white shadow-sm flex flex-col justify-between hover:scale-105 transition-transform cursor-pointer group">
                <div>
                  <h3 class="text-xl font-bold mb-1 truncate" title="${mapel}">${mapel}</h3>
-                 <p class="text-sm font-medium mb-4 text-white/90 bg-white/20 px-2 py-1 rounded inline-block">${pakets.length} Paket Soal</p>
+                 <p class="text-sm font-medium mb-4 text-white/90 bg-white/20 px-2 py-1 rounded inline-block">${pakets.length} Soal</p>
                </div>
                <div class="text-sm font-medium border-t border-white/20 pt-3 flex items-center justify-between">
-                 <span>Lihat Soal <i class="fas fa-arrow-right ml-1"></i></span>
+                 <span>Lihat Soal</span>
                  <i class="fas fa-book opacity-40 text-3xl"></i>
                </div>
             </div>`;
@@ -1544,7 +1561,7 @@
         
         const container = document.getElementById('list-butir-soal');
         if(!result.data || result.data.length === 0) {
-          container.innerHTML = `<p class="text-gray-500 text-center p-8 border border-dashed rounded-xl bg-white shadow-sm">Paket soal ini masih kosong.</p>`;
+          container.innerHTML = `<p class="text-gray-500 text-center p-8 border border-dashed rounded-xl bg-white shadow-sm">Soal ini masih kosong.</p>`;
         } else {
           let html = '';
           result.data.forEach((s, i) => {
@@ -1616,20 +1633,75 @@
        } catch(e) { hideLoader(); }
     }
 
+    // ================= PAGINASI JADWAL UJIAN =================
+    let currentPageJadwal = 1;
+    let limitDataJadwal = 10;
+    // (globalJadwalData sudah dideklarasikan sebelumnya, kita akan menggunakan itu)
+
+    function changeLimitJadwal() {
+        let val = document.getElementById('limit-jadwal').value;
+        let totalData = globalJadwalData ? globalJadwalData.length : 0;
+        limitDataJadwal = val === 'all' ? (totalData > 0 ? totalData : 1) : parseInt(val);
+        currentPageJadwal = 1;
+        renderTabelJadwalPaginated();
+    }
+
     async function loadDaftarJadwal() {
        try {
            const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) });
            const result = await res.json();
            hideLoader();
            globalJadwalData = result.data || [];
-           let html = '';
-           globalJadwalData.forEach(j => {
-               let jsData = JSON.stringify(j).replace(/'/g, "\\'"); 
-               html += `<tr class="border-b hover:bg-gray-50"><td class="p-4">${j.tanggal}</td><td class="p-4">${j.jam_mulai} - ${j.jam_selesai}</td><td class="p-4 font-bold text-blue-600">${j.kode_soal}</td><td class="p-4 uppercase">${j.ruang}</td><td class="p-4 uppercase">${j.sesi}</td><td class="p-4 text-center"><button onclick='bukaEditJadwal(${jsData})' class="text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded border border-blue-200 shadow-sm hover:bg-blue-100 transition mr-2">Edit</button><button onclick="hapusJadwal('${j.id}')" class="text-red-600 font-bold bg-red-50 px-3 py-1 rounded border border-red-200 shadow-sm hover:bg-red-100 transition">Hapus</button></td></tr>`;
-           });
-           document.getElementById('tabel-jadwal').innerHTML = html || `<tr><td colspan="6" class="p-8 text-center text-gray-500">Belum ada jadwal tersimpan.</td></tr>`;
-       } catch(e) { hideLoader(); }
+           changeLimitJadwal(); // Panggil fungsi render setelah data ditarik
+       } catch(e) { 
+           hideLoader(); 
+           document.getElementById('tabel-jadwal').innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Gagal memuat jadwal.</td></tr>`;
+       }
     }
+
+    function renderTabelJadwalPaginated() {
+        const tbody = document.getElementById('tabel-jadwal');
+        
+        if(!globalJadwalData || globalJadwalData.length === 0) { 
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">Belum ada jadwal tersimpan.</td></tr>`; 
+            document.getElementById('paginasi-jadwal').innerHTML = '';
+            return; 
+        }
+
+        let totalPages = Math.ceil(globalJadwalData.length / limitDataJadwal);
+        if(currentPageJadwal > totalPages) currentPageJadwal = totalPages;
+
+        let start = (currentPageJadwal - 1) * limitDataJadwal;
+        let end = start + limitDataJadwal;
+        let paginatedData = globalJadwalData.slice(start, end);
+
+        let html = '';
+        paginatedData.forEach(j => {
+            let jsData = JSON.stringify(j).replace(/'/g, "\\'"); 
+            html += `<tr class="border-b hover:bg-gray-50">
+                <td class="p-4">${j.tanggal}</td>
+                <td class="p-4">${j.jam_mulai} - ${j.jam_selesai}</td>
+                <td class="p-4 font-bold text-blue-600">${j.kode_soal}</td>
+                <td class="p-4 uppercase">${j.ruang}</td>
+                <td class="p-4 uppercase">${j.sesi}</td>
+                <td class="p-4 text-center">
+                    <button onclick='bukaEditJadwal(${jsData})' class="text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded border border-blue-200 shadow-sm hover:bg-blue-100 transition mr-2">Edit</button>
+                    <button onclick="hapusJadwal('${j.id}')" class="text-red-600 font-bold bg-red-50 px-3 py-1 rounded border border-red-200 shadow-sm hover:bg-red-100 transition">Hapus</button>
+                </td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+
+        let info = `<span class="text-sm text-gray-600 font-semibold bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">Menampilkan ${start + 1} - ${Math.min(end, globalJadwalData.length)} dari ${globalJadwalData.length} Data</span>`;
+        let buttons = `<div class="flex gap-2">
+            <button onclick="prevPageJadwal()" class="px-4 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition" ${currentPageJadwal === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left mr-1"></i> Prev</button>
+            <button onclick="nextPageJadwal()" class="px-4 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg text-sm font-bold hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed transition" ${currentPageJadwal === totalPages || totalPages === 0 ? 'disabled' : ''}>Next <i class="fas fa-chevron-right ml-1"></i></button>
+        </div>`;
+        document.getElementById('paginasi-jadwal').innerHTML = `${info} ${buttons}`;
+    }
+
+    function prevPageJadwal() { if(currentPageJadwal > 1) { currentPageJadwal--; renderTabelJadwalPaginated(); } }
+    function nextPageJadwal() { if(currentPageJadwal < Math.ceil(globalJadwalData.length / limitDataJadwal)) { currentPageJadwal++; renderTabelJadwalPaginated(); } }
 
     async function simpanJadwalBaru() {
        const tgl = document.getElementById('jadwal-tanggal').value;
@@ -1709,7 +1781,7 @@
        const kode = document.getElementById('filter-pantau-soal').value;
        const kelas = document.getElementById('filter-pantau-kelas').value.toUpperCase();
        
-       if(!kode) return Swal.fire('Pilih', 'Pilih paket soal terlebih dahulu untuk memantau.', 'info');
+       if(!kode) return Swal.fire('Pilih', 'Pilih soal terlebih dahulu untuk memantau.', 'info');
        
        showLoader('Menarik data pemantauan...');
        try {
@@ -1879,7 +1951,7 @@
                 <div class="p-3 bg-white rounded-xl shadow-sm text-lg group-hover:scale-110 transition ${iconColor}"><i class="fas fa-clock opacity-80"></i></div>
                 <div>
                    <h3 class="font-black text-lg">${wkt}</h3>
-                   <p class="text-xs font-semibold opacity-70 mt-1">${totalUjian} Paket Soal Ujian</p>
+                   <p class="text-xs font-semibold opacity-70 mt-1">${totalUjian} Soal Ujian</p>
                 </div>
             </div>`;
         });
@@ -1970,7 +2042,7 @@
 
         let payload = inactiveExams.map(u => ({ kode: u.kode, status: 'Aktif', token: Math.random().toString(36).substring(2, 7).toUpperCase() }));
 
-        Swal.fire({ title: 'Aktifkan Semua?', text: `${payload.length} paket soal akan diaktifkan dan dibuatkan token.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Ya' }).then(async r => {
+        Swal.fire({ title: 'Aktifkan Semua?', text: `${payload.length} Soal akan diaktifkan dan dibuatkan token.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Ya' }).then(async r => {
             if(r.isConfirmed) {
                 showLoader('Mengaktifkan Ujian...');
                 try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjianMassal', data: payload }) }); hideLoader(); Swal.fire('Berhasil', 'Ujian berhasil diaktifkan', 'success'); loadManajemenUjian(); } 
@@ -1987,7 +2059,7 @@
 
         let payload = activeExams.map(u => ({ kode: u.kode, status: 'Nonaktif', token: '' }));
 
-        Swal.fire({ title: 'Nonaktifkan Semua?', text: `${payload.length} paket soal akan dinonaktifkan dan token akan dihapus.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then(async r => {
+        Swal.fire({ title: 'Nonaktifkan Semua?', text: `${payload.length} soal akan dinonaktifkan dan token akan dihapus.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then(async r => {
             if(r.isConfirmed) {
                 showLoader('Menonaktifkan Ujian...');
                 try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjianMassal', data: payload }) }); hideLoader(); Swal.fire('Berhasil', 'Semua ujian di sesi ini dinonaktifkan', 'success'); loadManajemenUjian(); } 
