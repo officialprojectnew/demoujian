@@ -97,7 +97,7 @@
       <button onclick="switchMenu('view-konfigurasi')" id="btn-view-konfigurasi" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
         <i class="fas fa-cog w-5 text-center"></i> Konfigurasi
       </button>
-      <button onclick="switchMenu('view-token-ujian')" id="btn-view-token-ujian" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left text-orange-400">
+      <button onclick="switchMenu('view-token-ujian')" id="btn-view-token-ujian" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
         <i class="fas fa-key w-5 text-center"></i> Token Ujian
       </button>
       <button onclick="comingSoon()" class="sidebar-item flex items-center gap-4 px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium w-full text-left">
@@ -403,13 +403,13 @@
              <div class="mb-4 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-gray-800">Daftar Paket Ujian</h3>
                 <div class="flex gap-2">
-                  <button id="btn-nonaktifkan-semua" onclick="nonaktifkanSemuaToken()" class="bg-red-100 text-red-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-red-200 transition border border-red-200"><i class="fas fa-ban mr-1"></i>Nonaktifkan Sesi</button>
-                  <button id="btn-aktifkan-semua" onclick="aktifkanSemuaToken()" class="bg-green-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow hover:bg-green-700 transition"><i class="fas fa-bolt mr-2"></i>Aktifkan Sesi Ini</button>
+                  <button id="btn-nonaktifkan-semua" onclick="nonaktifkanSemuaToken()" class="bg-red-100 text-red-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-red-200 transition border border-red-200">Nonaktifkan</button>
+                  <button id="btn-aktifkan-semua" onclick="aktifkanSemuaToken()" class="bg-green-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow hover:bg-green-700 transition">Aktifkan</button>
                 </div>
              </div>
              <div class="overflow-x-auto border border-gray-200 rounded-xl">
                <table class="w-full text-left border-collapse whitespace-nowrap">
-                 <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">Kode Soal</th><th class="p-4 border-b font-semibold">Mata Pelajaran (Kelas)</th><th class="p-4 border-b text-center font-semibold">Status</th><th class="p-4 border-b text-center font-semibold">Token</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+                 <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">Kode Soal</th><th class="p-4 border-b font-semibold">Mata Pelajaran</th><th class="p-4 border-b text-center font-semibold">Kelas</th><th class="p-4 border-b text-center font-semibold">Status</th><th class="p-4 border-b text-center font-semibold">Token</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
                  <tbody id="tabel-manajemen-ujian"><tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">Memuat data...</td></tr></tbody>
                </table>
              </div>
@@ -421,7 +421,7 @@
              </div>
              <div class="overflow-x-auto border border-gray-200 rounded-xl">
                <table class="w-full text-left border-collapse whitespace-nowrap">
-                 <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">Kode Soal</th><th class="p-4 border-b font-semibold">Mata Pelajaran (Kelas)</th><th class="p-4 border-b text-center font-semibold">Status</th><th class="p-4 border-b text-center font-semibold">Token</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+                 <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">Kode Soal</th><th class="p-4 border-b font-semibold">Mata Pelajaran</th><th class="p-4 border-b text-center font-semibold">Kelas</th><th class="p-4 border-b text-center font-semibold">Status</th><th class="p-4 border-b text-center font-semibold">Token</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
                  <tbody id="tabel-search-ujian"></tbody>
                </table>
              </div>
@@ -1753,30 +1753,40 @@
 
     function buildTableUjian(dataArray, tbodyId) {
         const tbody = document.getElementById(tbodyId);
-        if(dataArray.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">Belum ada ujian.</td></tr>`; return;}
+        // Ubah colspan menjadi 7
+        if(dataArray.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">Belum ada ujian.</td></tr>`; return;}
         
         let html = ''; 
         dataArray.forEach((u, i) => {
           let isAktif = u.status === 'Aktif'; 
           let badge = isAktif ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200';
           let tokenDisp = u.token ? `<span class="font-mono font-bold text-lg text-blue-700 bg-blue-50 px-3 py-1 rounded border border-blue-200 tracking-wider shadow-sm inline-block min-w-[100px] text-center">${u.token}</span>` : '-';
+          
+          // Tombol WhatsApp yang sudah ditambahkan sebelumnya
           let btn = isAktif 
             ? `<div class="flex flex-col gap-1.5 w-full">
                  <button onclick="toggleStatusUjian('${u.kode}', 'Nonaktif')" class="bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-600 transition shadow w-full"><i class="fas fa-lock mr-1"></i> Tutup Ujian</button>
-                 <button onclick="kirimTokenWA('${u.kode}', '${u.mapel}', '${u.kelas}', '${u.token}')" class="bg-[#25D366] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#1DA851] transition shadow w-full"><i class="fab fa-whatsapp mr-1"></i> Kirim WA</button>
+                 <button onclick="kirimTokenWA('${u.kode}', '${u.mapel}', '${u.kelas}', '${u.token}')" class="bg-[#25D366] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#1DA851] transition shadow w-full"><i class="fab fa-whatsapp mr-1"></i> Kirim ke WA</button>
                </div>` 
             : `<button onclick="toggleStatusUjian('${u.kode}', 'Aktif')" class="bg-green-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-600 transition shadow w-full"><i class="fas fa-unlock mr-1"></i> Aktifkan & Buat Token</button>`;
           
           html += `<tr class="border-b hover:bg-gray-50">
             <td class="p-4 text-center text-sm">${i + 1}</td>
             <td class="p-4 text-sm font-bold text-blue-600">${u.kode}</td>
-            <td class="p-4 text-sm font-medium">${u.mapel} (${u.kelas})<br><span class="text-xs text-gray-400 font-normal"><i class="fas fa-user mr-1"></i>${u.id_guru} &nbsp;|&nbsp; <i class="fas fa-clock mr-1"></i>${u.waktu} mnt</span></td>
+            
+            <!-- Kolom Mapel Tanpa Kelas -->
+            <td class="p-4 text-sm font-medium">${u.mapel}<br><span class="text-xs text-gray-400 font-normal"><i class="fas fa-user mr-1"></i>${u.id_guru} &nbsp;|&nbsp; <i class="fas fa-clock mr-1"></i>${u.waktu} mnt</span></td>
+            
+            <!-- Kolom Kelas Baru -->
+            <td class="p-4 text-center text-sm font-bold text-gray-700">${u.kelas}</td>
+            
             <td class="p-4 text-center"><span class="px-3 py-1.5 rounded-full text-xs font-bold border ${badge} shadow-sm">${u.status}</span></td>
             <td class="p-4 text-center">${tokenDisp}</td>
             <td class="p-4 text-center w-36">${btn}</td>
           </tr>`;
         }); 
         tbody.innerHTML = html;
+    
     }
 
     function cariTokenUjian() {
