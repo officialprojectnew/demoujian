@@ -1768,7 +1768,7 @@
                  <button onclick="toggleStatusUjian('${u.kode}', 'Nonaktif')" class="bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-600 transition shadow w-full"><i class="fas fa-lock mr-1"></i> Tutup Ujian</button>
                  <button onclick="kirimTokenWA('${u.kode}', '${u.mapel}', '${u.kelas}', '${u.token}')" class="bg-[#25D366] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#1DA851] transition shadow w-full"><i class="fab fa-whatsapp mr-1"></i> Kirim ke WA</button>
                </div>` 
-            : `<button onclick="toggleStatusUjian('${u.kode}', 'Aktif')" class="bg-green-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-600 transition shadow w-full"><i class="fas fa-unlock mr-1"></i> Aktifkan & Buat Token</button>`;
+            : `<button onclick="toggleStatusUjian('${u.kode}', 'Aktif')" class="bg-green-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-600 transition shadow w-full"><i class="fas fa-unlock mr-1"></i> Aktifkan </button>`;
           
           html += `<tr class="border-b hover:bg-gray-50">
             <td class="p-4 text-center text-sm">${i + 1}</td>
