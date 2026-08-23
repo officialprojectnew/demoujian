@@ -1763,7 +1763,7 @@
           let btn = isAktif 
             ? `<div class="flex flex-col gap-1.5 w-full">
                  <button onclick="toggleStatusUjian('${u.kode}', 'Nonaktif')" class="bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-600 transition shadow w-full"><i class="fas fa-lock mr-1"></i> Tutup Ujian</button>
-                 <button onclick="kirimTokenWA('${u.kode}', '${u.mapel}', '${u.kelas}', '${u.token}')" class="bg-[#25D366] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#1DA851] transition shadow w-full"><i class="fab fa-whatsapp mr-1"></i> Kirim ke WA</button>
+                 <button onclick="kirimTokenWA('${u.kode}', '${u.mapel}', '${u.kelas}', '${u.token}')" class="bg-[#25D366] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#1DA851] transition shadow w-full"><i class="fab fa-whatsapp mr-1"></i> Kirim WA</button>
                </div>` 
             : `<button onclick="toggleStatusUjian('${u.kode}', 'Aktif')" class="bg-green-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-600 transition shadow w-full"><i class="fas fa-unlock mr-1"></i> Aktifkan & Buat Token</button>`;
           
@@ -1838,13 +1838,13 @@
     // ================= FUNGSI KIRIM TOKEN KE WHATSAPP =================
     function kirimTokenWA(kode, mapel, kelas, token) {
         Swal.fire({
-            title: 'Kirim Token via WhatsApp',
+            title: 'Kirim Token',
             html: `
-                <p class="text-sm text-gray-600 mb-3 text-left">Masukkan nomor Handphone siswa (awalan 08 atau 62)</p>
+                <p class="text-sm text-gray-600 mb-3 text-left">Masukkan nomor Handphone siswa</p>
                 <input type="number" id="wa-number" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/30 transition text-left" placeholder="Contoh: 081234567890">
             `,
             showCancelButton: true,
-            confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Buka WA Web',
+            confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Kirim',
             confirmButtonColor: '#25D366',
             cancelButtonText: 'Batal',
             cancelButtonColor: '#6b7280',
