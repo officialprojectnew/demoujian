@@ -239,7 +239,7 @@
         <h2 class="text-3xl font-bold text-gray-800 mb-6">Manajemen User</h2>
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
           <div class="flex border-b border-gray-200 px-6 pt-2 gap-8">
-            <button onclick="switchTabUser('siswa')" id="tab-btn-siswa" class="py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 transition">Data Siswa / Manajemen Kelas</button>
+            <button onclick="switchTabUser('siswa')" id="tab-btn-siswa" class="py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 transition">Data Siswa</button>
             <button onclick="switchTabUser('guru')" id="tab-btn-guru" class="py-4 text-center font-bold text-gray-400 hover:text-blue-600 hover:border-blue-600 transition border-b-2 border-transparent">Data Guru</button>
           </div>
           
@@ -711,7 +711,7 @@
         <div><label class="text-sm font-semibold">Sesi</label><input type="text" id="edit-kartu-sesi" class="w-full mt-1 p-2 border rounded focus:border-blue-500 outline-none uppercase"></div>
         <div><label class="text-sm font-semibold">Ruang</label><input type="text" id="edit-kartu-ruang" class="w-full mt-1 p-2 border rounded focus:border-blue-500 outline-none uppercase"></div>
         <div><label class="text-sm font-semibold">Password</label><input type="text" id="edit-kartu-pass" class="w-full mt-1 p-2 border rounded focus:border-blue-500 outline-none"></div>
-        <div><label class="text-sm font-semibold">Update Foto (Opsional)</label><input type="file" id="edit-kartu-foto" accept="image/*" class="w-full mt-1 text-sm border p-1 rounded"></div>
+        <div><label class="text-sm font-semibold">Update Foto</label><input type="file" id="edit-kartu-foto" accept="image/*" class="w-full mt-1 text-sm border p-1 rounded"></div>
       </div>
       <div class="flex gap-2 mt-5 border-t pt-4">
          <button onclick="tutupModal('modal-edit-kartu')" class="flex-1 bg-gray-100 p-2.5 rounded-xl font-bold">Batal</button>
@@ -817,12 +817,12 @@
         <div><label class="text-sm font-semibold text-gray-700">Kelas</label><input type="text" id="tambah-kelas-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="password" id="tambah-pass-siswa" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div class="p-3 border rounded-xl bg-gray-50">
-          <label class="text-sm font-semibold block mb-2 text-gray-700"><i class="fas fa-camera mr-2 text-blue-500"></i>Foto Siswa (Opsional)</label>
+          <label class="text-sm font-semibold block mb-2 text-gray-700"><i class="fas fa-camera mr-2 text-blue-500"></i>Foto Siswa</label>
           <input type="file" id="tambah-foto-siswa" accept="image/*" class="w-full text-xs">
         </div>
         <div class="pt-4 flex gap-3">
           <button onclick="tutupModal('modal-tambah-siswa')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
-          <button onclick="simpanSiswaBaru()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Simpan Data</button>
+          <button onclick="simpanSiswaBaru()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Simpan</button>
         </div>
       </div>
     </div>
@@ -838,7 +838,7 @@
         <div><label class="text-sm font-semibold text-gray-700">Kelas</label><input type="text" id="edit-kelas-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="text" id="edit-pass-siswa" class="w-full mt-1.5 p-3 border rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"></div>
         <div class="p-3 border rounded-xl bg-gray-50">
-          <label class="text-sm font-semibold block mb-2 text-gray-700"><i class="fas fa-camera mr-2 text-blue-500"></i>Update Foto Baru (Opsional)</label>
+          <label class="text-sm font-semibold block mb-2 text-gray-700"><i class="fas fa-camera mr-2 text-blue-500"></i>Update Foto Baru</label>
           <input type="file" id="edit-foto-siswa" accept="image/*" class="w-full text-xs">
         </div>
         <div class="pt-4 flex gap-3">
@@ -859,7 +859,7 @@
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="password" id="tambah-pass-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div class="pt-4 flex gap-3">
           <button onclick="tutupModal('modal-tambah-guru')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
-          <button onclick="simpanGuruBaru()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Simpan Data</button>
+          <button onclick="simpanGuruBaru()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Simpan</button>
         </div>
       </div>
     </div>
@@ -875,7 +875,7 @@
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="text" id="edit-pass-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div class="pt-4 flex gap-3">
           <button onclick="tutupModal('modal-edit-guru')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
-          <button onclick="simpanEditGuru()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Update Data</button>
+          <button onclick="simpanEditGuru()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Update</button>
         </div>
       </div>
     </div>
@@ -1148,7 +1148,7 @@
             cardHtml += `
             <div onclick="showKelasDetail('${kelas}')" class="${bgColor} rounded-xl p-5 text-white shadow-sm flex flex-col justify-between hover:scale-105 transition-transform cursor-pointer group">
                <div>
-                 <h3 class="text-2xl font-bold mb-1 group-hover:underline">Kelas ${kelas}</h3>
+                 <h3 class="text-2xl font-bold mb-1">Kelas ${kelas}</h3>
                  <p class="text-sm font-medium mb-4 text-white/90">${count} Siswa</p>
                </div>
                <div class="text-sm font-medium border-t border-white/20 pt-3 flex items-center justify-between">
@@ -1761,7 +1761,10 @@
           let badge = isAktif ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200';
           let tokenDisp = u.token ? `<span class="font-mono font-bold text-lg text-blue-700 bg-blue-50 px-3 py-1 rounded border border-blue-200 tracking-wider shadow-sm inline-block min-w-[100px] text-center">${u.token}</span>` : '-';
           let btn = isAktif 
-            ? `<button onclick="toggleStatusUjian('${u.kode}', 'Nonaktif')" class="bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-600 transition shadow w-full"><i class="fas fa-lock mr-1"></i> Tutup Ujian</button>` 
+            ? `<div class="flex flex-col gap-1.5 w-full">
+                 <button onclick="toggleStatusUjian('${u.kode}', 'Nonaktif')" class="bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-600 transition shadow w-full"><i class="fas fa-lock mr-1"></i> Tutup Ujian</button>
+                 <button onclick="kirimTokenWA('${u.kode}', '${u.mapel}', '${u.kelas}', '${u.token}')" class="bg-[#25D366] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#1DA851] transition shadow w-full"><i class="fab fa-whatsapp mr-1"></i> Kirim ke WA</button>
+               </div>` 
             : `<button onclick="toggleStatusUjian('${u.kode}', 'Aktif')" class="bg-green-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-600 transition shadow w-full"><i class="fas fa-unlock mr-1"></i> Aktifkan & Buat Token</button>`;
           
           html += `<tr class="border-b hover:bg-gray-50">
@@ -1832,7 +1835,43 @@
     }
 
     function toggleStatusUjian(kode, targetStatus) { Swal.fire({ title: 'Ubah Status?', text: `Ujian ${kode} akan menjadi ${targetStatus}.`, icon: 'question', showCancelButton: true, confirmButtonColor: targetStatus==='Aktif'?'#16a34a':'#d33', confirmButtonText: `Ya, ${targetStatus}kan!` }).then(async (result) => { if(result.isConfirmed) { let tokenBaru = targetStatus === 'Aktif' ? Math.random().toString(36).substring(2, 7).toUpperCase() : ''; showLoader('Update Status...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjian', kode, status: targetStatus, token: tokenBaru }) }); await res.json(); hideLoader(); loadManajemenUjian(); loadDashboard(); } catch(e) { hideLoader(); } } }); }
+    // ================= FUNGSI KIRIM TOKEN KE WHATSAPP =================
+    function kirimTokenWA(kode, mapel, kelas, token) {
+        Swal.fire({
+            title: 'Kirim Token via WhatsApp',
+            html: `
+                <p class="text-sm text-gray-600 mb-3 text-left">Masukkan nomor Handphone siswa (awalan 08 atau 62)</p>
+                <input type="number" id="wa-number" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/30 transition text-left" placeholder="Contoh: 081234567890">
+            `,
+            showCancelButton: true,
+            confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Buka WA Web',
+            confirmButtonColor: '#25D366',
+            cancelButtonText: 'Batal',
+            cancelButtonColor: '#6b7280',
+            preConfirm: () => {
+                const noWa = document.getElementById('wa-number').value;
+                if (!noWa) {
+                    Swal.showValidationMessage('Nomor handphone tidak boleh kosong!');
+                }
+                return noWa;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // 1. Bersihkan dan Format Nomor HP
+                let phone = result.value.replace(/\D/g, ''); 
+                if (phone.startsWith('0')) {
+                    phone = '62' + phone.substring(1); 
+                }
 
+                // 2. Format Pesan Pengumuman Ujian
+                const pesan = `*PENGUMUMAN PELAKSANAAN UJIAN* \n\nKepada Yth. Siswa/i Kelas ${kelas},\n\nDiberitahukan bahwa Anda sudah dapat mengikuti ujian untuk mata pelajaran *${mapel}* (Kode Ujian: ${kode}).\n\nBerikut adalah Token Ujian Anda: \n*${token}*\n\nSilakan login ke sistem CBT dan masukkan token tersebut untuk memulai pengerjaan soal. Pastikan koneksi internet stabil dan kerjakan dengan jujur.\n\nSemoga sukses!\n_Admin CBT System_`;
+
+                // 3. Arahkan ke WhatsApp Web
+                const waUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(pesan)}`;
+                window.open(waUrl, '_blank');
+            }
+        });
+    }
     // ================= KARTU UJIAN & SINKRONISASI (Cetak A4 & Generate Modal) =================
     let globalKartuData = [];
 

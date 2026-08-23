@@ -189,12 +189,12 @@
         <div class="absolute top-0 left-0 w-full h-3 bg-green-500"></div>
         <div class="w-24 h-24 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-5xl shadow-inner border border-green-100">🎉</div>
         <h2 class="text-3xl font-black mb-2 text-gray-800">Ujian Selesai!</h2>
-        <p class="text-sm text-gray-500 mb-8 font-medium">Jawaban Anda berhasil disimpan permanen dan akan direview oleh guru.</p>
+        <p class="text-sm text-gray-500 mb-8 font-medium">Jawaban Anda berhasil disimpan dan akan direview oleh guru.</p>
         <div class="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 mb-8 shadow-sm">
           <p class="text-xs text-blue-600 uppercase font-black tracking-widest mb-2">Skor Sementara (PG)</p>
           <p class="text-6xl font-black text-blue-600 drop-shadow-sm" id="display-skor-akhir">0</p>
         </div>
-        <button onclick="logoutSiswa()" class="w-full bg-gray-800 text-white font-bold py-4 rounded-xl hover:bg-gray-900 transition shadow-lg tracking-wide">Keluar Ke Beranda</button>
+        <button onclick="logoutSiswa()" class="w-full bg-gray-800 text-white font-bold py-4 rounded-xl hover:bg-gray-900 transition shadow-lg tracking-wide">Logout</button>
       </div>
     </div>
   </div>
@@ -448,7 +448,7 @@
 
     function konfirmasiSelesaiUjian() {
       document.getElementById('dropdown-soal-hp').classList.add('hidden');
-      Swal.fire({ title: 'Kirim Jawaban Permanen?', text: "Anda tidak dapat kembali setelah jawaban dikirim.", icon: 'question', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Ya, Kirim', cancelButtonText: 'Batal' }).then((result) => {
+      Swal.fire({ title: 'Kirim Jawaban?', text: "Anda tidak dapat kembali setelah jawaban dikirim.", icon: 'question', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Ya, Kirim', cancelButtonText: 'Batal' }).then((result) => {
         if (result.isConfirmed) kirimHasilUjian(false);
       });
     }
