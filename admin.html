@@ -146,8 +146,8 @@
         <!-- DASHBOARD CHARTS: MULTIPLE PIE CHARTS -->
         <div class="mb-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
            <div>
-               <h2 class="text-xl font-bold text-gray-800">Status Pengerjaan (Ujian Aktif)</h2>
-               <p class="text-sm text-gray-500 mt-1">Pantau progres siswa per-paket soal. Arahkan kursor ke diagram untuk melihat nama.</p>
+               <h2 class="text-xl font-bold text-gray-800">Status Pengerjaan </h2>
+               <p class="text-sm text-gray-500 mt-1">Pantau progres siswa persoal. Arahkan kursor ke diagram untuk melihat nama.</p>
            </div>
            <div class="flex gap-2 w-full md:w-auto">
              <input type="text" id="dash-filter-kelas" oninput="renderDashboardCharts()" placeholder="Filter Kelas..." class="w-full md:w-48 p-2 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm shadow-sm">
@@ -1818,7 +1818,7 @@
 
         let payload = inactiveExams.map(u => ({ kode: u.kode, status: 'Aktif', token: Math.random().toString(36).substring(2, 7).toUpperCase() }));
 
-        Swal.fire({ title: 'Aktifkan Semua?', text: `${payload.length} paket soal akan diaktifkan dan dibuatkan token.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Ya, Aktifkan!' }).then(async r => {
+        Swal.fire({ title: 'Aktifkan Semua?', text: `${payload.length} paket soal akan diaktifkan dan dibuatkan token.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Ya' }).then(async r => {
             if(r.isConfirmed) {
                 showLoader('Mengaktifkan Ujian...');
                 try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjianMassal', data: payload }) }); hideLoader(); Swal.fire('Berhasil', 'Ujian berhasil diaktifkan', 'success'); loadManajemenUjian(); } 
@@ -1835,7 +1835,7 @@
 
         let payload = activeExams.map(u => ({ kode: u.kode, status: 'Nonaktif', token: '' }));
 
-        Swal.fire({ title: 'Nonaktifkan Semua?', text: `${payload.length} paket soal akan dinonaktifkan dan token akan dihapus.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya, Nonaktifkan!' }).then(async r => {
+        Swal.fire({ title: 'Nonaktifkan Semua?', text: `${payload.length} paket soal akan dinonaktifkan dan token akan dihapus.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then(async r => {
             if(r.isConfirmed) {
                 showLoader('Menonaktifkan Ujian...');
                 try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjianMassal', data: payload }) }); hideLoader(); Swal.fire('Berhasil', 'Semua ujian di sesi ini dinonaktifkan', 'success'); loadManajemenUjian(); } 
