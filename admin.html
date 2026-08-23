@@ -263,18 +263,6 @@
             <div id="view-tabel-siswa" class="hidden">
               <div class="flex flex-wrap justify-between items-center mb-5 gap-3">
                 <button onclick="kembaliKeDaftarKelas()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-300 transition flex items-center gap-2"><i class="fas fa-arrow-left"></i> Kembali</button>
-                
-                <!-- DROPDOWN LIMIT DATA SISWA -->
-                <div class="flex items-center gap-2">
-                    <span class="text-sm font-bold text-gray-700">Tampilkan:</span>
-                    <select id="limit-siswa" onchange="changeLimitSiswa()" class="p-2 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm shadow-sm bg-white cursor-pointer">
-                        <option value="10">10 Baris</option>
-                        <option value="25">25 Baris</option>
-                        <option value="50">50 Baris</option>
-                        <option value="all">Semua</option>
-                    </select>
-                </div>
-
                 <button onclick="bukaModalTambahSiswa()" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 shadow-sm transition flex items-center gap-2"><i class="fas fa-plus"></i> Tambah Siswa</button>
               </div>
               <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
@@ -284,8 +272,19 @@
                 </table>
               </div>
               
-              <!-- CONTAINER TOMBOL PAGINASI SISWA -->
-              <div id="paginasi-siswa" class="flex flex-col md:flex-row justify-between items-center mt-4 gap-3"></div>
+              <!-- CONTAINER PAGINASI & DROPDOWN SISWA -->
+              <div class="flex flex-col md:flex-row justify-between items-center mt-4 gap-3">
+                  <div class="flex items-center gap-2">
+                      <span class="text-sm font-bold text-gray-700">Tampilkan:</span>
+                      <select id="limit-siswa" onchange="changeLimitSiswa()" class="p-2 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm shadow-sm bg-white cursor-pointer">
+                          <option value="10">10</option>
+                          <option value="25">25</option>
+                          <option value="50">50</option>
+                          <option value="all">Semua</option>
+                      </select>
+                  </div>
+                  <div id="paginasi-siswa" class="flex flex-col md:flex-row items-center gap-3"></div>
+              </div>
             </div>
           </div>
 
@@ -298,28 +297,26 @@
               </div>
             </div>
 
-            <!-- DROPDOWN LIMIT DATA GURU -->
-            <div class="flex justify-between items-center mb-3">
-              <div class="flex items-center gap-2">
-                  <span class="text-sm font-bold text-gray-700">Tampilkan:</span>
-                  <select id="limit-guru" onchange="changeLimitGuru()" class="p-2 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm shadow-sm bg-white cursor-pointer">
-                      <option value="10">10 Baris</option>
-                      <option value="25">25 Baris</option>
-                      <option value="50">50 Baris</option>
-                      <option value="all">Semua</option>
-                  </select>
-              </div>
-            </div>
-
             <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
               <table class="w-full text-left border-collapse whitespace-nowrap">
-                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIP/ID</th><th class="p-4 border-b font-semibold">Nama Guru</th><th class="p-4 border-b font-semibold">Username</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIP</th><th class="p-4 border-b font-semibold">Nama Guru</th><th class="p-4 border-b font-semibold">Username</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
                 <tbody id="tabel-rekap-guru"><tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">Klik Refresh Data...</td></tr></tbody>
               </table>
             </div>
 
-            <!-- CONTAINER TOMBOL PAGINASI GURU -->
-            <div id="paginasi-guru" class="flex flex-col md:flex-row justify-between items-center mt-4 gap-3"></div>
+            <!-- CONTAINER PAGINASI & DROPDOWN GURU -->
+            <div class="flex flex-col md:flex-row justify-between items-center mt-4 gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold text-gray-700">Tampilkan:</span>
+                    <select id="limit-guru" onchange="changeLimitGuru()" class="p-2 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-sm shadow-sm bg-white cursor-pointer">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="all">Semua</option>
+                    </select>
+                </div>
+                <div id="paginasi-guru" class="flex flex-col md:flex-row items-center gap-3"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1908,7 +1905,7 @@
           let btn = isAktif 
             ? `<div class="flex flex-col gap-1.5 w-full">
                  <button onclick="toggleStatusUjian('${u.kode}', 'Nonaktif')" class="bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-600 transition shadow w-full"><i class="fas fa-lock mr-1"></i> Tutup Ujian</button>
-                 <button onclick="kirimTokenWA('${u.kode}', '${u.mapel}', '${u.kelas}', '${u.token}')" class="bg-[#25D366] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#1DA851] transition shadow w-full"><i class="fab fa-whatsapp mr-1"></i> Kirim ke WA</button>
+                 <button onclick="kirimTokenWA('${u.kode}', '${u.mapel}', '${u.kelas}', '${u.token}')" class="bg-[#25D366] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#1DA851] transition shadow w-full"><i class="fab fa-whatsapp mr-1"></i> Kirim WA</button>
                </div>` 
             : `<button onclick="toggleStatusUjian('${u.kode}', 'Aktif')" class="bg-green-500 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-600 transition shadow w-full"><i class="fas fa-unlock mr-1"></i> Aktifkan </button>`;
           
