@@ -38,10 +38,10 @@
   </div>
 
   <div class="w-64 bg-white shadow-lg flex flex-col h-full z-10">
-    <div class="p-6 text-xl font-bold text-green-700 border-b">Panel Guru</div>
+    <div class="p-6 text-xl font-bold text-green-700 border-b">Admin Guru</div>
     <div class="flex-1 overflow-y-auto py-4">
-      <button onclick="switchMenu('guru-buat-soal')" id="btn-guru-buat-soal" class="w-full text-left px-6 py-3 hover:bg-gray-50 menu-active transition-colors">Buat / Import Soal</button>
-      <button onclick="switchMenu('guru-edit-soal')" id="btn-guru-edit-soal" class="w-full text-left px-6 py-3 hover:bg-gray-50 transition-colors">Manajemen Edit Paket</button>
+      <button onclick="switchMenu('guru-buat-soal')" id="btn-guru-buat-soal" class="w-full text-left px-6 py-3 hover:bg-gray-50 menu-active transition-colors">Input Soal</button>
+      <button onclick="switchMenu('guru-edit-soal')" id="btn-guru-edit-soal" class="w-full text-left px-6 py-3 hover:bg-gray-50 transition-colors">Edit Soal</button>
       <button onclick="switchMenu('guru-rekap-ujian')" id="btn-guru-rekap-ujian" class="w-full text-left px-6 py-3 hover:bg-gray-50 transition-colors">Rekap & Penilaian</button>
     </div>
     <div class="p-4 border-t">
@@ -59,10 +59,10 @@
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
           <h2 class="text-2xl font-bold text-gray-800" id="title-buat-soal">Pembuatan Soal Ujian</h2>
-          <p class="text-sm text-gray-500 mt-1">Buat soal manual atau import massal. Atur Parameter Ujian terlebih dahulu.</p>
+          <p class="text-sm text-gray-500 mt-1">Buat soal manual atau Import massal atur Parameter Soal Ujian terlebih dahulu.</p>
         </div>
         <button onclick="bukaModalSetupUjian()" id="btn-setup-ujian" class="bg-blue-600 text-white font-bold px-6 py-3 rounded-xl shadow-sm hover:bg-blue-700 transition flex items-center gap-2">
-          <i class="fas fa-cogs"></i> Setup Parameter Ujian
+          <i class="fas fa-cogs"></i> Setup Soal Ujian
         </button>
         <button onclick="batalkanEdit()" id="btn-batal-edit" class="hidden bg-red-100 text-red-600 font-bold px-6 py-3 rounded-xl hover:bg-red-200 transition shadow">❌ Keluar Mode Edit</button>
       </div>
@@ -150,11 +150,11 @@
         <!-- TOMBOL DINAMIS: TAMBAH KE KERANJANG ATAU UPDATE DB -->
         <div class="flex gap-3">
           <button id="btn-tambah-keranjang" onclick="tambahkanKeDaftar()" class="flex-1 bg-yellow-500 text-white font-bold py-3.5 rounded-xl hover:bg-yellow-600 transition shadow text-base tracking-wide">
-            <i class="fas fa-arrow-down mr-2"></i> Tambahkan Soal ke Keranjang
+            <i class="fas fa-arrow-down mr-2"></i> Tambahkan Soal
           </button>
           
           <button id="btn-update-db" onclick="updateLangsungKeDB()" class="hidden flex-1 bg-green-600 text-white font-bold py-3.5 rounded-xl hover:bg-green-700 transition shadow text-base tracking-wide">
-            <i class="fas fa-cloud-upload-alt mr-2"></i> Update Langsung ke Database
+            <i class="fas fa-cloud-upload-alt mr-2"></i> Update Database
           </button>
           
           <button id="btn-batal-edit-keranjang" onclick="batalEditKeranjang()" class="hidden bg-gray-500 text-white font-bold py-3.5 px-6 rounded-xl hover:bg-gray-600 transition shadow text-base tracking-wide">
@@ -176,11 +176,11 @@
       </button>
     </div>
 
-    <!-- MENU 2: MANAJEMEN EDIT PAKET -->
+    <!-- MENU 2: EDIT SOAL -->
     <div id="guru-edit-soal" class="guru-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Manajemen Edit Paket</h2>
-        <button onclick="loadEditSoal()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-blue-200 text-sm transition">🔄 Muat Ulang Data</button>
+        <h2 class="text-2xl font-bold">Manajemen Edit Soal</h2>
+        <button onclick="loadEditSoal()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-blue-200 text-sm transition">🔄</button>
       </div>
       <div class="overflow-x-auto border border-gray-200 rounded-xl">
         <table class="w-full text-left border-collapse">
@@ -202,15 +202,15 @@
     <!-- MENU 3: REKAP UJIAN & PENILAIAN ESSAY -->
     <div id="guru-rekap-ujian" class="guru-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Rekap & Penilaian Ujian</h2>
-        <button onclick="loadDropdownRekap()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg text-sm transition">🔄 Muat Pilihan Paket</button>
+        <h2 class="text-2xl font-bold">Rekap & Nilai Ujian</h2>
+        <button onclick="loadDropdownRekap()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg text-sm transition">🔄</button>
       </div>
       <div class="mb-6 bg-gray-50 p-5 rounded-xl border flex items-end gap-4 shadow-sm">
         <div class="flex-1">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Paket Ujian Anda:</label>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Soal Ujian</label>
           <select id="select-rekap" class="w-full p-2.5 border rounded-lg outline-none focus:border-blue-500 transition"><option value="">-- Muat Ulang Dulu --</option></select>
         </div>
-        <button onclick="tampilkanRekap()" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow">Tampilkan Tabel</button>
+        <button onclick="tampilkanRekap()" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow">Cari</button>
       </div>
       <div class="overflow-x-auto border rounded-xl">
         <table class="w-full text-left border-collapse">
@@ -221,11 +221,11 @@
               <th class="p-4 border-b text-center">PG</th>
               <th class="p-4 border-b text-center">Essay</th>
               <th class="p-4 border-b text-center font-bold">Total</th>
-              <th class="p-4 border-b text-center">Aksi Penilaian</th>
+              <th class="p-4 border-b text-center">Aksi</th>
             </tr>
           </thead>
           <tbody id="tabel-rekap-nilai">
-            <tr><td colspan="6" class="p-8 text-center text-gray-500">Pilih paket dan klik tampilkan.</td></tr>
+            <tr><td colspan="6" class="p-8 text-center text-gray-500">Pilih soal dan klik cari</td></tr>
           </tbody>
         </table>
       </div>
