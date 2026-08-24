@@ -57,7 +57,7 @@
       <div class="text-right hidden sm:block">
         <p class="text-sm font-bold text-gray-800" id="nama-siswa-login">Siswa</p>
         <!-- Teks sementara sebelum ditarik dari database -->
-        <p class="text-xs text-gray-500 font-semibold" id="nis-siswa-login">NISN: Memuat...</p>
+        <p class="text-xs text-gray-500 font-semibold" id="nis-siswa-login">NISN : Memuat...</p>
       </div>
       <button id="btn-toggle-soal-hp" onclick="toggleDaftarSoalHP()" class="hidden md:hidden bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-bold shadow-sm border border-blue-200">
         <i class="fas fa-th-large"></i> Daftar
@@ -94,7 +94,7 @@
             <div class="flex justify-center mb-5"><div class="w-28 h-32 bg-gray-50 rounded-xl overflow-hidden border border-gray-300 flex items-center justify-center shadow-inner"><svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" /></svg></div></div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left border-collapse">
-                    <tr class="border-b"><td class="py-3 font-bold text-gray-500 pr-4">NIS (ID)</td><td class="py-3 font-bold text-gray-900" id="profil-nis">Memuat...</td></tr>
+                    <tr class="border-b"><td class="py-3 font-bold text-gray-500 pr-4">NIS</td><td class="py-3 font-bold text-gray-900" id="profil-nis">Memuat...</td></tr>
                     <tr class="border-b"><td class="py-3 font-bold text-gray-500 pr-4">Nama</td><td class="py-3 font-bold text-blue-700" id="profil-nama">Memuat...</td></tr>
                     <tr class="border-b"><td class="py-3 font-bold text-gray-500 pr-4">NISN</td><td class="py-3 font-bold text-gray-900" id="profil-nisn">Memuat...</td></tr>
                     <tr class="border-b"><td class="py-3 font-bold text-gray-500 pr-4">Sesi</td><td class="py-3 font-semibold text-gray-800" id="profil-sesi">Memuat...</td></tr>
@@ -231,7 +231,7 @@
         if (result.status === 'success') {
           // Menampilkan NISN dengan benar
           document.getElementById('profil-nisn').innerText = result.data.nisn; 
-          document.getElementById('nis-siswa-login').innerText = `NISN: ${result.data.nisn}`; 
+          document.getElementById('nis-siswa-login').innerText = `NISN : ${result.data.nisn}`; 
           
           document.getElementById('profil-sesi').innerText = result.data.sesi; 
           document.getElementById('profil-ruang').innerText = result.data.ruang;
@@ -249,7 +249,7 @@
         }
       } catch (e) {
           document.getElementById('profil-nisn').innerText = "-"; 
-          document.getElementById('nis-siswa-login').innerText = `NIS: ${user.id}`; 
+          document.getElementById('nis-siswa-login').innerText = `NIS : ${user.id}`; 
       }
     }
     fetchProfilKartu();
@@ -291,7 +291,7 @@
 
           Swal.fire({
             title: 'Konfirmasi Ujian',
-            html: `<div class="text-left mt-2"><table class="w-full border-collapse swal-table"><tr><td>Nama</td><td>: <span class="font-bold">${user.nama}</span></td></tr><tr><td>Kelas</td><td>: ${dataUjian.kelas}</td></tr><tr><td>Mapel</td><td class="text-blue-600 font-bold">${dataUjian.mapel}</td></tr><tr><td>Waktu</td><td class="font-bold">${dataUjian.waktu} Menit</td></tr></table><br><p class="text-xs text-red-600 text-center font-bold">*Anda wajib memberikan Izin Kamera setelah mengklik Mulai Ujian.</p></div>`,
+            html: `<div class="text-left mt-2"><table class="w-full border-collapse swal-table"><tr><td>Nama</td><td>: <span class="font-bold">${user.nama}</span></td></tr><tr><td>Kelas</td><td>: ${dataUjian.kelas}</td></tr><tr><td>Mapel</td><td>: class="text-blue-600 font-bold">${dataUjian.mapel}</td></tr><tr><td>Waktu</td><td>: class="font-bold">${dataUjian.waktu} Menit</td></tr></table><br><p class="text-xs text-red-600 text-center font-bold">*Anda wajib memberikan Izin Kamera setelah mengklik Mulai Ujian.</p></div>`,
             icon: 'info', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Mulai Ujian', allowOutsideClick: false
           }).then((res) => { if (res.isConfirmed) initCameraAndStart(token, parseInt(dataUjian.waktu) * 60, true); });
         } else { Swal.fire('Ditolak!', result.pesan, 'error'); }
@@ -333,7 +333,7 @@
                 action: 'uploadFotoPemantauan',
                 data: {
                     kode_soal: dataUjian.kode,
-                    nis: user.id,
+                    nis : user.id,
                     nama: user.nama,
                     kelas: dataUjian.kelas,
                     tahap: tahap,
@@ -448,7 +448,7 @@
 
     function konfirmasiSelesaiUjian() {
       document.getElementById('dropdown-soal-hp').classList.add('hidden');
-      Swal.fire({ title: 'Kirim Jawaban?', text: "Anda tidak dapat kembali setelah jawaban dikirim.", icon: 'question', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Ya, Kirim', cancelButtonText: 'Batal' }).then((result) => {
+      Swal.fire({ title: 'Kirim Jawaban?', text: "Anda tidak dapat kembali setelah jawaban dikirim.", icon: 'question', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Ya', cancelButtonText: 'Batal' }).then((result) => {
         if (result.isConfirmed) kirimHasilUjian(false);
       });
     }
