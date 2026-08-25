@@ -278,12 +278,14 @@
             <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider">
               <th class="p-4 border-b text-center font-bold">No</th>
               <th class="p-4 border-b font-bold">Kode Soal</th>
-              <th class="p-4 border-b font-bold">Mapel</th>
+              <th class="p-4 border-b font-bold">Mata Pelajaran</th>
+              <th class="p-4 border-b text-center font-bold">Kelas</th>
               <th class="p-4 border-b text-center font-bold">Aksi</th>
             </tr>
           </thead>
           <tbody id="tabel-edit-soal">
-            <tr><td colspan="4" class="p-8 text-center text-gray-500">Klik Refresh Untuk Memuat Data.</td></tr>
+            <!-- Colspan diubah dari 4 menjadi 5 -->
+            <tr><td colspan="5" class="p-8 text-center text-gray-500">Klik Refresh Untuk Memuat Data.</td></tr>
           </tbody>
         </table>
       </div>
@@ -1195,24 +1197,34 @@
 
     // ================= EDIT PAKET SOAL (DITAMBAH HAPUS PAKET PERMANEN) =================
     async function loadEditSoal() {
-      const tbody = document.getElementById('tabel-edit-soal'); tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-500 animate-pulse">Memuat data dari database...</td></tr>`;
+      const tbody = document.getElementById('tabel-edit-soal'); 
+      // Colspan diubah jadi 5
+      tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500 animate-pulse">Memuat data dari database...</td></tr>`;
       showLoader('Mengambil Daftar Paket Ujian...');
       try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getPaketGuru', id_guru: user.id }) });
-        const result = await res.json(); let html = ''; 
+        const result = await res.json(); 
+        let html = ''; 
+        
         result.data.forEach((p,i) => { 
           html += `<tr class="border-b hover:bg-gray-50">
             <td class="p-4 text-center">${i+1}</td>
             <td class="p-4 font-bold text-blue-600">${p.kode}</td>
-            <td class="p-4">${p.mapel} (${p.kelas})</td>
+            <td class="p-4 font-medium text-gray-800">${p.mapel}</td>
+            <td class="p-4 text-center font-bold text-gray-700">${p.kelas}</td>
             <td class="p-4 text-center flex justify-center gap-2">
                <button onclick='masukModeEditPaket(${JSON.stringify(p).replace(/'/g, "\\'")})' class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold hover:bg-blue-200 transition shadow-sm"><i class="fas fa-edit mr-1"></i> Edit Paket DB</button>
                <button onclick="hapusPaketKeseluruhan('${p.kode}')" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-bold hover:bg-red-200 transition shadow-sm"><i class="fas fa-trash-alt mr-1"></i> Hapus Paket</button>
             </td>
           </tr>`; 
         });
-        tbody.innerHTML = html || `<tr><td colspan="4" class="p-8 text-center text-gray-500">Belum ada paket soal dibuat.</td></tr>`;
-      } catch(e) { tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">Gagal memuat.</td></tr>`; }
+        
+        // Colspan diubah jadi 5
+        tbody.innerHTML = html || `<tr><td colspan="5" class="p-8 text-center text-gray-500">Belum ada paket soal dibuat.</td></tr>`;
+      } catch(e) { 
+        // Colspan diubah jadi 5
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-red-500">Gagal memuat.</td></tr>`; 
+      }
       hideLoader();
     }
 
@@ -1340,22 +1352,38 @@
     async function loadDashboardGuru() {
         showLoader('Menyinkronkan Dashboard...');
         
-        // 1. Tampilkan Biodata Guru
+        // 1. Tampilkan Biodata Dasar dari Session
         document.getElementById('dash-nama-guru').innerText = user.nama;
         document.getElementById('dash-id-guru').innerText = user.id;
 
-        let urlFoto = getDirectImageUrl(user.foto);
-        if(urlFoto) {
-            document.getElementById('dash-foto-guru').src = urlFoto;
-            document.getElementById('dash-foto-guru').classList.remove('hidden');
-            document.getElementById('dash-icon-guru').classList.add('hidden');
-        } else {
-            document.getElementById('dash-foto-guru').classList.add('hidden');
-            document.getElementById('dash-icon-guru').classList.remove('hidden');
-        }
-
         try {
-            // 2. Tarik Data Ujian & Siswa berbarengan
+            // TARIK DATA FOTO TERBARU DARI DATABASE
+            // Ini untuk mencegah foto blank akibat session lama
+            const resGuruDb = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getGuru' }) });
+            const resultGuruDb = await resGuruDb.json();
+            
+            if(resultGuruDb.status === 'success') {
+                // Cari profil guru yang sedang login di database
+                let myProfile = resultGuruDb.data.find(g => g.nip.toString() === user.id.toString() || g.username.toString() === user.id.toString());
+                
+                if (myProfile && myProfile.foto) {
+                    let urlFotoRealtime = getDirectImageUrl(myProfile.foto);
+                    if(urlFotoRealtime) {
+                        document.getElementById('dash-foto-guru').src = urlFotoRealtime;
+                        document.getElementById('dash-foto-guru').classList.remove('hidden');
+                        document.getElementById('dash-icon-guru').classList.add('hidden');
+                        
+                        // Opsional: Perbarui session local storage agar besoknya lebih cepat
+                        user.foto = myProfile.foto;
+                        localStorage.setItem('auth_user', JSON.stringify(user));
+                    }
+                } else {
+                    document.getElementById('dash-foto-guru').classList.add('hidden');
+                    document.getElementById('dash-icon-guru').classList.remove('hidden');
+                }
+            }
+
+            // 2. Tarik Data Ujian & Siswa berbarengan (Kode Lama Anda)
             const [resUjian, resSiswa] = await Promise.all([
                 fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }).then(r => r.json()),
                 fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }).then(r => r.json())
