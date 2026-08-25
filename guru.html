@@ -20,8 +20,17 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* CSS KHUSUS UNTUK PRINT ANALISA GURU */
+    @media print {
+      body > *:not(#print-area) { display: none !important; }
+      body { background-color: #fff; margin: 0; padding: 0; }
+      #print-area { display: block !important; width: 100%; margin: 0; padding: 0; }
+      @page { size: A4 landscape !important; margin: 10mm; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+
     body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; }
-    .menu-active { background-color: #ecfdf5; color: #047857; border-right: 4px solid #047857; font-weight: 600;}
+    .menu-active { background-color: #3b82f6 !important; color: #ffffff !important; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.4); }
     .ql-editor { min-height: 150px; font-size: 16px; font-family: 'Poppins', sans-serif; }
     .ql-toolbar.ql-snow { border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; background: #f9fafb; }
     .ql-container.ql-snow { border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
@@ -32,29 +41,108 @@
 </head>
 <body class="flex h-screen overflow-hidden text-gray-800 relative">
 
+  <div id="print-area" class="hidden"></div>
+
   <div id="global-loader" class="fixed inset-0 bg-gray-900/70 z-[9999] hidden flex-col items-center justify-center backdrop-blur-sm transition-opacity">
     <div class="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mb-4 shadow-lg"></div>
     <p class="text-white font-bold text-lg animate-pulse tracking-wide" id="loader-text">Memuat Data...</p>
   </div>
 
-  <div class="w-64 bg-white shadow-lg flex flex-col h-full z-10">
-    <div class="p-6 text-xl font-bold text-green-700 border-b">Admin Guru</div>
-    <div class="flex-1 overflow-y-auto py-4">
-      <button onclick="switchMenu('guru-buat-soal')" id="btn-guru-buat-soal" class="w-full text-left px-6 py-3 hover:bg-gray-50 menu-active transition-colors">Input Soal</button>
-      <button onclick="switchMenu('guru-edit-soal')" id="btn-guru-edit-soal" class="w-full text-left px-6 py-3 hover:bg-gray-50 transition-colors">Edit Soal</button>
-      <button onclick="switchMenu('guru-rekap-ujian')" id="btn-guru-rekap-ujian" class="w-full text-left px-6 py-3 hover:bg-gray-50 transition-colors">Rekap & Penilaian</button>
+  <!-- ================= SIDEBAR GURU ================= -->
+  <div class="w-64 bg-[#1e293b] text-gray-400 flex flex-col h-full z-20 shadow-xl overflow-y-auto">
+    
+    <div class="p-6 text-xl font-bold text-white border-b border-slate-700/50 mb-2 sticky top-0 bg-[#1e293b] z-10 flex items-center gap-3">
+      <i class="fas fa-chalkboard-teacher text-blue-500"></i> Admin Guru
     </div>
-    <div class="p-4 border-t">
-      <p class="text-xs text-gray-500">Login sebagai:</p>
-      <p class="font-bold text-sm mb-3" id="nama-guru-login">Guru</p>
-      <button onclick="logout()" class="w-full py-2 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 transition">Logout</button>
+    
+    <div class="flex-1 py-2 flex flex-col gap-1 pr-4">
+      <button onclick="switchMenu('guru-dashboard')" id="btn-guru-dashboard" class="menu-active w-full text-left px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium flex items-center">
+        <i class="fas fa-home mr-3 w-5 text-center"></i> Dashboard
+      </button>
+      <button onclick="switchMenu('guru-buat-soal')" id="btn-guru-buat-soal" class="w-full text-left px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium flex items-center">
+        <i class="fas fa-plus mr-3 w-5 text-center"></i> Input Soal
+      </button>
+      <button onclick="switchMenu('guru-edit-soal')" id="btn-guru-edit-soal" class="w-full text-left px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium flex items-center">
+        <i class="fas fa-edit mr-3 w-5 text-center"></i> Edit Soal
+      </button>
+      <button onclick="switchMenu('guru-rekap-ujian')" id="btn-guru-rekap-ujian" class="w-full text-left px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium flex items-center">
+        <i class="fas fa-chart-bar mr-3 w-5 text-center"></i> Rekap & Penilaian
+      </button>
+      
+      <!-- Tombol Analisa (Jika sebelumnya sudah ditambahkan) -->
+      <button onclick="switchMenu('guru-analisa-soal')" id="btn-guru-analisa-soal" class="w-full text-left px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium flex items-center">
+        <i class="fas fa-chart-pie mr-3 w-5 text-center"></i> Analisa Soal
+      </button>
+      <button onclick="switchMenu('guru-analisa-jawaban')" id="btn-guru-analisa-jawaban" class="w-full text-left px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium flex items-center">
+        <i class="fas fa-chart-line mr-3 w-5 text-center"></i> Analisa Jawaban
+      </button>
     </div>
+
+    <div class="p-5 border-t border-slate-700/50 mt-auto bg-[#1e293b] sticky bottom-0">
+      <p class="text-xs text-slate-400 mb-1">Login sebagai:</p>
+      <p class="font-bold text-sm mb-4 text-white truncate" id="nama-guru-login">Guru</p>
+      <button onclick="logout()" class="w-full flex items-center justify-center gap-2 py-2.5 bg-red-500/10 text-red-500 font-bold rounded-xl hover:bg-red-500 hover:text-white transition-colors text-sm">
+        <i class="fas fa-sign-out-alt"></i> Keluar
+      </button>
+    </div>
+    
   </div>
 
   <div class="flex-1 p-8 overflow-y-auto w-full relative">
+    <!-- MENU 0: DASHBOARD -->
+    <div id="guru-dashboard" class="guru-menu block bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+       <div class="mb-6 border-b border-gray-100 pb-4">
+         <h2 class="text-3xl font-bold text-gray-800">Dashboard Guru</h2>
+         <p class="text-sm text-gray-500 mt-1">Ringkasan aktivitas dan manajemen ujian Anda.</p>
+       </div>
+       
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <!-- Biodata Card -->
+          <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-sm flex flex-col justify-center transform hover:-translate-y-1 transition">
+             <div class="flex items-center gap-4">
+                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-3xl shadow-inner"><i class="fas fa-user-tie"></i></div>
+                <div class="overflow-hidden">
+                   <p class="text-xs text-green-100 uppercase tracking-wider font-bold mb-1">Biodata Guru</p>
+                   <h3 class="text-xl font-black truncate" id="dash-nama-guru">Memuat...</h3>
+                   <p class="text-sm font-medium mt-0.5 bg-green-700/50 inline-block px-2 py-0.5 rounded">ID: <span id="dash-id-guru">...</span></p>
+                </div>
+             </div>
+          </div>
+          
+          <!-- Total Siswa Card -->
+          <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex items-center gap-5 transform hover:-translate-y-1 transition">
+             <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl shadow-sm"><i class="fas fa-users"></i></div>
+             <div>
+                <h3 class="text-4xl font-black text-gray-800" id="dash-total-siswa">0</h3>
+                <p class="text-sm font-bold text-gray-500 mt-1 uppercase tracking-wide">Siswa Diajar</p>
+             </div>
+          </div>
+
+          <!-- Total Soal Aktif Card -->
+          <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex items-center gap-5 transform hover:-translate-y-1 transition">
+             <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center text-2xl shadow-sm"><i class="fas fa-file-signature"></i></div>
+             <div>
+                <h3 class="text-4xl font-black text-gray-800" id="dash-total-soal-aktif">0</h3>
+                <p class="text-sm font-bold text-gray-500 mt-1 uppercase tracking-wide">Soal Aktif</p>
+             </div>
+          </div>
+       </div>
+
+       <!-- Chart Container -->
+       <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-sm">
+          <div class="flex items-center gap-2 mb-4 border-b border-gray-200 pb-3">
+             <i class="fas fa-chart-pie text-xl text-indigo-600"></i>
+             <h3 class="font-bold text-gray-800 text-lg">Distribusi Status Soal Buatan Anda</h3>
+          </div>
+          <div class="w-full h-72 flex justify-center relative">
+             <!-- Canvas untuk Chart.js -->
+             <canvas id="chart-soal-guru"></canvas>
+          </div>
+       </div>
+    </div>
     
     <!-- MENU 1: BUAT / IMPORT SOAL -->
-    <div id="guru-buat-soal" class="guru-menu block bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+    <div id="guru-buat-soal" class="guru-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
@@ -293,6 +381,112 @@
       </div>
     </div>
 
+    <!-- MENU: ANALISA SOAL GURU -->
+    <div id="guru-analisa-soal" class="guru-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-800">Analisa Soal</h2>
+          <p class="text-sm text-gray-500 mt-1">Analisis tingkat ketuntasan setiap butir soal secara klasikal (Hanya untuk soal buatan Anda).</p>
+        </div>
+        <button onclick="cetakAreaGuru('area-cetak-soal')" class="bg-green-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><i class="fas fa-print mr-2"></i>Print</button>
+      </div>
+      
+      <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
+            <select id="an-soal-kategori" onchange="filterAnalisaKelasGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white"></select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
+            <select id="an-soal-kelas" onchange="filterAnalisaMapelGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white"><option value="">-- Pilih Kategori --</option></select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
+            <select id="an-soal-mapel" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white"><option value="">-- Pilih Kategori --</option></select>
+          </div>
+          <button onclick="prosesAnalisaSoalGuru()" class="bg-blue-600 text-white w-full px-4 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide"><i class="fas fa-search mr-2"></i>Cari</button>
+        </div>
+      </div>
+
+      <div id="area-cetak-soal" class="bg-white p-4 border rounded-xl overflow-x-auto min-h-[400px]">
+        <h3 class="font-bold text-lg text-center mb-4 hidden print-show" style="text-decoration: underline;">ANALISA BUTIR SOAL</h3>
+        <div id="tabel-analisa-soal-container">
+          <p class="text-center text-gray-400 mt-10 italic">Pilih Kategori, Kelas, Mapel lalu klik Proses Cari</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENU: ANALISA JAWABAN GURU -->
+    <div id="guru-analisa-jawaban" class="guru-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-800">Analisa Jawaban</h2>
+          <p class="text-sm text-gray-500 mt-1">Analisis ketuntasan siswa perorangan dan ketuntasan kelas (Hanya untuk soal buatan Anda).</p>
+        </div>
+        <button onclick="cetakAreaGuru('area-cetak-jawaban')" class="bg-green-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><i class="fas fa-print mr-2"></i>Print</button>
+      </div>
+      
+      <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
+            <select id="an-jawaban-kategori" onchange="filterAnalisaKelasGuru('jawaban')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white"></select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
+            <select id="an-jawaban-kelas" onchange="filterAnalisaMapelGuru('jawaban')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white"><option value="">-- Pilih Kategori --</option></select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
+            <select id="an-jawaban-mapel" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white"><option value="">-- Pilih Kategori --</option></select>
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row gap-4 items-end justify-end border-t pt-4 border-gray-200 mt-2">
+          <div class="w-full md:w-48">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Batas KKM</label>
+            <input type="number" id="input-kkm-jawaban" value="65" class="w-full p-3 border border-gray-300 rounded-xl outline-none text-center font-bold text-blue-600 shadow-sm bg-white">
+          </div>
+          <button onclick="prosesAnalisaJawabanGuru()" class="bg-blue-600 text-white w-full md:w-auto px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide"><i class="fas fa-search mr-2"></i>Cari</button>
+        </div>
+      </div>
+
+      <div id="area-cetak-jawaban" class="bg-white p-4 border rounded-xl overflow-x-auto min-h-[400px]">
+         <div class="text-center mb-6 hidden print-show">
+             <h3 class="font-bold text-lg" style="text-decoration: underline;">ANALISIS ULANGAN HARIAN</h3>
+         </div>
+         
+         <div id="tabel-analisa-jawaban-container">
+            <p class="text-center text-gray-400 mt-10 italic">Pilih Kategori, Kelas, Mapel lalu klik Cari.</p>
+         </div>
+
+         <!-- Hasil Analisis -->
+         <div id="kesimpulan-analisa-jawaban-container" class="mt-8 hidden">
+            <h4 class="font-bold text-gray-800 mb-3 border-b pb-2">HASIL ANALISIS</h4>
+            <div class="mb-4">
+              <p class="font-bold text-gray-700 text-sm">1. Ketuntasan Belajar</p>
+              <div class="ml-4 text-sm text-gray-600 space-y-1 mt-2">
+                <p>1.1 Perorangan</p>
+                <table class="ml-4">
+                   <tr><td class="w-64">a. Banyaknya siswa seluruhnya</td><td>: <span id="an-jml-siswa" class="font-bold text-gray-900">0</span> orang</td></tr>
+                   <tr><td>b. Banyaknya siswa yang tuntas</td><td>: <span id="an-jml-tuntas" class="font-bold text-green-600">0</span> orang</td></tr>
+                   <tr><td>c. Banyaknya siswa yang belum tuntas</td><td>: <span id="an-jml-gagal" class="font-bold text-red-600">0</span> orang</td></tr>
+                </table>
+                <p class="mt-2">1.2 Klasikal (Minimal 85%) : <span id="an-klasikal" class="font-bold px-2 py-1 rounded">TIDAK</span></p>
+              </div>
+            </div>
+            <div>
+              <p class="font-bold text-gray-700 text-sm">2. Kesimpulan / Program Perbaikan</p>
+              <div class="ml-4 text-sm text-gray-600 space-y-2 mt-2">
+                <p>a. Perlu perbaikan secara klasikal untuk soal nomor : <b id="an-soal-sulit" class="text-red-600">-</b></p>
+                <p>b. Siswa yang perlu perbaikan (karena belum tuntas) :</p>
+                <ul id="an-siswa-remedial" class="list-decimal ml-6 mt-1 text-red-600 font-semibold"></ul>
+              </div>
+            </div>
+         </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="script.js"></script>
@@ -320,9 +514,329 @@
       if(targetId === 'guru-buat-soal') loadMasterData(); 
       if(targetId === 'guru-edit-soal') loadEditSoal();
       if(targetId === 'guru-rekap-ujian') loadDropdownRekap();
+      if(targetId === 'guru-dashboard') loadDashboardGuru();
+      if(targetId === 'guru-analisa-soal') loadDataFilterAnalisaGuru();
+      if(targetId === 'guru-analisa-jawaban') loadDataFilterAnalisaGuru();
     }
     
-    loadMasterData();
+    // ==========================================
+    // FITUR ANALISA SOAL & JAWABAN (GURU)
+    // ==========================================
+    let globalAnalisaExamsGuru = [];
+
+    // Mengambil dan menyiapkan data filter (Hanya Soal Milik Guru)
+    async function loadDataFilterAnalisaGuru() {
+      try {
+        // Ambil ujian hanya berdasarkan ID Guru yang sedang login
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getPaketGuru', id_guru: user.id }) });
+        const result = await res.json();
+        globalAnalisaExamsGuru = result.data || [];
+        
+        let optKat = '<option value="">-- Pilih Kategori --</option>';
+        if (masterDataCache.kategori && masterDataCache.kategori.length > 0) {
+            masterDataCache.kategori.forEach(c => {
+               optKat += `<option value="${c.kode}">${c.nama} (${c.kode})</option>`;
+            });
+        } else {
+            let categories = new Set();
+            globalAnalisaExamsGuru.forEach(e => {
+                let cat = e.kode.split(/[-_ ]/)[0]; 
+                if(cat) categories.add(cat);
+            });
+            [...categories].sort().forEach(c => optKat += `<option value="${c}">${c}</option>`);
+        }
+        
+        document.getElementById('an-soal-kategori').innerHTML = optKat;
+        document.getElementById('an-jawaban-kategori').innerHTML = optKat;
+        
+        document.getElementById('an-soal-kelas').innerHTML = '<option value="">-- Pilih Kategori --</option>';
+        document.getElementById('an-soal-mapel').innerHTML = '<option value="">-- Pilih Kelas --</option>';
+        
+        document.getElementById('an-jawaban-kelas').innerHTML = '<option value="">-- Pilih Kategori --</option>';
+        document.getElementById('an-jawaban-mapel').innerHTML = '<option value="">-- Pilih Kelas --</option>';
+      } catch(e) {}
+    }
+
+    function filterAnalisaKelasGuru(tipe) {
+        let katKode = document.getElementById(`an-${tipe}-kategori`).value;
+        if(!katKode) {
+            document.getElementById(`an-${tipe}-kelas`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
+            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            return;
+        }
+        let filtered = globalAnalisaExamsGuru.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()));
+        let kelasSet = new Set(filtered.map(e => e.kelas));
+        let optKls = '<option value="">-- Pilih Kelas --</option>';
+        [...kelasSet].sort().forEach(k => optKls += `<option value="${k}">${k}</option>`);
+        document.getElementById(`an-${tipe}-kelas`).innerHTML = optKls;
+        document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
+    }
+
+    function filterAnalisaMapelGuru(tipe) {
+        let katKode = document.getElementById(`an-${tipe}-kategori`).value;
+        let kls = document.getElementById(`an-${tipe}-kelas`).value;
+        if(!kls) {
+            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            return;
+        }
+        let filtered = globalAnalisaExamsGuru.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()) && e.kelas === kls);
+        let optMapel = '<option value="">-- Pilih Mata Pelajaran --</option>';
+        filtered.forEach(e => optMapel += `<option value="${e.kode}">${e.mapel} (${e.kode})</option>`);
+        document.getElementById(`an-${tipe}-mapel`).innerHTML = optMapel;
+    }
+
+    // A. MENU ANALISA SOAL
+    async function prosesAnalisaSoalGuru() {
+      const kode = document.getElementById('an-soal-mapel').value;
+      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
+      
+      showLoader('Menganalisis Butir Soal...');
+      try {
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) });
+        const result = await res.json();
+        hideLoader();
+
+        if(result.data.length === 0) {
+            document.getElementById('tabel-analisa-soal-container').innerHTML = `<p class="text-center text-red-500 italic mt-10">Belum ada data pengerjaan ujian untuk paket ini.</p>`;
+            return;
+        }
+
+        let sampleDetail = [];
+        try { sampleDetail = JSON.parse(result.data[0].detail); } catch(e){}
+        let jumlahSoal = sampleDetail.length;
+        if(jumlahSoal === 0) return Swal.fire('Error', 'Detail jawaban tidak ditemukan.', 'error');
+
+        let skorPerSoal = Array(jumlahSoal).fill(0), countPerSoal = Array(jumlahSoal).fill(0); 
+        
+        result.data.forEach((s) => {
+            let detail = [];
+            try { detail = JSON.parse(s.detail); } catch(e){}
+            for(let i=0; i<jumlahSoal; i++) {
+                let soal = detail.find(d => d.no === (i+1));
+                skorPerSoal[i] += soal ? parseFloat(soal.sk || 0) : 0;
+                countPerSoal[i] += 10; 
+            }
+        });
+
+        let examInfo = globalAnalisaExamsGuru.find(e => e.kode === kode) || { mapel: '-', kelas: '-' };
+        
+        let katKode = document.getElementById('an-soal-kategori').value;
+        let katObj = masterDataCache.kategori.find(k => k.kode === katKode);
+        let kategoriStr = katObj ? katObj.nama : katKode;
+        let thnObj = masterDataCache.tahun.length > 0 ? masterDataCache.tahun[0].nama : '2026/2027';
+
+        let printHeader = `
+          <div class="mb-4 text-left text-sm print-show hidden border-b pb-4 border-gray-300">
+            <table class="w-full md:w-1/2 font-bold text-gray-800">
+              <tr><td class="w-40">Mata Pelajaran</td><td>: ${examInfo.mapel}</td></tr>
+              <tr><td>Kelas</td><td>: ${examInfo.kelas}</td></tr>
+              <tr><td>Kategori Ujian</td><td>: ${kategoriStr}</td></tr>
+              <tr><td>Tahun Ajaran</td><td>: ${thnObj}</td></tr>
+            </table>
+          </div>
+        `;
+
+        let htmlTable = `
+        <table class="w-full text-left border-collapse text-sm border border-gray-300 print-table">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="border border-gray-300 p-3 text-center w-12">No. Soal</th>
+                    <th class="border border-gray-300 p-3 text-center">Persentase Daya Serap (Standar 65%)</th>
+                    <th class="border border-gray-300 p-3 text-center">Ketuntasan Butir Soal (Klasikal)</th>
+                </tr>
+            </thead>
+            <tbody>`;
+        
+        let tuntasKlasikal = 0, tidakTuntasKlasikal = 0;
+        for(let i=0; i<jumlahSoal; i++) {
+            let persen = countPerSoal[i] > 0 ? (skorPerSoal[i] / countPerSoal[i]) * 100 : 0;
+            let isTuntas = persen >= 65; 
+            
+            if(isTuntas) tuntasKlasikal++; else tidakTuntasKlasikal++;
+
+            htmlTable += `<tr>
+                <td class="border border-gray-300 p-3 text-center font-bold">${i+1}</td>
+                <td class="border border-gray-300 p-3 text-center">
+                   <div class="flex items-center justify-center gap-2">
+                     <div class="w-1/2 bg-gray-200 rounded-full h-2.5">
+                        <div class="bg-blue-600 h-2.5 rounded-full print-bg-blue" style="width: ${persen}%"></div>
+                     </div>
+                     <span class="font-bold">${persen.toFixed(1)}%</span>
+                   </div>
+                </td>
+                <td class="border border-gray-300 p-3 text-center font-bold ${isTuntas ? 'text-green-600' : 'text-red-600'}">${isTuntas ? 'TUNTAS' : 'PERLU PERBAIKAN'}</td>
+            </tr>`;
+        }
+        htmlTable += `</tbody></table>`;
+        
+        let kesimpulan = `
+          <div class="mt-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
+            <h4 class="font-bold text-blue-800 mb-2">Kesimpulan Analisa Soal:</h4>
+            <ul class="list-disc ml-5 text-sm text-blue-900">
+               <li>Total Butir Soal: <b>${jumlahSoal}</b></li>
+               <li>Soal Tuntas (Daya serap >= 65%): <b class="text-green-600">${tuntasKlasikal} Soal</b></li>
+               <li>Soal Perlu Perbaikan Klasikal (Daya serap < 65%): <b class="text-red-600">${tidakTuntasKlasikal} Soal</b></li>
+            </ul>
+          </div>
+        `;
+        document.getElementById('tabel-analisa-soal-container').innerHTML = printHeader + htmlTable + kesimpulan;
+
+      } catch(e) { hideLoader(); Swal.fire('Error', 'Terjadi kesalahan saat memproses data.', 'error'); }
+    }
+
+    // B. MENU ANALISA JAWABAN
+    async function prosesAnalisaJawabanGuru() {
+      const kode = document.getElementById('an-jawaban-mapel').value;
+      const kkm = parseFloat(document.getElementById('input-kkm-jawaban').value) || 65; 
+      
+      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
+      
+      showLoader('Menganalisis Jawaban...');
+      try {
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) });
+        const result = await res.json();
+        hideLoader();
+
+        if(result.data.length === 0) {
+            document.getElementById('tabel-analisa-jawaban-container').innerHTML = `<p class="text-center text-red-500 italic mt-10">Belum ada data pengerjaan ujian.</p>`;
+            document.getElementById('kesimpulan-analisa-jawaban-container').classList.add('hidden'); return;
+        }
+
+        let sampleDetail = [];
+        try { sampleDetail = JSON.parse(result.data[0].detail); } catch(e){}
+        let jumlahSoal = sampleDetail.length;
+        if(jumlahSoal === 0) return Swal.fire('Error', 'Detail jawaban tidak ditemukan.', 'error');
+
+        let examInfo = globalAnalisaExamsGuru.find(e => e.kode === kode) || { mapel: '-', kelas: '-' };
+        
+        let katKode = document.getElementById('an-jawaban-kategori').value;
+        let katObj = masterDataCache.kategori.find(k => k.kode === katKode);
+        let kategoriStr = katObj ? katObj.nama : katKode;
+        let thnObj = masterDataCache.tahun.length > 0 ? masterDataCache.tahun[0].nama : '2026/2027';
+
+        let printHeader = `
+          <div class="mb-4 text-left text-sm print-show hidden border-b pb-4 border-gray-300">
+            <table class="w-full md:w-1/2 font-bold text-gray-800">
+              <tr><td class="w-40">Mata Pelajaran</td><td>: ${examInfo.mapel}</td></tr>
+              <tr><td>Kelas</td><td>: ${examInfo.kelas}</td></tr>
+              <tr><td>Kategori Ujian</td><td>: ${kategoriStr}</td></tr>
+              <tr><td>Tahun Ajaran</td><td>: ${thnObj}</td></tr>
+            </table>
+          </div>
+        `;
+
+        let htmlTable = `
+        <table class="w-full text-left border-collapse text-xs border border-gray-300 print-table">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center w-8">No</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center w-48">NAMA SISWA</th>
+                    <th colspan="${jumlahSoal}" class="border border-gray-300 p-2 text-center">Skor Tiap Nomor</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center">Jlh Skor</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center">NILAI</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center">KETUNTASAN</th>
+                </tr>
+                <tr class="bg-gray-100">`;
+        
+        for(let i=1; i<=jumlahSoal; i++) htmlTable += `<th class="border border-gray-300 p-1 text-center font-bold w-6">${i}</th>`;
+        htmlTable += `</tr></thead><tbody>`;
+
+        let statTuntas = 0, statGagal = 0, siswaRemedial = [];
+        let skorPerSoal = Array(jumlahSoal).fill(0), countPerSoal = Array(jumlahSoal).fill(0); 
+
+        result.data.forEach((s, idx) => {
+            let detail = [];
+            try { detail = JSON.parse(s.detail); } catch(e){}
+            
+            let htmlRow = `<tr>
+                <td class="border border-gray-300 p-2 text-center">${idx + 1}</td>
+                <td class="border border-gray-300 p-2 font-semibold text-gray-800 min-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis">${s.nama}</td>`;
+            
+            let skorTotal = 0, maxSkorMungkin = 0;
+
+            for(let i=0; i<jumlahSoal; i++) {
+                let soal = detail.find(d => d.no === (i+1));
+                let skor = soal ? parseFloat(soal.sk || 0) : 0;
+                let maxSkorItem = 10; 
+                skorTotal += skor;
+                maxSkorMungkin += maxSkorItem;
+                skorPerSoal[i] += skor;
+                countPerSoal[i] += maxSkorItem;
+                htmlRow += `<td class="border border-gray-300 p-1 text-center ${skor == 0 ? 'text-red-500' : 'text-gray-700'}">${skor}</td>`;
+            }
+
+            let isTuntas = skorTotal >= kkm; 
+            if(isTuntas) statTuntas++; else { statGagal++; siswaRemedial.push(s.nama); }
+
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold">${skorTotal}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-blue-600">${s.nilai_pg}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold ${isTuntas ? 'text-green-600' : 'text-red-600'}">${isTuntas ? 'YA' : 'TDK'}</td>`;
+            htmlRow += `</tr>`;
+            htmlTable += htmlRow;
+        });
+
+        htmlTable += `</tbody></table>`;
+        document.getElementById('tabel-analisa-jawaban-container').innerHTML = printHeader + htmlTable;
+        document.getElementById('kesimpulan-analisa-jawaban-container').classList.remove('hidden');
+        
+        let totalSiswa = result.data.length;
+        let persenTuntasKlasikal = ((statTuntas / totalSiswa) * 100).toFixed(1);
+        
+        document.getElementById('an-jml-siswa').innerText = totalSiswa;
+        document.getElementById('an-jml-tuntas').innerText = statTuntas;
+        document.getElementById('an-jml-gagal').innerText = statGagal;
+
+        let elKlasikal = document.getElementById('an-klasikal');
+        if(parseFloat(persenTuntasKlasikal) >= 85) { 
+            elKlasikal.innerText = "YA";
+            elKlasikal.className = "font-bold px-2 py-1 bg-green-100 text-green-700 rounded border border-green-300";
+        } else {
+            elKlasikal.innerText = "TIDAK";
+            elKlasikal.className = "font-bold px-2 py-1 bg-red-100 text-red-700 rounded border border-red-300";
+        }
+
+        let soalSulit = [];
+        for(let i=0; i<jumlahSoal; i++) {
+            let persentaseKebenaran = countPerSoal[i] > 0 ? (skorPerSoal[i] / countPerSoal[i]) * 100 : 0;
+            if(persentaseKebenaran < 65) soalSulit.push(i + 1);
+        }
+        document.getElementById('an-soal-sulit').innerText = soalSulit.length > 0 ? soalSulit.join(", ") : "Tidak ada";
+
+        let htmlRemedial = "";
+        if(siswaRemedial.length > 0) {
+            siswaRemedial.forEach(nama => htmlRemedial += `<li>${nama}</li>`);
+        } else {
+            htmlRemedial = "<li class='text-green-600 list-none font-bold'><i class='fas fa-check-circle mr-1'></i> Semua siswa tuntas</li>";
+        }
+        document.getElementById('an-siswa-remedial').innerHTML = htmlRemedial;
+        
+      } catch(e) { hideLoader(); Swal.fire('Error', 'Terjadi kesalahan saat memproses data.', 'error'); }
+    }
+
+    // Fungsi Cetak Template Khusus (Landscape)
+    function cetakAreaGuru(areaId) {
+        let printArea = document.getElementById('print-area');
+        let contentNode = document.getElementById(areaId).cloneNode(true);
+        
+        contentNode.querySelectorAll('.print-show').forEach(el => el.classList.remove('hidden'));
+        
+        printArea.innerHTML = `
+           <div style="font-family: Arial, sans-serif; padding: 0; color: #000; background-color: #fff; width: 100%;">
+             ${contentNode.innerHTML}
+           </div>
+        `;
+        
+        window.print();
+        printArea.innerHTML = ''; 
+    }
+
+
+
+    // Hapus kode: loadMasterData();
+    // GANTI DENGAN KODE BERIKUT:
+    document.addEventListener("DOMContentLoaded", () => {
+        switchMenu('guru-dashboard'); // Buka dashboard saat login
+    });
 
     // ================= MODAL PARAMETER UJIAN =================
     async function loadMasterData() {
@@ -437,25 +951,24 @@
 
       keranjangSoal.forEach((s, index) => {
         let imgSrc = getDirectImageUrl(s.gambar); 
-        let textPertanyaan = s.pertanyaan.replace(/<[^>]+>/g, '').substring(0, 80) + '...';
         
+        // Kode diperbarui: Menghapus <details> dan mengubahnya menjadi Card statis yang rapi
         let itemHtml = `
-        <div class="bg-gray-50 border rounded-xl shadow-sm mb-3">
-          <details class="group cursor-pointer">
-            <summary class="p-4 rounded-xl font-semibold outline-none hover:bg-gray-100 transition flex justify-between items-center list-none">
-               <span>📝 Soal No ${index + 1} - ${s.tipe} (${s.bobot} Poin)</span>
-               <span class="text-xs text-gray-500 font-normal hidden md:inline">${textPertanyaan}</span>
-            </summary>
-            <div class="p-5 border-t text-sm leading-relaxed bg-white rounded-b-xl">
-               ${s.pertanyaan}
-               ${imgSrc ? `<img src="${imgSrc}" class="max-h-32 my-3 border rounded shadow-sm">` : ''}
-               <p class="font-bold text-green-600 mt-2 bg-green-50 inline-block px-3 py-1 rounded">Kunci: ${s.kunci}</p>
-               <div class="flex gap-2 mt-4">
-                 <button onclick="editSoalDariKeranjang(${index})" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold text-xs hover:bg-blue-200 transition shadow-sm"><i class="fas fa-pen mr-1"></i> Tarik Ke Editor</button>
-                 <button onclick="hapusSoalDariKeranjang(${index})" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-bold text-xs hover:bg-red-200 transition shadow-sm"><i class="fas fa-trash mr-1"></i> Hapus</button>
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm mb-4 overflow-hidden hover:shadow-md transition">
+            <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+               <span class="font-bold text-gray-800">📝 Soal No ${index + 1} - ${s.tipe} <span class="text-blue-600 text-sm">(${s.bobot} Poin)</span></span>
+               <div class="flex gap-2">
+                 <button onclick="editSoalDariKeranjang(${index})" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-bold text-xs hover:bg-blue-200 transition shadow-sm"><i class="fas fa-pen mr-1"></i> Edit</button>
+                 <button onclick="hapusSoalDariKeranjang(${index})" class="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg font-bold text-xs hover:bg-red-200 transition shadow-sm"><i class="fas fa-trash mr-1"></i> Hapus</button>
                </div>
             </div>
-          </details>
+            <div class="p-5 text-sm leading-relaxed text-gray-700">
+               <div class="mb-3">${s.pertanyaan}</div>
+               ${imgSrc ? `<img src="${imgSrc}" class="max-h-32 mb-3 border rounded shadow-sm object-contain">` : ''}
+               <div class="mt-2 pt-3 border-t border-gray-100">
+                  <p class="font-bold text-green-700 bg-green-50 inline-block px-3 py-1.5 rounded-lg border border-green-200 text-xs">Kunci: ${s.kunci}</p>
+               </div>
+            </div>
         </div>`;
 
         if (s.tipe === 'PG') { cPG++; htmlPG += itemHtml; }
@@ -814,6 +1327,93 @@
     function hitungTotalRealtime() { const s = dataRekapSaatIni[barisEditAktif]; let totalPG = Number(s.nilai_pg) || 0; let totalEssay = 0; bankSoalSaatIni.forEach((soalDB, i) => { if(soalDB.tipe === 'ESSAY') { let val = document.getElementById(`input-skor-${i}`).value; let skorBaru = Number(val) || 0; if (skorBaru > Number(soalDB.bobot)) { document.getElementById(`input-skor-${i}`).value = soalDB.bobot; skorBaru = Number(soalDB.bobot); } totalEssay += skorBaru; let hdr = document.getElementById(`hdr-skor-${i}`); if(hdr) hdr.innerText = skorBaru; } }); document.getElementById('modal-total-skor').innerText = totalPG + totalEssay; }
     function tutupModalPenilaian() { document.getElementById('modal-content-penilaian').classList.replace('scale-100', 'scale-95'); setTimeout(() => document.getElementById('modal-edit-penilaian').classList.add('hidden'), 200); }
     async function simpanEditPenilaian() { const s = dataRekapSaatIni[barisEditAktif]; let totalEssay = 0; bankSoalSaatIni.forEach((soalDB, i) => { if(soalDB.tipe === 'ESSAY') { let val = document.getElementById(`input-skor-${i}`).value; let skorBaru = Number(val) || 0; totalEssay += skorBaru; let target = detailEditAktif.find(d => d.no === (i + 1)) || detailEditAktif[i]; if (target) { if (target.sk !== undefined) target.sk = skorBaru; else target.skor = skorBaru; } } }); let totalPG = Number(s.nilai_pg) || 0; let finalTotal = totalPG + totalEssay; showLoader('Menyimpan Penilaian...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateNilaiDetail', data: { baris: s.baris, nilai_essay: totalEssay, total: finalTotal, detail: detailEditAktif } }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire({title: 'Berhasil!', text: 'Nilai manual berhasil disimpan!', icon: 'success', timer: 1500, showConfirmButton: false}); tutupModalPenilaian(); tampilkanRekap(); } else { Swal.fire('Error', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error', 'Gagal menyimpan penilaian.', 'error'); } }
+  // ==========================================
+    // FITUR DASHBOARD GURU
+    // ==========================================
+    let chartGuruInstance = null;
+
+    async function loadDashboardGuru() {
+        showLoader('Menyinkronkan Dashboard...');
+        
+        // 1. Tampilkan Biodata Guru
+        document.getElementById('dash-nama-guru').innerText = user.nama;
+        document.getElementById('dash-id-guru').innerText = user.id;
+
+        try {
+            // 2. Tarik Data Ujian dari server
+            const resUjian = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) });
+            const resultUjian = await resUjian.json();
+            
+            // Filter paket ujian yang dibuat oleh Guru yang sedang login
+            let soalGuruIni = resultUjian.data ? resultUjian.data.filter(u => u.id_guru.toString() === user.id.toString()) : [];
+            
+            let soalAktif = 0;
+            let soalNonaktif = 0;
+            let kelasDiajar = new Set();
+            
+            soalGuruIni.forEach(s => {
+                // Hitung status aktif
+                if(s.status === 'Aktif') soalAktif++;
+                else soalNonaktif++;
+                
+                // Kumpulkan kelas-kelas dari paket soal guru ini
+                if(s.kelas) kelasDiajar.add(s.kelas);
+            });
+            
+            document.getElementById('dash-total-soal-aktif').innerText = soalAktif;
+
+            // 3. Tarik Data Siswa untuk menghitung jumlah murid
+            const resSiswa = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) });
+            const resultSiswa = await resSiswa.json();
+            
+            let totalSiswaDiajar = 0;
+            if (resultSiswa.data) {
+                resultSiswa.data.forEach(siswa => {
+                    // Hitung siswa jika kelasnya ada di dalam himpunan 'kelasDiajar'
+                    if (kelasDiajar.has(siswa.kelas)) {
+                        totalSiswaDiajar++;
+                    }
+                });
+            }
+            
+            document.getElementById('dash-total-siswa').innerText = totalSiswaDiajar;
+
+            // 4. Render Diagram Pie (Chart.js)
+            if (chartGuruInstance) chartGuruInstance.destroy();
+            const ctx = document.getElementById('chart-soal-guru').getContext('2d');
+            
+            if (soalAktif === 0 && soalNonaktif === 0) {
+               // Render chart kosong transparan jika belum ada soal
+               chartGuruInstance = new Chart(ctx, { type: 'pie', data: { labels: ['Kosong'], datasets: [{ data: [1], backgroundColor: ['#e5e7eb'] }] } });
+            } else {
+               chartGuruInstance = new Chart(ctx, {
+                   type: 'pie',
+                   data: {
+                       labels: ['Ujian Aktif (Sedang Berjalan)', 'Ujian Nonaktif (Terkunci)'],
+                       datasets: [{
+                           data: [soalAktif, soalNonaktif],
+                           backgroundColor: ['#10b981', '#ef4444'], // Emerald (Hijau) & Red
+                           borderWidth: 3,
+                           borderColor: '#f9fafb'
+                       }]
+                   },
+                   options: {
+                       responsive: true,
+                       maintainAspectRatio: false,
+                       plugins: {
+                           legend: { position: 'bottom', labels: { font: { family: "'Poppins', sans-serif", weight: 'bold' } } },
+                           tooltip: { callbacks: { label: function(context) { return ` ${context.label}: ${context.parsed} Paket`; } } }
+                       }
+                   }
+               });
+            }
+            
+        } catch(e) {
+            console.log('Gagal memuat data dashboard guru:', e);
+        }
+        
+        hideLoader();
+    }
   </script>
 </body>
 </html>
