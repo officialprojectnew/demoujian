@@ -97,14 +97,16 @@
        </div>
        
        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          
           <!-- Biodata Card -->
           <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-sm flex flex-col justify-center transform hover:-translate-y-1 transition">
              <div class="flex items-center gap-4">
-                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-3xl shadow-inner"><i class="fas fa-user-tie"></i></div>
+                <img id="dash-foto-guru" src="" class="w-16 h-16 rounded-full border-2 border-white/50 object-cover shadow-inner hidden">
+                <div id="dash-icon-guru" class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-3xl shadow-inner"><i class="fas fa-user-tie"></i></div>
                 <div class="overflow-hidden">
                    <p class="text-xs text-green-100 uppercase tracking-wider font-bold mb-1">Biodata Guru</p>
                    <h3 class="text-xl font-black truncate" id="dash-nama-guru">Memuat...</h3>
-                   <p class="text-sm font-medium mt-0.5 bg-green-700/50 inline-block px-2 py-0.5 rounded">ID : <span id="dash-id-guru">...</span></p>
+                   <p class="text-sm font-medium mt-0.5 bg-green-700/50 inline-block px-2 py-0.5 rounded">ID: <span id="dash-id-guru">...</span></p>
                 </div>
              </div>
           </div>
@@ -1341,6 +1343,16 @@
         // 1. Tampilkan Biodata Guru
         document.getElementById('dash-nama-guru').innerText = user.nama;
         document.getElementById('dash-id-guru').innerText = user.id;
+
+        let urlFoto = getDirectImageUrl(user.foto);
+        if(urlFoto) {
+            document.getElementById('dash-foto-guru').src = urlFoto;
+            document.getElementById('dash-foto-guru').classList.remove('hidden');
+            document.getElementById('dash-icon-guru').classList.add('hidden');
+        } else {
+            document.getElementById('dash-foto-guru').classList.add('hidden');
+            document.getElementById('dash-icon-guru').classList.remove('hidden');
+        }
 
         try {
             // 2. Tarik Data Ujian & Siswa berbarengan

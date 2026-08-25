@@ -326,8 +326,8 @@
 
             <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
               <table class="w-full text-left border-collapse whitespace-nowrap">
-                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIP</th><th class="p-4 border-b font-semibold">Nama Guru</th><th class="p-4 border-b font-semibold">Username</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
-                <tbody id="tabel-rekap-guru"><tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">Klik Refresh Data...</td></tr></tbody>
+                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b text-center font-semibold">Foto</th><th class="p-4 border-b font-semibold">NIP</th><th class="p-4 border-b font-semibold">Nama Guru</th><th class="p-4 border-b font-semibold">Username</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+                <tbody id="tabel-rekap-guru"><tr><td colspan="7" class="p-8 text-center text-gray-500 text-sm">Klik Refresh Data...</td></tr></tbody>
               </table>
             </div>
 
@@ -1066,6 +1066,10 @@
         <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="tambah-nama-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Username Login</label><input type="text" id="tambah-user-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="password" id="tambah-pass-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
+        <div class="p-3 border rounded-xl bg-gray-50">
+          <label class="text-sm font-semibold block mb-2 text-gray-700"><i class="fas fa-camera mr-2 text-blue-500"></i>Foto Guru</label>
+          <input type="file" id="tambah-foto-guru" accept="image/*" class="w-full text-xs">
+        </div>
         <div class="pt-4 flex gap-3">
           <button onclick="tutupModal('modal-tambah-guru')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
           <button onclick="simpanGuruBaru()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Simpan</button>
@@ -1082,6 +1086,10 @@
         <div><label class="text-sm font-semibold text-gray-700">Nama Lengkap</label><input type="text" id="edit-nama-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Username</label><input type="text" id="edit-user-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
         <div><label class="text-sm font-semibold text-gray-700">Password</label><input type="text" id="edit-pass-guru" class="w-full mt-1.5 p-3 border rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 bg-gray-50"></div>
+        <div class="p-3 border rounded-xl bg-gray-50">
+          <label class="text-sm font-semibold block mb-2 text-gray-700"><i class="fas fa-camera mr-2 text-blue-500"></i>Update Foto</label>
+          <input type="file" id="edit-foto-guru" accept="image/*" class="w-full text-xs">
+        </div>
         <div class="pt-4 flex gap-3">
           <button onclick="tutupModal('modal-edit-guru')" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
           <button onclick="simpanEditGuru()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Update</button>
@@ -1551,7 +1559,9 @@
         paginatedData.forEach((g, index) => { 
           let i = start + index;
           let jsData = JSON.stringify(g).replace(/'/g, "\\'"); 
-          html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-sm font-bold">${g.nip}</td><td class="p-4 text-sm">${g.nama}</td><td class="p-4 text-sm">${g.username}</td><td class="p-4 text-sm font-mono text-gray-400">${g.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditGuru(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-yellow-200 transition"><i class="fas fa-pen"></i></button> <button onclick="hapusGuru('${g.nip}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button></td></tr>`; 
+          let urlFoto = getDirectImageUrl(g.foto);
+          let imgTbl = urlFoto ? `<img src="${urlFoto}" class="h-10 w-10 object-cover rounded-full border shadow-sm mx-auto">` : `<div class="h-10 w-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center text-xs mx-auto border border-blue-100"><i class="fas fa-user-tie"></i></div>`;
+          html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-center">${imgTbl}</td><td class="p-4 text-sm font-bold">${g.nip}</td><td class="p-4 text-sm">${g.nama}</td><td class="p-4 text-sm">${g.username}</td><td class="p-4 text-sm font-mono text-gray-400">${g.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditGuru(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-yellow-200 transition"><i class="fas fa-pen"></i></button> <button onclick="hapusGuru('${g.nip}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button></td></tr>`; 
         }); 
         tbody.innerHTML = html;
 
@@ -1595,17 +1605,24 @@
     }
     function hapusSiswa(nis) { Swal.fire({ title: 'Hapus Siswa?', text: "Data tidak bisa dikembalikan.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusSiswa', nis }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapSiswa(); } catch(e) { hideLoader(); } } }); }
 
-    // ================= CRUD GURU =================
-    function bukaModalTambahGuru() { ['tambah-nip-guru','tambah-nama-guru','tambah-user-guru','tambah-pass-guru'].forEach(i => document.getElementById(i).value=''); bukaModal('modal-tambah-guru'); }
+// ================= CRUD GURU =================
+    function bukaModalTambahGuru() { ['tambah-nip-guru','tambah-nama-guru','tambah-user-guru','tambah-pass-guru','tambah-foto-guru'].forEach(i => document.getElementById(i).value=''); bukaModal('modal-tambah-guru'); }
+    
     async function simpanGuruBaru() {
-      const data = { nip: document.getElementById('tambah-nip-guru').value, nama: document.getElementById('tambah-nama-guru').value, username: document.getElementById('tambah-user-guru').value, password: document.getElementById('tambah-pass-guru').value };
+      let fileInput = document.getElementById('tambah-foto-guru'); let base64Foto = ""; if (fileInput.files.length > 0) base64Foto = await getBase64(fileInput.files[0]);
+      const data = { nip: document.getElementById('tambah-nip-guru').value, nama: document.getElementById('tambah-nama-guru').value, username: document.getElementById('tambah-user-guru').value, password: document.getElementById('tambah-pass-guru').value, foto: base64Foto };
       if(!data.nip || !data.nama || !data.username || !data.password) return Swal.fire('Oops!', 'Isi semua!', 'warning');
       if(data.nip.length !== 18) return Swal.fire('Oops!', 'NIP harus berjumlah tepat 18 angka!', 'warning');
       showLoader('Menyimpan Guru...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanGuru', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Sukses!', result.pesan, 'success'); tutupModal('modal-tambah-guru'); loadRekapGuru(); } else Swal.fire('Gagal!', result.pesan, 'error'); } catch(e) { hideLoader(); }
     }
     
-    function bukaEditGuru(data) { document.getElementById('edit-nip-guru').value = data.nip; document.getElementById('edit-nama-guru').value = data.nama; document.getElementById('edit-user-guru').value = data.username; document.getElementById('edit-pass-guru').value = data.password; bukaModal('modal-edit-guru'); }
-    async function simpanEditGuru() { const data = { nip: document.getElementById('edit-nip-guru').value, nama: document.getElementById('edit-nama-guru').value, username: document.getElementById('edit-user-guru').value, password: document.getElementById('edit-pass-guru').value }; showLoader('Memperbarui...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editGuru', data }) }); await res.json(); hideLoader(); tutupModal('modal-edit-guru'); loadRekapGuru(); } catch(e) { hideLoader(); } }
+    function bukaEditGuru(data) { document.getElementById('edit-nip-guru').value = data.nip; document.getElementById('edit-nama-guru').value = data.nama; document.getElementById('edit-user-guru').value = data.username; document.getElementById('edit-pass-guru').value = data.password; document.getElementById('edit-foto-guru').value = ''; bukaModal('modal-edit-guru'); }
+    
+    async function simpanEditGuru() { 
+      let fileInput = document.getElementById('edit-foto-guru'); let base64Foto = ""; if (fileInput.files.length > 0) base64Foto = await getBase64(fileInput.files[0]);
+      const data = { nip: document.getElementById('edit-nip-guru').value, nama: document.getElementById('edit-nama-guru').value, username: document.getElementById('edit-user-guru').value, password: document.getElementById('edit-pass-guru').value, foto: base64Foto }; showLoader('Memperbarui...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editGuru', data }) }); await res.json(); hideLoader(); tutupModal('modal-edit-guru'); loadRekapGuru(); } catch(e) { hideLoader(); } 
+    }
+    
     function hapusGuru(nip) { Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya!' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusGuru', nip }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapGuru(); } catch(e) { hideLoader(); } } }); }
 
     // ================= MENU: DATABASE ATRIBUT SOAL =================
