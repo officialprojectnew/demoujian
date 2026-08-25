@@ -537,8 +537,22 @@
 
           <div class="overflow-x-auto border border-gray-200 rounded-xl">
             <table class="w-full text-left border-collapse whitespace-nowrap">
-              <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIS</th><th class="p-4 border-b font-semibold">Nama Siswa</th><th class="p-4 border-b text-center font-semibold">Nilai PG</th><th class="p-4 border-b text-center font-semibold">Nilai Essay</th><th class="p-4 border-b text-center font-bold text-gray-800">Total Nilai</th></tr></thead>
-              <tbody id="tabel-rekap-nilai-admin"><tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">Pilih soal dan klik tampilkan.</td></tr></tbody>
+              <thead>
+                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider text-center">
+                  <th rowspan="2" class="p-4 border-b font-semibold">No</th>
+                  <th rowspan="2" class="p-4 border-b font-semibold">NIS</th>
+                  <th rowspan="2" class="p-4 border-b font-semibold text-left">Nama Siswa</th>
+                  <th colspan="4" class="p-2 border-b border-r font-bold text-gray-700 bg-blue-50/50">NILAI</th>
+                  <th rowspan="2" class="p-4 border-b font-bold text-gray-900 bg-gray-100">Total Nilai</th>
+                </tr>
+                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider text-center">
+                  <th class="p-2 border-b font-semibold bg-blue-50/30">PG</th>
+                  <th class="p-2 border-b font-semibold bg-blue-50/30">PGK</th>
+                  <th class="p-2 border-b font-semibold bg-blue-50/30">Isian</th>
+                  <th class="p-2 border-b border-r font-semibold bg-blue-50/30">Essay</th>
+                </tr>
+              </thead>
+              <tbody id="tabel-rekap-nilai-admin"><tr><td colspan="8" class="p-8 text-center text-gray-500 text-sm">Pilih soal dan klik tampilkan.</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -2756,8 +2770,42 @@
 
     // ================= REKAP HASIL UJIAN GLOBAL =================
     async function loadDropdownRekapAdmin() { const select = document.getElementById('select-rekap-admin'); select.innerHTML = '<option value="">Memuat Paket...</option>'; try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }); const result = await res.json(); let opts = '<option value="">-- Pilih Kode Ujian --</option>'; result.data.forEach(p => opts += `<option value="${p.kode}">${p.kode} - ${p.mapel} (${p.kelas})</option>`); select.innerHTML = opts; } catch(e) { select.innerHTML = '<option value="">Gagal</option>'; } }
-    async function tampilkanRekapAdmin() { const kode = document.getElementById('select-rekap-admin').value; if(!kode) return Swal.fire('Info', 'Pilih paket ujian!', 'info'); const tbody = document.getElementById('tabel-rekap-nilai-admin'); showLoader('Menarik Nilai...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }); const result = await res.json(); hideLoader(); if(result.data.length === 0) return tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">Belum ada siswa yang ikut ujian ini.</td></tr>`; let html = ''; result.data.forEach((s, i) => { html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-sm font-semibold">${s.nis}</td><td class="p-4 text-sm font-bold text-gray-800">${s.nama}</td><td class="p-4 text-center font-bold text-blue-600">${s.nilai_pg}</td><td class="p-4 text-center font-bold text-yellow-500">${s.nilai_essay}</td><td class="p-4 text-center font-black text-green-600 text-lg">${s.total}</td></tr>`; }); tbody.innerHTML = html; } catch(e) { hideLoader(); } }
+    async function tampilkanRekapAdmin() { 
+      const kode = document.getElementById('select-rekap-admin').value; 
+      if(!kode) return Swal.fire('Info', 'Pilih paket ujian!', 'info'); 
+      const tbody = document.getElementById('tabel-rekap-nilai-admin'); 
+      showLoader('Menarik Nilai...'); 
+      try { 
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }); 
+        const result = await res.json(); 
+        hideLoader(); 
+        
+        if(result.data.length === 0) return tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">Belum ada siswa yang ikut ujian ini.</td></tr>`; 
+        
+        let html = ''; 
+        result.data.forEach((s, i) => { 
+          // Ambil nilai masing-masing komponen (gunakan 0 jika propertinya belum ada)
+          let nilaiPg = s.nilai_pg !== undefined ? s.nilai_pg : (s.pg || 0);
+          let nilaiPgk = s.nilai_pgk !== undefined ? s.nilai_pgk : (s.pgk || 0);
+          let nilaiIsian = s.nilai_isian !== undefined ? s.nilai_isian : (s.isian || 0);
+          let nilaiEssay = s.nilai_essay !== undefined ? s.nilai_essay : (s.essay || 0);
+          let totalNilai = s.total !== undefined ? s.total : (nilaiPg + nilaiPgk + nilaiIsian + nilaiEssay);
 
+          html += `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-4 text-center text-sm">${i + 1}</td>
+            <td class="p-4 text-sm font-semibold">${s.nis}</td>
+            <td class="p-4 text-sm font-bold text-gray-800">${s.nama}</td>
+            <td class="p-4 text-center font-bold text-blue-600 bg-blue-50/10">${nilaiPg}</td>
+            <td class="p-4 text-center font-bold text-indigo-600 bg-blue-50/10">${nilaiPgk}</td>
+            <td class="p-4 text-center font-bold text-purple-600 bg-blue-50/10">${nilaiIsian}</td>
+            <td class="p-4 text-center font-bold text-yellow-600 bg-blue-50/10 border-r">${nilaiEssay}</td>
+            <td class="p-4 text-center font-black text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
+          </tr>`; 
+        }); 
+        tbody.innerHTML = html; 
+      } catch(e) { hideLoader(); } 
+    }
     // ==========================================
     // FITUR ANALISA SOAL & JAWABAN (Standar PDF)
     // ==========================================

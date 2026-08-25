@@ -311,17 +311,22 @@
       <div class="overflow-x-auto border rounded-xl">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-gray-100 text-gray-700 text-sm">
-              <th class="p-4 border-b text-center">NIS</th>
-              <th class="p-4 border-b">Nama Siswa</th>
-              <th class="p-4 border-b text-center">PG</th>
-              <th class="p-4 border-b text-center">Essay</th>
-              <th class="p-4 border-b text-center font-bold">Total</th>
-              <th class="p-4 border-b text-center">Aksi</th>
+            <tr class="bg-gray-100 text-gray-700 text-sm text-center">
+              <th rowspan="2" class="p-4 border-b">NIS</th>
+              <th rowspan="2" class="p-4 border-b text-left">Nama Siswa</th>
+              <th colspan="4" class="p-2 border-b border-r font-bold text-gray-800 bg-blue-50/50">NILAI</th>
+              <th rowspan="2" class="p-4 border-b font-bold bg-gray-100">Total</th>
+              <th rowspan="2" class="p-4 border-b">Aksi</th>
+            </tr>
+            <tr class="bg-gray-100 text-gray-700 text-sm text-center">
+              <th class="p-2 border-b font-semibold bg-blue-50/30">PG</th>
+              <th class="p-2 border-b font-semibold bg-blue-50/30">PGK</th>
+              <th class="p-2 border-b font-semibold bg-blue-50/30">Isian</th>
+              <th class="p-2 border-b border-r font-semibold bg-blue-50/30">Essay</th>
             </tr>
           </thead>
           <tbody id="tabel-rekap-nilai">
-            <tr><td colspan="6" class="p-8 text-center text-gray-500">Pilih soal dan klik cari</td></tr>
+            <tr><td colspan="8" class="p-8 text-center text-gray-500">Pilih soal dan klik cari</td></tr>
           </tbody>
         </table>
       </div>
@@ -1318,14 +1323,36 @@
     let dataRekapSaatIni = []; let bankSoalSaatIni = []; let barisEditAktif = 0; let detailEditAktif = [];
 
     async function tampilkanRekap() {
-      const kode = document.getElementById('select-rekap').value; if(!kode) return Swal.fire('Peringatan','Pilih soal dulu!','warning');
+      const kode = document.getElementById('select-rekap').value; if(!kode) return Swal.fire('Peringatan','Pilih paket dulu!','warning');
       const tbody = document.getElementById('tabel-rekap-nilai'); showLoader('Menarik rekap...');
       try {
         const resSoal = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getBankSoal', kode_soal: kode }) }); const resultSoal = await resSoal.json(); bankSoalSaatIni = resultSoal.data;
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }); const result = await res.json(); dataRekapSaatIni = result.data;
-        if(dataRekapSaatIni.length === 0) { hideLoader(); return tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">Belum ada siswa yang mengerjakan ujian.</td></tr>`; }
-        let html = ''; dataRekapSaatIni.forEach((s, i) => { html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center">${s.nis}</td><td class="p-4 font-semibold">${s.nama}</td><td class="p-4 text-center text-blue-600">${s.nilai_pg}</td><td class="p-4 text-center text-yellow-600 font-bold">${s.nilai_essay}</td><td class="p-4 text-center font-bold text-green-600 text-lg">${s.total}</td><td class="p-4 text-center"><button onclick="bukaEditPenilaian(${i})" class="bg-blue-600 text-white font-bold px-5 py-2 rounded-xl hover:bg-blue-700 shadow-md text-sm whitespace-nowrap transition">👀 Lihat & Nilai</button></td></tr>`; }); tbody.innerHTML = html;
-      } catch(e) { tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Gagal menarik data.</td></tr>`; } hideLoader();
+        
+        if(dataRekapSaatIni.length === 0) { hideLoader(); return tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">Belum ada siswa yang mengerjakan ujian.</td></tr>`; }
+        
+        let html = ''; 
+        dataRekapSaatIni.forEach((s, i) => { 
+          let nilaiPg = s.nilai_pg !== undefined ? s.nilai_pg : (s.pg || 0);
+          let nilaiPgk = s.nilai_pgk !== undefined ? s.nilai_pgk : (s.pgk || 0);
+          let nilaiIsian = s.nilai_isian !== undefined ? s.nilai_isian : (s.isian || 0);
+          let nilaiEssay = s.nilai_essay !== undefined ? s.nilai_essay : (s.essay || 0);
+          let totalNilai = s.total !== undefined ? s.total : (nilaiPg + nilaiPgk + nilaiIsian + nilaiEssay);
+
+          html += `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-4 text-center">${s.nis}</td>
+            <td class="p-4 font-semibold">${s.nama}</td>
+            <td class="p-4 text-center text-blue-600 bg-blue-50/10">${nilaiPg}</td>
+            <td class="p-4 text-center text-indigo-600 bg-blue-50/10">${nilaiPgk}</td>
+            <td class="p-4 text-center text-purple-600 bg-blue-50/10">${nilaiIsian}</td>
+            <td class="p-4 text-center text-yellow-600 font-bold bg-blue-50/10 border-r">${nilaiEssay}</td>
+            <td class="p-4 text-center font-bold text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
+            <td class="p-4 text-center"><button onclick="bukaEditPenilaian(${i})" class="bg-blue-600 text-white font-bold px-5 py-2 rounded-xl hover:bg-blue-700 shadow-md text-sm whitespace-nowrap transition">👀 Lihat & Nilai</button></td>
+          </tr>`; 
+        }); 
+        tbody.innerHTML = html;
+      } catch(e) { tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-red-500">Gagal menarik data.</td></tr>`; } hideLoader();
     }
 
     function bukaEditPenilaian(index) {
