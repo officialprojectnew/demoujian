@@ -1394,16 +1394,24 @@
 
     async function simpanSiswaBaru() {
       let fileInput = document.getElementById('tambah-foto-siswa'); let base64Foto = ""; if (fileInput.files.length > 0) base64Foto = await getBase64(fileInput.files[0]);
+      
+      // Ambil nilai asli NISN (belum ditambah tanda kutip)
+      let nisnAsli = document.getElementById('tambah-nisn-siswa').value;
+
       const data = { 
         nis: "'" + document.getElementById('tambah-nis-siswa').value, 
         nama: document.getElementById('tambah-nama-siswa').value, 
-        nisn: document.getElementById('tambah-nisn-siswa').value ? ("'" + document.getElementById('tambah-nisn-siswa').value) : "",
+        nisn: nisnAsli ? ("'" + nisnAsli) : "",
         kelas: document.getElementById('tambah-kelas-siswa').value, 
         password: "'" + document.getElementById('tambah-pass-siswa').value, 
         foto: base64Foto 
       };
+      
       if(!data.nis || !data.nama || !data.kelas || !data.password || !data.nisn) return Swal.fire('Oops!','Harap isi semua kolom Teks!','warning');
-      if(data.nisn.length !== 10) return Swal.fire('Oops!', 'NISN harus berjumlah tepat 10 angka!', 'warning');
+      
+      // Validasi panjang string dari nilai aslinya
+      if(nisnAsli.length !== 10) return Swal.fire('Oops!', 'NISN harus berjumlah tepat 10 angka!', 'warning');
+      
       showLoader('Menyimpan Data...');
       try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanSiswa', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Berhasil!', result.pesan, 'success'); tutupModal('modal-tambah-siswa'); loadRekapSiswa(); } else { Swal.fire('Gagal!', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error!','Gagal.','error'); }
     }
@@ -1610,17 +1618,23 @@
     }
     async function simpanEditSiswa() {
       let fileInput = document.getElementById('edit-foto-siswa'); let base64Foto = ""; if (fileInput.files.length > 0) base64Foto = await getBase64(fileInput.files[0]);
+      
+      let nisnAsli = document.getElementById('edit-nisn-siswa').value;
+
       const data = { 
         old_nis: old_nis_edit, 
         nis: "'" + document.getElementById('edit-nis-siswa').value, 
         nama: document.getElementById('edit-nama-siswa').value, 
-        nisn: document.getElementById('edit-nisn-siswa').value ? ("'" + document.getElementById('edit-nisn-siswa').value) : "",
+        nisn: nisnAsli ? ("'" + nisnAsli) : "",
         kelas: document.getElementById('edit-kelas-siswa').value, 
         password: "'" + document.getElementById('edit-pass-siswa').value, 
         foto: base64Foto 
       };
+      
       if(!data.nama || !data.kelas || !data.password || !data.nis || !data.nisn) return Swal.fire('Oops!', 'Teks form tidak boleh kosong!', 'warning');
-      if(data.nisn.length !== 10) return Swal.fire('Oops!', 'NISN harus berjumlah tepat 10 angka!', 'warning');
+      
+      if(nisnAsli.length !== 10) return Swal.fire('Oops!', 'NISN harus berjumlah tepat 10 angka!', 'warning');
+      
       showLoader('Memperbarui Data & Foto...');
       try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editSiswa', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Berhasil!', result.pesan, 'success'); tutupModal('modal-edit-siswa'); loadRekapSiswa(); } else { Swal.fire('Gagal!', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error!','Gagal.','error');} 
     }
