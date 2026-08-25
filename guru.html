@@ -161,7 +161,7 @@
         <button onclick="batalkanEdit()" id="btn-batal-edit" class="hidden bg-red-100 text-red-600 font-bold px-6 py-3 rounded-xl hover:bg-red-200 transition shadow">❌ Keluar Mode Edit</button>
       </div>
 
-      <!-- Info Soal -->
+      <!-- Info Paket -->
       <div class="bg-blue-50 p-5 rounded-xl border border-blue-100 mb-6 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
            <p class="text-xs font-bold text-blue-500 uppercase tracking-widest mb-1">Kode Soal :</p>
@@ -265,8 +265,8 @@
         <div class="w-full bg-gray-200 rounded-full h-3.5"><div id="progress-bar" class="bg-gradient-to-r from-green-400 to-green-600 h-3.5 rounded-full progress-bar-fill" style="width: 0%"></div></div>
       </div>
       
-      <button onclick="simpanSoalDenganValidasi()" id="btn-simpan-final" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition shadow-lg text-lg hidden tracking-wide">
-        <i class="fas fa-save mr-2"></i> Simpan Database
+      <button onclick="simpanPaketDenganValidasi()" id="btn-simpan-final" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition shadow-lg text-lg hidden tracking-wide">
+        <i class="fas fa-save mr-2"></i> Save Database
       </button>
     </div>
 
@@ -343,8 +343,8 @@
     </div>
 
     <!-- ================= MODAL SETUP PARAMETER UJIAN ================= -->
-    <div id="modal-setup-soal" class="fixed inset-0 modal-overlay hidden z-50 flex justify-center items-center p-4">
-      <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-lg transform scale-95 transition-transform duration-200" id="content-setup-soal">
+    <div id="modal-setup-paket" class="fixed inset-0 modal-overlay hidden z-50 flex justify-center items-center p-4">
+      <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-lg transform scale-95 transition-transform duration-200" id="content-setup-paket">
         <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-5">
           <h3 class="text-2xl font-black text-gray-800"><i class="fas fa-cogs text-blue-500 mr-2"></i>Parameter Ujian</h3>
           <button onclick="tutupModalSetup()" class="text-gray-400 hover:text-red-500 text-2xl font-bold transition">&times;</button>
@@ -536,7 +536,7 @@
     async function loadDataFilterAnalisaGuru() {
       try {
         // Ambil ujian hanya berdasarkan ID Guru yang sedang login
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSoalGuru', id_guru: user.id }) });
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getPaketGuru', id_guru: user.id }) });
         const result = await res.json();
         globalAnalisaExamsGuru = result.data || [];
         
@@ -605,7 +605,7 @@
         hideLoader();
 
         if(result.data.length === 0) {
-            document.getElementById('tabel-analisa-soal-container').innerHTML = `<p class="text-center text-red-500 italic mt-10">Belum ada data pengerjaan ujian untuk soal ini.</p>`;
+            document.getElementById('tabel-analisa-soal-container').innerHTML = `<p class="text-center text-red-500 italic mt-10">Belum ada data pengerjaan ujian untuk paket ini.</p>`;
             return;
         }
 
@@ -860,10 +860,10 @@
     function bukaModalSetupUjian() {
       if(isEditMode) { ['setup-mapel', 'setup-kelas', 'setup-kategori', 'setup-tahun'].forEach(id => document.getElementById(id).disabled = true); } 
       else { ['setup-mapel', 'setup-kelas', 'setup-kategori', 'setup-tahun'].forEach(id => document.getElementById(id).disabled = false); }
-      document.getElementById('modal-setup-soal').classList.remove('hidden'); document.getElementById('modal-setup-soal').classList.add('flex'); setTimeout(() => document.getElementById('content-setup-soal').classList.replace('scale-95', 'scale-100'), 10);
+      document.getElementById('modal-setup-paket').classList.remove('hidden'); document.getElementById('modal-setup-paket').classList.add('flex'); setTimeout(() => document.getElementById('content-setup-paket').classList.replace('scale-95', 'scale-100'), 10);
       generateKodeOtomatis();
     }
-    function tutupModalSetup() { document.getElementById('content-setup-soal').classList.replace('scale-100', 'scale-95'); setTimeout(() => { document.getElementById('modal-setup-soal').classList.add('hidden'); document.getElementById('modal-setup-soal').classList.remove('flex'); }, 200); }
+    function tutupModalSetup() { document.getElementById('content-setup-paket').classList.replace('scale-100', 'scale-95'); setTimeout(() => { document.getElementById('modal-setup-paket').classList.add('hidden'); document.getElementById('modal-setup-paket').classList.remove('flex'); }, 200); }
 
     function generateKodeOtomatis() {
       if(isEditMode) { document.getElementById('preview-kode-soal').innerText = parameterAktif.kodeSoal; return; }
@@ -1063,7 +1063,7 @@
           if (result.isConfirmed) { 
              keranjangSoal.splice(index, 1); 
              renderDropdownKeranjang(); 
-             if(isEditMode) Swal.fire('Terhapus Lokal', 'Soal dihapus dari keranjang. Klik Update Seluruh Soal untuk menghapus permanen di DB.', 'info');
+             if(isEditMode) Swal.fire('Terhapus Lokal', 'Soal dihapus dari keranjang. Klik Update Seluruh Paket untuk menghapus permanen di DB.', 'info');
           } 
        }); 
     }
@@ -1090,21 +1090,21 @@
         const result = await res.json();
         hideLoader();
         if(result.status === 'success') {
-           Swal.fire({title: 'Berhasil!', text: 'Satu soal langsung terupdate di database tanpa perlu menyimpan seluruh soal.', icon: 'success', timer: 2000, showConfirmButton: false});
+           Swal.fire({title: 'Berhasil!', text: 'Satu soal langsung terupdate di database tanpa perlu menyimpan seluruh paket.', icon: 'success', timer: 2000, showConfirmButton: false});
            keranjangSoal[indexEditKeranjang] = objSoal; 
            batalEditKeranjang(); 
         } else { Swal.fire('Gagal!', result.pesan, 'error'); }
       } catch(e) { hideLoader(); Swal.fire('Error!', 'Koneksi ke server gagal.', 'error'); }
     }
 
-    async function simpansoalDenganValidasi() {
+    async function simpanPaketDenganValidasi() {
       if (!parameterAktif.kodeSoal) return Swal.fire('Error', 'Parameter ujian belum di-setup!', 'error');
       const head = { kode: parameterAktif.kodeSoal, mapel: parameterAktif.mapelNama, kelas: parameterAktif.kelas, waktu: parameterAktif.waktu, id_guru: user.id };
       
       document.getElementById('btn-simpan-final').classList.add('hidden'); document.getElementById('progress-container').classList.remove('hidden');
       
       try {
-        let resHead = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: isEditMode ? 'updatesoalHeaderOnly' : 'simpansoalHeaderOnly', data: head }) });
+        let resHead = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: isEditMode ? 'updatePaketHeaderOnly' : 'simpanPaketHeaderOnly', data: head }) });
         let resultHead = await resHead.json(); if(resultHead.status === 'error') { document.getElementById('progress-container').classList.add('hidden'); document.getElementById('btn-simpan-final').classList.remove('hidden'); return Swal.fire('Error', resultHead.pesan, 'error'); }
       } catch(e) { document.getElementById('progress-container').classList.add('hidden'); document.getElementById('btn-simpan-final').classList.remove('hidden'); return Swal.fire('Error','Gagal menghubungi server!','error'); }
 
@@ -1199,14 +1199,14 @@
       } else { Swal.fire('Error','Gunakan format .xlsx, .docx, .doc, atau .txt','error'); document.getElementById('btn-proses-import').innerHTML = "<i class='fas fa-upload mr-1'></i> Import Sekarang"; }
     }
 
-    // ================= EDIT soal SOAL (DITAMBAH HAPUS soal PERMANEN) =================
+    // ================= EDIT PAKET SOAL (DITAMBAH HAPUS PAKET PERMANEN) =================
     async function loadEditSoal() {
       const tbody = document.getElementById('tabel-edit-soal'); 
       // Colspan diubah jadi 5
       tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500 animate-pulse">Memuat data dari database...</td></tr>`;
-      showLoader('Mengambil Daftar soal Ujian...');
+      showLoader('Mengambil Daftar Paket Ujian...');
       try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getsoalGuru', id_guru: user.id }) });
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getPaketGuru', id_guru: user.id }) });
         const result = await res.json(); 
         let html = ''; 
         
@@ -1217,14 +1217,14 @@
             <td class="p-4 font-medium text-gray-800">${p.mapel}</td>
             <td class="p-4 text-center font-bold text-gray-700">${p.kelas}</td>
             <td class="p-4 text-center flex justify-center gap-2">
-               <button onclick='masukModeEditsoal(${JSON.stringify(p).replace(/'/g, "\\'")})' class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold hover:bg-blue-200 transition shadow-sm"><i class="fas fa-edit mr-1"></i> Edit</button>
-               <button onclick="hapussoalKeseluruhan('${p.kode}')" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-bold hover:bg-red-200 transition shadow-sm"><i class="fas fa-trash-alt mr-1"></i> Hapus</button>
+               <button onclick='masukModeEditPaket(${JSON.stringify(p).replace(/'/g, "\\'")})' class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold hover:bg-blue-200 transition shadow-sm"><i class="fas fa-edit mr-1"></i> Edit</button>
+               <button onclick="hapusPaketKeseluruhan('${p.kode}')" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-bold hover:bg-red-200 transition shadow-sm"><i class="fas fa-trash-alt mr-1"></i> Hapus</button>
             </td>
           </tr>`; 
         });
         
         // Colspan diubah jadi 5
-        tbody.innerHTML = html || `<tr><td colspan="5" class="p-8 text-center text-gray-500">Belum ada soal dibuat.</td></tr>`;
+        tbody.innerHTML = html || `<tr><td colspan="5" class="p-8 text-center text-gray-500">Belum ada paket soal dibuat.</td></tr>`;
       } catch(e) { 
         // Colspan diubah jadi 5
         tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-red-500">Gagal memuat.</td></tr>`; 
@@ -1232,7 +1232,7 @@
       hideLoader();
     }
 
-    function hapussoalKeseluruhan(kodeSoal) {
+    function hapusPaketKeseluruhan(kodeSoal) {
       Swal.fire({
         title: 'Hapus Soal?',
         text: `Soal dengan kode ${kodeSoal} beserta semua isinya akan dihapus permanen dari Database!`,
@@ -1245,7 +1245,7 @@
         if (result.isConfirmed) {
           showLoader(`Menghapus ${kodeSoal} dari Database...`);
           try {
-             const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapussoalUjian', kode: kodeSoal }) });
+             const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusPaketUjian', kode: kodeSoal }) });
              const r = await res.json(); hideLoader();
              if(r.status === 'success') {
                  Swal.fire('Terhapus!', r.pesan, 'success');
@@ -1258,7 +1258,7 @@
       });
     }
 
-    async function masukModeEditsoal(p) { 
+    async function masukModeEditPaket(p) { 
       Swal.fire({ title: 'Tarik Soal?', text: "Seluruh soal ditarik ke Editor. Anda bisa mengedit & menyimpan soal", icon: 'question', showCancelButton: true, confirmButtonText: 'Ya' }).then(async (result) => {
         if (result.isConfirmed) {
           isEditMode=true; switchMenu('guru-buat-soal'); 
@@ -1303,14 +1303,14 @@
       document.getElementById('setup-waktu').value = 90;
       
       keranjangSoal=[]; renderDropdownKeranjang(); document.getElementById('progress-container').classList.add('hidden'); 
-      document.getElementById('btn-simpan-final').innerHTML = "<i class='fas fa-save mr-2'></i> SIMPAN SELURUH soal KE DATABASE";
+      document.getElementById('btn-simpan-final').innerHTML = "<i class='fas fa-save mr-2'></i> SIMPAN SELURUH PAKET KE DATABASE";
     }
 
     // ================= REKAP & PENILAIAN ESSAY =================
     async function loadDropdownRekap() {
       const select = document.getElementById('select-rekap'); select.innerHTML = '<option value="">Sedang memuat...</option>';
       try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getsoalGuru', id_guru: user.id }) });
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getPaketGuru', id_guru: user.id }) });
         const result = await res.json(); let opts = '<option value="">-- Pilih Kode Soal --</option>'; result.data.forEach(p => opts += `<option value="${p.kode}">${p.kode} - ${p.mapel}</option>`); select.innerHTML = opts;
       } catch(e) {}
     }
@@ -1396,7 +1396,7 @@
             globalDashSiswaGuru = resSiswa.data || [];
             let semuaUjian = resUjian.data || [];
             
-            // Filter hanya soal ujian yang dibuat oleh Guru yang sedang login
+            // Filter hanya paket ujian yang dibuat oleh Guru yang sedang login
             globalDashUjianGuru = semuaUjian.filter(u => u.id_guru.toString() === user.id.toString());
             
             let soalAktif = 0;
