@@ -312,7 +312,8 @@
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-gray-100 text-gray-700 text-sm text-center">
-              <th rowspan="2" class="p-4 border-b">NIS</th>
+              <th rowspan="2" class="p-4 border-b w-12 text-center">No</th>
+              <th rowspan="2" class="p-4 border-b text-center">NIS</th>
               <th rowspan="2" class="p-4 border-b text-left">Nama Siswa</th>
               <th colspan="4" class="p-2 border-b border-r font-bold text-gray-800 bg-blue-50/50">NILAI</th>
               <th rowspan="2" class="p-4 border-b font-bold bg-gray-100">Total</th>
@@ -326,7 +327,8 @@
             </tr>
           </thead>
           <tbody id="tabel-rekap-nilai">
-            <tr><td colspan="8" class="p-8 text-center text-gray-500">Pilih soal dan klik cari</td></tr>
+            <!-- Colspan diubah menjadi 9 karena ada tambahan 1 kolom -->
+            <tr><td colspan="9" class="p-8 text-center text-gray-500">Pilih soal dan klik cari</td></tr>
           </tbody>
         </table>
       </div>
@@ -1114,8 +1116,19 @@
       } catch(e) { document.getElementById('progress-container').classList.add('hidden'); document.getElementById('btn-simpan-final').classList.remove('hidden'); return Swal.fire('Error','Gagal menghubungi server!','error'); }
 
       for (let i = 0; i < keranjangSoal.length; i++) {
+        // 1. Hitung persentase terlebih dahulu
+        let persentase = Math.round(((i + 1) / keranjangSoal.length) * 100);
+        
+        // 2. Ubah teks informasinya
         document.getElementById('progress-text').innerText = `Upload Seluruh Soal ${i + 1} dari ${keranjangSoal.length}...`;
-        document.getElementById('progress-bar').style.width = `${Math.round(((i + 1) / keranjangSoal.length) * 100)}%`;
+        
+        // 3. Ubah lebar warna progress bar
+        document.getElementById('progress-bar').style.width = `${persentase}%`;
+        
+        // 4. INI KODE TAMBAHAN: Ubah teks angka 0% menjadi angka persentase yang berjalan
+        document.getElementById('progress-percent').innerText = `${persentase}%`;
+        
+        // 5. Proses pengiriman ke server
         await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanSoalSatuan', data: { header: head, soal: keranjangSoal[i] } })});
       }
       
@@ -1329,7 +1342,8 @@
         const resSoal = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getBankSoal', kode_soal: kode }) }); const resultSoal = await resSoal.json(); bankSoalSaatIni = resultSoal.data;
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }); const result = await res.json(); dataRekapSaatIni = result.data;
         
-        if(dataRekapSaatIni.length === 0) { hideLoader(); return tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">Belum ada siswa yang mengerjakan ujian.</td></tr>`; }
+        // Ubah colspan pesan error menjadi 9
+        if(dataRekapSaatIni.length === 0) { hideLoader(); return tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-gray-500">Belum ada siswa yang mengerjakan ujian.</td></tr>`; }
         
         let html = ''; 
         dataRekapSaatIni.forEach((s, i) => { 
@@ -1341,6 +1355,7 @@
 
           html += `
           <tr class="border-b hover:bg-gray-50">
+            <td class="p-4 text-center text-sm font-bold">${i + 1}</td>
             <td class="p-4 text-center">${s.nis}</td>
             <td class="p-4 font-semibold">${s.nama}</td>
             <td class="p-4 text-center text-blue-600 bg-blue-50/10">${nilaiPg}</td>
@@ -1348,11 +1363,11 @@
             <td class="p-4 text-center text-purple-600 bg-blue-50/10">${nilaiIsian}</td>
             <td class="p-4 text-center text-yellow-600 font-bold bg-blue-50/10 border-r">${nilaiEssay}</td>
             <td class="p-4 text-center font-bold text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
-            <td class="p-4 text-center"><button onclick="bukaEditPenilaian(${i})" class="bg-blue-600 text-white font-bold px-5 py-2 rounded-xl hover:bg-blue-700 shadow-md text-sm whitespace-nowrap transition">👀 Lihat & Nilai</button></td>
+            <td class="p-4 text-center"><button onclick="bukaEditPenilaian(${i})" class="bg-blue-600 text-white font-bold px-5 py-2 rounded-xl hover:bg-blue-700 shadow-md text-sm whitespace-nowrap transition">Nilai Essay</button></td>
           </tr>`; 
         }); 
         tbody.innerHTML = html;
-      } catch(e) { tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-red-500">Gagal menarik data.</td></tr>`; } hideLoader();
+      } catch(e) { tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-red-500">Gagal menarik data.</td></tr>`; } hideLoader();
     }
 
     function bukaEditPenilaian(index) {
@@ -1369,9 +1384,77 @@
       }
       container.innerHTML = html; document.getElementById('modal-edit-penilaian').classList.remove('hidden'); setTimeout(() => document.getElementById('modal-content-penilaian').classList.replace('scale-95', 'scale-100'), 10);
     }
-    function hitungTotalRealtime() { const s = dataRekapSaatIni[barisEditAktif]; let totalPG = Number(s.nilai_pg) || 0; let totalEssay = 0; bankSoalSaatIni.forEach((soalDB, i) => { if(soalDB.tipe === 'ESSAY') { let val = document.getElementById(`input-skor-${i}`).value; let skorBaru = Number(val) || 0; if (skorBaru > Number(soalDB.bobot)) { document.getElementById(`input-skor-${i}`).value = soalDB.bobot; skorBaru = Number(soalDB.bobot); } totalEssay += skorBaru; let hdr = document.getElementById(`hdr-skor-${i}`); if(hdr) hdr.innerText = skorBaru; } }); document.getElementById('modal-total-skor').innerText = totalPG + totalEssay; }
+    function hitungTotalRealtime() { 
+      const s = dataRekapSaatIni[barisEditAktif]; 
+      
+      // Ambil semua nilai otomatis yang sudah ada
+      let nilaiPg = Number(s.nilai_pg) || 0;
+      let nilaiPgk = Number(s.nilai_pgk) || 0;
+      let nilaiIsian = Number(s.nilai_isian) || 0;
+      let totalOtomatis = nilaiPg + nilaiPgk + nilaiIsian;
+      
+      let totalEssay = 0; 
+      bankSoalSaatIni.forEach((soalDB, i) => { 
+        if(soalDB.tipe === 'ESSAY') { 
+          let val = document.getElementById(`input-skor-${i}`).value; 
+          let skorBaru = Number(val) || 0; 
+          // Cegah nilai essay melebihi batas bobot maksimal soal
+          if (skorBaru > Number(soalDB.bobot)) { 
+            document.getElementById(`input-skor-${i}`).value = soalDB.bobot; 
+            skorBaru = Number(soalDB.bobot); 
+          } 
+          totalEssay += skorBaru; 
+          let hdr = document.getElementById(`hdr-skor-${i}`); 
+          if(hdr) hdr.innerText = skorBaru; 
+        } 
+      }); 
+      
+      // Tampilkan total keseluruhan (Otomatis + Essay)
+      document.getElementById('modal-total-skor').innerText = totalOtomatis + totalEssay; 
+    }
     function tutupModalPenilaian() { document.getElementById('modal-content-penilaian').classList.replace('scale-100', 'scale-95'); setTimeout(() => document.getElementById('modal-edit-penilaian').classList.add('hidden'), 200); }
-    async function simpanEditPenilaian() { const s = dataRekapSaatIni[barisEditAktif]; let totalEssay = 0; bankSoalSaatIni.forEach((soalDB, i) => { if(soalDB.tipe === 'ESSAY') { let val = document.getElementById(`input-skor-${i}`).value; let skorBaru = Number(val) || 0; totalEssay += skorBaru; let target = detailEditAktif.find(d => d.no === (i + 1)) || detailEditAktif[i]; if (target) { if (target.sk !== undefined) target.sk = skorBaru; else target.skor = skorBaru; } } }); let totalPG = Number(s.nilai_pg) || 0; let finalTotal = totalPG + totalEssay; showLoader('Menyimpan Penilaian...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateNilaiDetail', data: { baris: s.baris, nilai_essay: totalEssay, total: finalTotal, detail: detailEditAktif } }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire({title: 'Berhasil!', text: 'Nilai manual berhasil disimpan!', icon: 'success', timer: 1500, showConfirmButton: false}); tutupModalPenilaian(); tampilkanRekap(); } else { Swal.fire('Error', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error', 'Gagal menyimpan penilaian.', 'error'); } }
+    async function simpanEditPenilaian() { 
+      const s = dataRekapSaatIni[barisEditAktif]; 
+      let totalEssay = 0; 
+      
+      bankSoalSaatIni.forEach((soalDB, i) => { 
+        if(soalDB.tipe === 'ESSAY') { 
+          let val = document.getElementById(`input-skor-${i}`).value; 
+          let skorBaru = Number(val) || 0; 
+          totalEssay += skorBaru; 
+          let target = detailEditAktif.find(d => d.no === (i + 1)) || detailEditAktif[i]; 
+          if (target) { 
+             if (target.sk !== undefined) target.sk = skorBaru; 
+             else target.skor = skorBaru; 
+          } 
+        } 
+      }); 
+      
+      // Kalkulasi semua komponen nilai sebelum disimpan
+      let nilaiPg = Number(s.nilai_pg) || 0;
+      let nilaiPgk = Number(s.nilai_pgk) || 0;
+      let nilaiIsian = Number(s.nilai_isian) || 0;
+      let totalOtomatis = nilaiPg + nilaiPgk + nilaiIsian;
+      
+      let finalTotal = totalOtomatis + totalEssay; 
+      
+      showLoader('Menyimpan Penilaian...'); 
+      try { 
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateNilaiDetail', data: { baris: s.baris, nilai_essay: totalEssay, total: finalTotal, detail: detailEditAktif } }) }); 
+        const result = await res.json(); 
+        hideLoader(); 
+        if(result.status === 'success') { 
+           Swal.fire({title: 'Berhasil!', text: 'Nilai manual berhasil disimpan!', icon: 'success', timer: 1500, showConfirmButton: false}); 
+           tutupModalPenilaian(); 
+           tampilkanRekap(); 
+        } else { 
+           Swal.fire('Error', result.pesan, 'error'); 
+        } 
+      } catch(e) { 
+        hideLoader(); 
+        Swal.fire('Error', 'Gagal menyimpan penilaian.', 'error'); 
+      } 
+    }
   // ==========================================
     // FITUR DASHBOARD GURU (MULTI CHART)
     // ==========================================

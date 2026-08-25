@@ -2333,12 +2333,48 @@
 
     function toggleStatusUjian(kode, targetStatus) { Swal.fire({ title: 'Ubah Status?', text: `Ujian ${kode} akan menjadi ${targetStatus}.`, icon: 'question', showCancelButton: true, confirmButtonColor: targetStatus==='Aktif'?'#16a34a':'#d33', confirmButtonText: `Ya` }).then(async (result) => { if(result.isConfirmed) { let tokenBaru = targetStatus === 'Aktif' ? Math.random().toString(36).substring(2, 7).toUpperCase() : ''; showLoader('Update Status...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjian', kode, status: targetStatus, token: tokenBaru }) }); await res.json(); hideLoader(); loadManajemenUjian(); loadDashboard(); } catch(e) { hideLoader(); } } }); }
     // ================= FUNGSI KIRIM TOKEN KE WHATSAPP =================
-    function kirimTokenWA(kode, mapel, kelas, token) {
+    // ================= FUNGSI KIRIM TOKEN KE WHATSAPP =================
+    async function kirimTokenWA(kode, mapel, kelas, token) {
+        // 1. Tarik data siswa dari server jika belum ada di memori
+        if (!allSiswaData || allSiswaData.length === 0) {
+            showLoader('Memuat data siswa...');
+            try {
+                const resSiswa = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) });
+                const resS = await resSiswa.json();
+                allSiswaData = resS.data || [];
+            } catch(e) {
+                console.error("Gagal memuat data siswa", e);
+            }
+            hideLoader();
+        }
+
+        // 2. Filter siswa yang sesuai dengan kelas pada kode soal
+        let siswaKelas = allSiswaData.filter(s => s.kelas === kelas);
+        
+        // 3. Bangun opsi dropdown HTML
+        let optionsHtml = '<option value="">-- Pilih Siswa --</option>';
+        siswaKelas.sort((a, b) => a.nama.localeCompare(b.nama)).forEach(s => {
+            optionsHtml += `<option value="${s.nama}">${s.nama} (${s.nis})</option>`;
+        });
+
+        if (siswaKelas.length === 0) {
+            optionsHtml = '<option value="">Tidak ada siswa di kelas ini</option>';
+        }
+
+        // 4. Tampilkan Modal SweetAlert
         Swal.fire({
-            title: 'Kirim Token',
+            title: 'Kirim Token via WA',
             html: `
-                <p class="text-sm text-gray-600 mb-3 text-left">Masukkan Nomor Handphone</p>
-                <input type="number" id="wa-number" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/30 transition text-left" placeholder="Contoh : 081534567899">
+                <div class="text-left mb-4 mt-2">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Nama Siswa</label>
+                    <select id="wa-student-name" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/30 transition bg-white shadow-sm cursor-pointer">
+                        ${optionsHtml}
+                    </select>
+                </div>
+                <div class="text-left mb-2">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor Handphone</label>
+                    <input type="number" id="wa-number" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/30 transition shadow-sm" placeholder="Contoh: 081234567890">
+                </div>
             `,
             showCancelButton: true,
             confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Kirim',
@@ -2346,24 +2382,33 @@
             cancelButtonText: 'Batal',
             cancelButtonColor: '#6b7280',
             preConfirm: () => {
+                const namaSiswa = document.getElementById('wa-student-name').value;
                 const noWa = document.getElementById('wa-number').value;
+                
+                if (!namaSiswa) {
+                    Swal.showValidationMessage('Silakan pilih nama siswa terlebih dahulu!');
+                    return false;
+                }
                 if (!noWa) {
                     Swal.showValidationMessage('Nomor handphone tidak boleh kosong!');
+                    return false;
                 }
-                return noWa;
+                return { namaSiswa, noWa };
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // 1. Bersihkan dan Format Nomor HP
-                let phone = result.value.replace(/\D/g, ''); 
+                const { namaSiswa, noWa } = result.value;
+                
+                // 1. Bersihkan dan Format Nomor HP (Ubah awalan 0 menjadi 62)
+                let phone = noWa.replace(/\D/g, ''); 
                 if (phone.startsWith('0')) {
                     phone = '62' + phone.substring(1); 
                 }
 
-                // 2. Format Pesan Pengumuman Ujian
-                const pesan = `*PENGUMUMAN PELAKSANAAN UJIAN* \n\nKepada Yth. Siswa/i Kelas ${kelas},\n\nDiberitahukan bahwa Anda sudah dapat mengikuti ujian untuk mata pelajaran *${mapel}* (Kode Ujian: ${kode}).\n\nBerikut adalah Token Ujian Anda: \n*${token}*\n\nSilakan login ke sistem CBT dan masukkan token tersebut untuk memulai pengerjaan soal. Pastikan koneksi internet stabil dan kerjakan dengan jujur.\n\nSemoga sukses!\n_Admin CBT System_`;
+                // 2. Format Pesan Pengumuman Ujian dengan menyisipkan Nama Siswa
+                const pesan = `*PENGUMUMAN PELAKSANAAN UJIAN* \n\nKepada Yth. *${namaSiswa}* (Kelas ${kelas}),\n\nDiberitahukan bahwa Anda sudah dapat mengikuti ujian untuk mata pelajaran *${mapel}* (Kode Ujian: ${kode}).\n\nBerikut adalah Token Ujian Anda: \n*${token}*\n\nSilakan login ke sistem CBT dan masukkan token tersebut untuk memulai pengerjaan soal. Pastikan koneksi internet stabil dan kerjakan dengan jujur.\n\nSemoga sukses!\n_Admin CBT System_`;
 
-                // 3. Arahkan ke WhatsApp Web
+                // 3. Arahkan ke WhatsApp Web / Aplikasi
                 const waUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(pesan)}`;
                 window.open(waUrl, '_blank');
             }
