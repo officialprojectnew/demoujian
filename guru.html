@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Guru - CBT System</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
   
@@ -128,16 +128,16 @@
           </div>
        </div>
 
-       <!-- Chart Container -->
-       <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <div class="flex items-center gap-2 mb-4 border-b border-gray-200 pb-3">
-             <i class="fas fa-chart-pie text-xl text-indigo-600"></i>
-             <h3 class="font-bold text-gray-800 text-lg">Distribusi Status Soal Buatan Anda</h3>
-          </div>
-          <div class="w-full h-72 flex justify-center relative">
-             <!-- Canvas untuk Chart.js -->
-             <canvas id="chart-soal-guru"></canvas>
-          </div>
+       
+       <!-- Chart Container Dinamis -->
+       <div class="mt-8 mb-4 border-b border-gray-200 pb-3 flex items-center gap-2">
+           <i class="fas fa-chart-pie text-xl text-indigo-600"></i>
+           <h3 class="font-bold text-gray-800 text-lg">Status Pengerjaan Ujian Aktif Anda</h3>
+       </div>
+       
+       <!-- Grid untuk menampung diagram per mata pelajaran -->
+       <div id="dashboard-charts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+           <p class="text-gray-500 col-span-full text-center py-4 italic">Memuat diagram...</p>
        </div>
     </div>
     
@@ -1328,9 +1328,12 @@
     function tutupModalPenilaian() { document.getElementById('modal-content-penilaian').classList.replace('scale-100', 'scale-95'); setTimeout(() => document.getElementById('modal-edit-penilaian').classList.add('hidden'), 200); }
     async function simpanEditPenilaian() { const s = dataRekapSaatIni[barisEditAktif]; let totalEssay = 0; bankSoalSaatIni.forEach((soalDB, i) => { if(soalDB.tipe === 'ESSAY') { let val = document.getElementById(`input-skor-${i}`).value; let skorBaru = Number(val) || 0; totalEssay += skorBaru; let target = detailEditAktif.find(d => d.no === (i + 1)) || detailEditAktif[i]; if (target) { if (target.sk !== undefined) target.sk = skorBaru; else target.skor = skorBaru; } } }); let totalPG = Number(s.nilai_pg) || 0; let finalTotal = totalPG + totalEssay; showLoader('Menyimpan Penilaian...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateNilaiDetail', data: { baris: s.baris, nilai_essay: totalEssay, total: finalTotal, detail: detailEditAktif } }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire({title: 'Berhasil!', text: 'Nilai manual berhasil disimpan!', icon: 'success', timer: 1500, showConfirmButton: false}); tutupModalPenilaian(); tampilkanRekap(); } else { Swal.fire('Error', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error', 'Gagal menyimpan penilaian.', 'error'); } }
   // ==========================================
-    // FITUR DASHBOARD GURU
+    // FITUR DASHBOARD GURU (MULTI CHART)
     // ==========================================
-    let chartGuruInstance = null;
+    let dashChartInstancesGuru = [];
+    let globalDashSiswaGuru = [];
+    let globalDashUjianGuru = [];
+    let globalDashPantauGuru = [];
 
     async function loadDashboardGuru() {
         showLoader('Menyinkronkan Dashboard...');
@@ -1340,80 +1343,135 @@
         document.getElementById('dash-id-guru').innerText = user.id;
 
         try {
-            // 2. Tarik Data Ujian dari server
-            const resUjian = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) });
-            const resultUjian = await resUjian.json();
+            // 2. Tarik Data Ujian & Siswa berbarengan
+            const [resUjian, resSiswa] = await Promise.all([
+                fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }).then(r => r.json()),
+                fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }).then(r => r.json())
+            ]);
             
-            // Filter paket ujian yang dibuat oleh Guru yang sedang login
-            let soalGuruIni = resultUjian.data ? resultUjian.data.filter(u => u.id_guru.toString() === user.id.toString()) : [];
+            globalDashSiswaGuru = resSiswa.data || [];
+            let semuaUjian = resUjian.data || [];
+            
+            // Filter hanya paket ujian yang dibuat oleh Guru yang sedang login
+            globalDashUjianGuru = semuaUjian.filter(u => u.id_guru.toString() === user.id.toString());
             
             let soalAktif = 0;
-            let soalNonaktif = 0;
             let kelasDiajar = new Set();
             
-            soalGuruIni.forEach(s => {
-                // Hitung status aktif
+            globalDashUjianGuru.forEach(s => {
                 if(s.status === 'Aktif') soalAktif++;
-                else soalNonaktif++;
-                
-                // Kumpulkan kelas-kelas dari paket soal guru ini
                 if(s.kelas) kelasDiajar.add(s.kelas);
             });
             
             document.getElementById('dash-total-soal-aktif').innerText = soalAktif;
 
-            // 3. Tarik Data Siswa untuk menghitung jumlah murid
-            const resSiswa = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) });
-            const resultSiswa = await resSiswa.json();
-            
+            // Hitung total siswa
             let totalSiswaDiajar = 0;
-            if (resultSiswa.data) {
-                resultSiswa.data.forEach(siswa => {
-                    // Hitung siswa jika kelasnya ada di dalam himpunan 'kelasDiajar'
-                    if (kelasDiajar.has(siswa.kelas)) {
-                        totalSiswaDiajar++;
-                    }
-                });
-            }
-            
+            globalDashSiswaGuru.forEach(siswa => {
+                if (kelasDiajar.has(siswa.kelas)) totalSiswaDiajar++;
+            });
             document.getElementById('dash-total-siswa').innerText = totalSiswaDiajar;
 
-            // 4. Render Diagram Pie (Chart.js)
-            if (chartGuruInstance) chartGuruInstance.destroy();
-            const ctx = document.getElementById('chart-soal-guru').getContext('2d');
+            // 3. Persiapkan Area Chart untuk Ujian Aktif
+            let activeExams = globalDashUjianGuru.filter(u => u.status === 'Aktif');
+            let container = document.getElementById('dashboard-charts-container');
             
-            if (soalAktif === 0 && soalNonaktif === 0) {
-               // Render chart kosong transparan jika belum ada soal
-               chartGuruInstance = new Chart(ctx, { type: 'pie', data: { labels: ['Kosong'], datasets: [{ data: [1], backgroundColor: ['#e5e7eb'] }] } });
-            } else {
-               chartGuruInstance = new Chart(ctx, {
-                   type: 'pie',
-                   data: {
-                       labels: ['Ujian Aktif (Sedang Berjalan)', 'Ujian Nonaktif (Terkunci)'],
-                       datasets: [{
-                           data: [soalAktif, soalNonaktif],
-                           backgroundColor: ['#10b981', '#ef4444'], // Emerald (Hijau) & Red
-                           borderWidth: 3,
-                           borderColor: '#f9fafb'
-                       }]
-                   },
-                   options: {
-                       responsive: true,
-                       maintainAspectRatio: false,
-                       plugins: {
-                           legend: { position: 'bottom', labels: { font: { family: "'Poppins', sans-serif", weight: 'bold' } } },
-                           tooltip: { callbacks: { label: function(context) { return ` ${context.label}: ${context.parsed} Paket`; } } }
-                       }
-                   }
-               });
+            if(activeExams.length === 0) {
+                container.innerHTML = `<div class="bg-gray-50 border border-dashed border-gray-300 rounded-2xl p-8 col-span-full text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-3 opacity-50"></i><p>Belum ada ujian buatan Anda yang sedang aktif.</p></div>`;
+                hideLoader();
+                return;
             }
+
+            container.innerHTML = `<p class="text-blue-500 col-span-full text-center p-8 bg-blue-50 rounded-xl border border-dashed animate-pulse">Menarik data pelacakan siswa...</p>`;
+
+            // 4. Tarik data Pemantauan (Sedang/Sudah mengerjakan) untuk tiap ujian aktif
+            const pantauPromises = activeExams.map(u => 
+                fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getPemantauan', kode_soal: u.kode, kelas: u.kelas }) }).then(r => r.json()) 
+            );
             
+            globalDashPantauGuru = await Promise.all(pantauPromises);
+            
+            // 5. Gambar semua diagram
+            renderChartsGuru(activeExams);
+
         } catch(e) {
             console.log('Gagal memuat data dashboard guru:', e);
+            document.getElementById('dashboard-charts-container').innerHTML = `<p class="text-red-500 col-span-full text-center p-4">Gagal memuat data diagram.</p>`;
         }
         
         hideLoader();
-    }
+      } 
+
+    function renderChartsGuru(activeExams) {
+        // Hapus chart lama jika ada
+        dashChartInstancesGuru.forEach(c => c.destroy());
+        dashChartInstancesGuru = [];
+        
+        let container = document.getElementById('dashboard-charts-container');
+        container.innerHTML = '';
+
+        activeExams.forEach((u, idx) => {
+            let pantauData = (globalDashPantauGuru[idx] && globalDashPantauGuru[idx].data) ? globalDashPantauGuru[idx].data : [];
+            
+            // Ekstrak nama berdasarkan status dari data Pemantauan
+            let sudahNames = pantauData.filter(p => p.status === 'Selesai').map(p => p.nama);
+            let sedangNames = pantauData.filter(p => p.status === 'Proses').map(p => p.nama);
+            
+            // Cari siswa yang belum mengerjakan (Siswa di kelas - Siswa di Pemantauan)
+            let targetSiswa = globalDashSiswaGuru.filter(s => s.kelas === u.kelas);
+            let belumNames = targetSiswa.filter(s => !sudahNames.includes(s.nama) && !sedangNames.includes(s.nama)).map(s => s.nama);
+
+            // Buat elemen Card untuk Chart
+            let chartDiv = document.createElement('div');
+            chartDiv.className = 'bg-white border border-gray-200 p-5 rounded-2xl shadow-sm text-center transform hover:-translate-y-1 transition';
+            chartDiv.innerHTML = `
+                <h3 class="font-bold text-gray-800 text-base mb-1 truncate" title="${u.mapel}">${u.mapel}</h3>
+                <p class="text-xs text-blue-600 mb-4 font-semibold bg-blue-50 inline-block px-3 py-1 rounded-full border border-blue-100">Kelas: ${u.kelas} | Kode: ${u.kode}</p>
+                <div class="relative w-full h-52 flex justify-center"><canvas id="chart-pie-guru-${idx}"></canvas></div>
+            `;
+            container.appendChild(chartDiv);
+
+            // Eksekusi render Chart.js
+            const ctx = document.getElementById(`chart-pie-guru-${idx}`);
+            let pieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Sudah Selesai', 'Sedang Mengerjakan', 'Belum Mulai'],
+                    datasets: [{
+                        data: [sudahNames.length, sedangNames.length, belumNames.length],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], // Hijau, Kuning, Merah
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: {size: 11} } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) { return ` ${context.label}: ${context.parsed} Siswa`; },
+                                afterLabel: function(context) {
+                                    // Tampilkan daftar nama siswa saat chart di-hover
+                                    let names = [];
+                                    if(context.label === 'Sudah Selesai') names = sudahNames;
+                                    else if(context.label === 'Sedang Mengerjakan') names = sedangNames;
+                                    else names = belumNames;
+                                    
+                                    if(names.length === 0) return '  Tidak ada data';
+                                    let displayNames = names.slice(0, 10).map(n => '  • ' + n);
+                                    if(names.length > 10) displayNames.push(`  ...dan ${names.length - 10} lainnya`);
+                                    return displayNames;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            dashChartInstancesGuru.push(pieChart);
+        });
+      }
   </script>
 </body>
 </html>
