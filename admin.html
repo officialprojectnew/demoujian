@@ -2361,7 +2361,7 @@
                 }
 
                 // 2. Format Pesan Pengumuman Ujian
-                const pesan = `*PENGUMUMAN PELAKSANAAN UJIAN* \n\nKepada Yth. Siswa/i ${namasiswa},\n\nKelas ${kelas},\n\nDiberitahukan bahwa Anda sudah dapat mengikuti ujian untuk mata pelajaran *${mapel}* (Kode Ujian: ${kode}).\n\nBerikut adalah Token Ujian Anda: \n*${token}*\n\nSilakan login ke sistem CBT dan masukkan token tersebut untuk memulai pengerjaan soal. Pastikan koneksi internet stabil dan kerjakan dengan jujur.\n\nSemoga sukses!\n_Admin CBT System_`;
+                const pesan = `*PENGUMUMAN PELAKSANAAN UJIAN* \n\nKepada Yth. Siswa/i Kelas ${kelas},\n\nDiberitahukan bahwa Anda sudah dapat mengikuti ujian untuk mata pelajaran *${mapel}* (Kode Ujian: ${kode}).\n\nBerikut adalah Token Ujian Anda: \n*${token}*\n\nSilakan login ke sistem CBT dan masukkan token tersebut untuk memulai pengerjaan soal. Pastikan koneksi internet stabil dan kerjakan dengan jujur.\n\nSemoga sukses!\n_Admin CBT System_`;
 
                 // 3. Arahkan ke WhatsApp Web
                 const waUrl = `https://web.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(pesan)}`;
