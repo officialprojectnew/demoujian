@@ -171,8 +171,8 @@
                 <label class="text-sm font-bold text-gray-700">Pilih Soal</label>
                 <select id="jadwal-soal" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500"><option value="">-- Loading --</option></select>
              </div>
-             <div><label class="text-sm font-bold text-gray-700">Sesi</label><input type="text" id="jadwal-sesi" placeholder="Cth: Sesi 1" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500 uppercase"></div>
-             <div><label class="text-sm font-bold text-gray-700">Ruang</label><input type="text" id="jadwal-ruang" placeholder="Cth: R-01" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500 uppercase"></div>
+             <div><label class="text-sm font-bold text-gray-700">Sesi</label><input type="text" id="jadwal-sesi" placeholder="Contoh : Sesi 1" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500"></div>
+             <div><label class="text-sm font-bold text-gray-700">Ruang</label><input type="text" id="jadwal-ruang" placeholder="Contoh : Ruang 01" class="w-full mt-1 p-2 border rounded-lg outline-none focus:border-blue-500"></div>
           </div>
           <button onclick="simpanJadwalBaru()" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-blue-700 shadow-sm w-full md:w-auto"><i class="fas fa-save mr-2"></i> Simpan </button>
         </div>
@@ -537,22 +537,8 @@
 
           <div class="overflow-x-auto border border-gray-200 rounded-xl">
             <table class="w-full text-left border-collapse whitespace-nowrap">
-              <thead>
-                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider text-center">
-                  <th rowspan="2" class="p-4 border-b font-semibold">No</th>
-                  <th rowspan="2" class="p-4 border-b font-semibold">NIS</th>
-                  <th rowspan="2" class="p-4 border-b font-semibold text-left">Nama Siswa</th>
-                  <th colspan="4" class="p-2 border-b border-r font-bold text-gray-700 bg-blue-50/50">NILAI</th>
-                  <th rowspan="2" class="p-4 border-b font-bold text-gray-900 bg-gray-100">Total Nilai</th>
-                </tr>
-                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider text-center">
-                  <th class="p-2 border-b font-semibold bg-blue-50/30">PG</th>
-                  <th class="p-2 border-b font-semibold bg-blue-50/30">PGK</th>
-                  <th class="p-2 border-b font-semibold bg-blue-50/30">Isian</th>
-                  <th class="p-2 border-b border-r font-semibold bg-blue-50/30">Essay</th>
-                </tr>
-              </thead>
-              <tbody id="tabel-rekap-nilai-admin"><tr><td colspan="8" class="p-8 text-center text-gray-500 text-sm">Pilih soal dan klik tampilkan.</td></tr></tbody>
+              <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIS</th><th class="p-4 border-b font-semibold">Nama Siswa</th><th class="p-4 border-b text-center font-semibold">Nilai PG</th><th class="p-4 border-b text-center font-semibold">Nilai Essay</th><th class="p-4 border-b text-center font-bold text-gray-800">Total Nilai</th></tr></thead>
+              <tbody id="tabel-rekap-nilai-admin"><tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">Pilih soal dan klik tampilkan.</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -860,13 +846,13 @@
       
       <div class="space-y-4">
           <div>
-              <label class="text-sm font-bold text-gray-700">1. Pilih Ruang Ujian</label>
+              <label class="text-sm font-bold text-gray-700">Pilih Ruang Ujian</label>
               <select id="ba-ruang" onchange="renderMapelBeritaAbsen()" class="w-full mt-1 p-3 border rounded-xl outline-none focus:border-blue-500 bg-gray-50">
               </select>
           </div>
           
           <div>
-              <label class="text-sm font-bold text-gray-700">2. Pilih Jenis Dokumen</label>
+              <label class="text-sm font-bold text-gray-700">Pilih Jenis Dokumen</label>
               <div class="flex gap-4 mt-2">
                   <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="ba_jenis" value="absen" checked class="w-4 h-4 accent-blue-600"> Daftar Hadir</label>
                   <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="ba_jenis" value="berita_acara" class="w-4 h-4 accent-blue-600"> Berita Acara</label>
@@ -875,7 +861,7 @@
 
           <div>
               <label class="text-sm font-bold text-gray-700 flex justify-between">
-                  <span>3. Pilih Mata Pelajaran</span>
+                  <span>Pilih Mata Pelajaran</span>
                   <label class="text-xs text-blue-600 cursor-pointer flex items-center gap-1"><input type="checkbox" id="ba-chk-all" onchange="toggleAllBaMapel()" class="accent-blue-600"> Pilih Semua</label>
               </label>
               <div id="ba-mapel-container" class="mt-2 max-h-40 overflow-y-auto border border-gray-200 rounded-xl p-3 bg-gray-50 space-y-2">
@@ -2081,7 +2067,7 @@
                html += `<tr class="border-b hover:bg-gray-50">
                   <td class="p-4">
                      <p class="font-bold text-gray-800">${p.nama}</p>
-                     <p class="text-xs text-gray-500">NIS: ${p.nis} | Kls: <span class="font-semibold">${p.kelas}</span></p>
+                     <p class="text-xs text-gray-500">NIS: ${p.nis} | Kelas: <span class="font-semibold">${p.kelas}</span></p>
                   </td>
                   <td class="p-4 text-center"><span class="px-3 py-1 text-xs font-bold rounded-full border ${badge}">${p.status}</span></td>
                   <td class="p-4 text-center">${f1}</td>
@@ -2351,8 +2337,8 @@
         Swal.fire({
             title: 'Kirim Token',
             html: `
-                <p class="text-sm text-gray-600 mb-3 text-left">Masukkan nomor Handphone siswa</p>
-                <input type="number" id="wa-number" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/30 transition text-left" placeholder="Contoh: 081234567890">
+                <p class="text-sm text-gray-600 mb-3 text-left">Masukkan Nomor Handphone</p>
+                <input type="number" id="wa-number" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-[#25D366] focus:ring-2 focus:ring-[#25D366]/30 transition text-left" placeholder="Contoh : 081534567899">
             `,
             showCancelButton: true,
             confirmButtonText: '<i class="fab fa-whatsapp mr-1"></i> Kirim',
