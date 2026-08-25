@@ -1519,7 +1519,7 @@
         paginatedData.forEach((s, index) => { 
           let i = start + index; // Agar nomor urut tidak kembali ke 1
           let jsData = JSON.stringify(s).replace(/'/g, "\\'"); let urlFoto = getDirectImageUrl(s.foto);
-          let imgTbl = urlFoto ? `<img src="${urlFoto}" class="h-10 w-10 object-cover rounded-full border shadow-sm mx-auto">` : `<div class="h-10 w-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center text-xs mx-auto border border-blue-100"><i class="fas fa-user"></i></div>`;
+          let imgTbl = urlFoto ? `<img src="${urlFoto}" loading="lazy" class="h-10 w-10 object-cover rounded-full border shadow-sm mx-auto">` : `<div class="h-10 w-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center text-xs mx-auto border border-blue-100"><i class="fas fa-user"></i></div>`;
           html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-center">${imgTbl}</td><td class="p-4 text-sm font-bold text-gray-800">${s.nis}</td><td class="p-4 text-sm">${s.nama}</td><td class="p-4 text-sm">${s.nisn || '-'}</td><td class="p-4 text-sm">${s.kelas}</td><td class="p-4 text-sm font-mono text-gray-400">${s.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditSiswa(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg hover:bg-yellow-200 transition flex items-center justify-center"><i class="fas fa-pen"></i></button> <button onclick="hapusSiswa('${s.nis}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg hover:bg-red-200 transition flex items-center justify-center"><i class="fas fa-trash"></i></button></td></tr>`; 
         }); 
         tbody.innerHTML = html;
@@ -1589,7 +1589,7 @@
           let i = start + index;
           let jsData = JSON.stringify(g).replace(/'/g, "\\'"); 
           let urlFoto = getDirectImageUrl(g.foto);
-          let imgTbl = urlFoto ? `<img src="${urlFoto}" class="h-10 w-10 object-cover rounded-full border shadow-sm mx-auto">` : `<div class="h-10 w-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center text-xs mx-auto border border-blue-100"><i class="fas fa-user-tie"></i></div>`;
+          let imgTbl = urlFoto ? `<img src="${urlFoto}" loading="lazy" class="h-10 w-10 object-cover rounded-full border shadow-sm mx-auto">` : `<div class="h-10 w-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center text-xs mx-auto border border-blue-100"><i class="fas fa-user-tie"></i></div>`;
           html += `<tr class="border-b hover:bg-gray-50"><td class="p-4 text-center text-sm">${i + 1}</td><td class="p-4 text-center">${imgTbl}</td><td class="p-4 text-sm font-bold">${g.nip}</td><td class="p-4 text-sm">${g.nama}</td><td class="p-4 text-sm">${g.username}</td><td class="p-4 text-sm font-mono text-gray-400">${g.password}</td><td class="p-4 text-center flex justify-center gap-2"><button onclick='bukaEditGuru(${jsData})' class="bg-yellow-100 text-yellow-700 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-yellow-200 transition"><i class="fas fa-pen"></i></button> <button onclick="hapusGuru('${g.nip}')" class="bg-red-100 text-red-600 w-8 h-8 rounded-lg flex justify-center items-center hover:bg-red-200 transition"><i class="fas fa-trash"></i></button></td></tr>`; 
         }); 
         tbody.innerHTML = html;
@@ -2386,7 +2386,7 @@
         let html = ''; 
         globalKartuData.forEach((k, i) => { 
             let urlFoto = getDirectImageUrl(k.foto); 
-            let imgTbl = urlFoto ? `<img src="${urlFoto}" class="h-10 w-10 object-cover rounded-full border shadow-sm mx-auto">` : '<div class="h-10 w-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center text-xs mx-auto border border-blue-100"><i class="fas fa-user"></i></div>'; 
+            let imgTbl = urlFoto ? `<img src="${urlFoto}" loading="lazy" class="h-10 w-10 object-cover rounded-full border shadow-sm mx-auto">` : '<div class="h-10 w-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center text-xs mx-auto border border-blue-100"><i class="fas fa-user"></i></div>'; 
             let jsData = JSON.stringify(k).replace(/'/g, "\\'");
             
             html += `<tr class="hover:bg-gray-50 border-b">
