@@ -240,7 +240,7 @@
         <!-- TOMBOL DINAMIS: TAMBAH KE KERANJANG ATAU UPDATE DB -->
         <div class="flex gap-3">
           <button id="btn-tambah-keranjang" onclick="tambahkanKeDaftar()" class="flex-1 bg-yellow-500 text-white font-bold py-3.5 rounded-xl hover:bg-yellow-600 transition shadow text-base tracking-wide">
-            <i class="fas fa-arrow-down mr-2"><> Tambah Soal
+            <i class="fas fa-arrow-down mr-2"></i> Tambah Soal
           </button>
           
           <button id="btn-update-db" onclick="updateLangsungKeDB()" class="hidden flex-1 bg-green-600 text-white font-bold py-3.5 rounded-xl hover:bg-green-700 transition shadow text-base tracking-wide">
@@ -248,7 +248,7 @@
           </button>
           
           <button id="btn-batal-edit-keranjang" onclick="batalEditKeranjang()" class="hidden bg-gray-500 text-white font-bold py-3.5 px-6 rounded-xl hover:bg-gray-600 transition shadow text-base tracking-wide">
-            Batal Edit
+            Cancel
           </button>
         </div>
       </div>
@@ -262,7 +262,7 @@
       </div>
       
       <button onclick="simpanPaketDenganValidasi()" id="btn-simpan-final" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition shadow-lg text-lg hidden tracking-wide">
-        <i class="fas fa-save mr-2"></i> SIMPAN DATABASE
+        <i class="fas fa-save mr-2"></i> Save Database
       </button>
     </div>
 
@@ -353,7 +353,7 @@
           </div>
           <div>
             <label class="text-sm font-bold text-gray-700 mb-1 block">Kelas</label>
-            <input type="text" id="setup-kelas" oninput="generateKodeOtomatis()" placeholder="Contoh: 10A" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 uppercase transition">
+            <input type="text" id="setup-kelas" oninput="generateKodeOtomatis()" placeholder="-- Kelas 1 --" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition">
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
@@ -366,7 +366,7 @@
             </div>
           </div>
           <div>
-            <label class="text-sm font-bold text-gray-700 mb-1 block">Waktu Ujian (Menit)</label>
+            <label class="text-sm font-bold text-gray-700 mb-1 block">Waktu Ujian</label>
             <input type="number" id="setup-waktu" value="90" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 font-bold text-blue-600 transition">
           </div>
           
@@ -424,7 +424,7 @@
       <div class="flex justify-between items-center mb-6">
         <div>
           <h2 class="text-3xl font-bold text-gray-800">Analisa Jawaban</h2>
-          <p class="text-sm text-gray-500 mt-1">Analisis ketuntasan siswa perorangan dan ketuntasan kelas (Hanya untuk soal buatan Anda).</p>
+          <p class="text-sm text-gray-500 mt-1">Analisis ketuntasan siswa perorangan dan ketuntasan kelas.</p>
         </div>
         <button onclick="cetakAreaGuru('area-cetak-jawaban')" class="bg-green-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><i class="fas fa-print mr-2"></i>Print</button>
       </div>
@@ -1033,18 +1033,18 @@
       } else {
           document.getElementById('btn-tambah-keranjang').classList.remove('hidden');
           document.getElementById('btn-update-db').classList.add('hidden');
-          document.getElementById('btn-tambah-keranjang').innerHTML = `<i class="fas fa-sync-alt mr-2"></i> Update Soal di Keranjang`;
+          document.getElementById('btn-tambah-keranjang').innerHTML = `<i class="fas fa-sync-alt mr-2"></i> Update Soal`;
       }
       
       document.getElementById('btn-batal-edit-keranjang').classList.remove('hidden'); 
-      document.getElementById('label-nomor-soal').innerHTML = `<i class="fas fa-edit mr-2 text-blue-500"></i> Mengedit Soal No. ${index + 1}`; 
+      document.getElementById('label-nomor-soal').innerHTML = `<i class="fas fa-edit mr-2 text-blue-500"></i> Edit Soal No. ${index + 1}`; 
       document.getElementById('form-editor-container').scrollIntoView({ behavior: 'smooth' });
     }
 
     function batalEditKeranjang() {
       indexEditKeranjang = null; 
       document.getElementById('btn-tambah-keranjang').classList.remove('hidden');
-      document.getElementById('btn-tambah-keranjang').innerHTML = `<i class="fas fa-arrow-down mr-2"></i> Tambahkan Soal ke Keranjang`;
+      document.getElementById('btn-tambah-keranjang').innerHTML = `<i class="fas fa-arrow-down mr-2"></i> Tambahkan ke Bank Soal`;
       document.getElementById('btn-update-db').classList.add('hidden');
       document.getElementById('btn-batal-edit-keranjang').classList.add('hidden'); 
       document.getElementById('label-nomor-soal').innerHTML = `<i class="fas fa-pen mr-2 text-blue-500"></i> Ketik Soal Manual`;
@@ -1053,7 +1053,7 @@
     }
 
     function hapusSoalDariKeranjang(index) { 
-       Swal.fire({ title: 'Hapus Soal?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus Lokal' }).then((result) => { 
+       Swal.fire({ title: 'Hapus Soal?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya' }).then((result) => { 
           if (result.isConfirmed) { 
              keranjangSoal.splice(index, 1); 
              renderDropdownKeranjang(); 
