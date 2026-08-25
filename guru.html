@@ -79,7 +79,7 @@
     </div>
 
     <div class="p-5 border-t border-slate-700/50 mt-auto bg-[#1e293b] sticky bottom-0">
-      <p class="text-xs text-slate-400 mb-1">Login sebagai:</p>
+      <p class="text-xs text-slate-400 mb-1">Login sebagai :</p>
       <p class="font-bold text-sm mb-4 text-white truncate" id="nama-guru-login">Guru</p>
       <button onclick="logout()" class="w-full flex items-center justify-center gap-2 py-2.5 bg-red-500/10 text-red-500 font-bold rounded-xl hover:bg-red-500 hover:text-white transition-colors text-sm">
         <i class="fas fa-sign-out-alt"></i> Keluar
@@ -596,7 +596,7 @@
     // A. MENU ANALISA SOAL
     async function prosesAnalisaSoalGuru() {
       const kode = document.getElementById('an-soal-mapel').value;
-      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
+      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter soal ujian terlebih dahulu!', 'info');
       
       showLoader('Menganalisis Butir Soal...');
       try {
@@ -697,7 +697,7 @@
       const kode = document.getElementById('an-jawaban-mapel').value;
       const kkm = parseFloat(document.getElementById('input-kkm-jawaban').value) || 65; 
       
-      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
+      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter soal ujian terlebih dahulu!', 'info');
       
       showLoader('Menganalisis Jawaban...');
       try {
@@ -1114,7 +1114,7 @@
         await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanSoalSatuan', data: { header: head, soal: keranjangSoal[i] } })});
       }
       
-      Swal.fire({title: 'Sukses!', text: isEditMode ? 'Seluruh Paket soal diperbarui!' : 'Paket soal disimpan!', icon: 'success'});
+      Swal.fire({title: 'Sukses!', text: isEditMode ? 'Seluruh Paket soal diperbarui!' : 'Soal disimpan!', icon: 'success'});
       batalkanEdit(); 
     }
 
@@ -1217,8 +1217,8 @@
             <td class="p-4 font-medium text-gray-800">${p.mapel}</td>
             <td class="p-4 text-center font-bold text-gray-700">${p.kelas}</td>
             <td class="p-4 text-center flex justify-center gap-2">
-               <button onclick='masukModeEditPaket(${JSON.stringify(p).replace(/'/g, "\\'")})' class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold hover:bg-blue-200 transition shadow-sm"><i class="fas fa-edit mr-1"></i> Edit Paket DB</button>
-               <button onclick="hapusPaketKeseluruhan('${p.kode}')" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-bold hover:bg-red-200 transition shadow-sm"><i class="fas fa-trash-alt mr-1"></i> Hapus Paket</button>
+               <button onclick='masukModeEditPaket(${JSON.stringify(p).replace(/'/g, "\\'")})' class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-bold hover:bg-blue-200 transition shadow-sm"><i class="fas fa-edit mr-1"></i> Edit/button>
+               <button onclick="hapusPaketKeseluruhan('${p.kode}')" class="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-bold hover:bg-red-200 transition shadow-sm"><i class="fas fa-trash-alt mr-1"></i> Hapus</button>
             </td>
           </tr>`; 
         });
@@ -1234,13 +1234,13 @@
 
     function hapusPaketKeseluruhan(kodeSoal) {
       Swal.fire({
-        title: 'Hapus Seluruh Paket?',
-        text: `Paket dengan kode ${kodeSoal} beserta semua isi butir soalnya akan dihapus permanen dari Database!`,
+        title: 'Hapus Soal?',
+        text: `Soal dengan kode ${kodeSoal} beserta semua isinya akan dihapus permanen dari Database!`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, Hapus Permanen!'
+        confirmButtonText: 'Ya'
       }).then(async (result) => {
         if (result.isConfirmed) {
           showLoader(`Menghapus ${kodeSoal} dari Database...`);
@@ -1259,7 +1259,7 @@
     }
 
     async function masukModeEditPaket(p) { 
-      Swal.fire({ title: 'Tarik Paket?', text: "Seluruh soal dari paket ini ditarik ke Editor. Anda bisa mengedit & menyimpan per-1-soal, atau merombak semuanya.", icon: 'question', showCancelButton: true, confirmButtonText: 'Ya, Tarik!' }).then(async (result) => {
+      Swal.fire({ title: 'Tarik Soal?', text: "Seluruh soal ditarik ke Editor. Anda bisa mengedit & menyimpan soal", icon: 'question', showCancelButton: true, confirmButtonText: 'Ya' }).then(async (result) => {
         if (result.isConfirmed) {
           isEditMode=true; switchMenu('guru-buat-soal'); 
           document.getElementById('title-buat-soal').innerHTML = "<i class='fas fa-database text-orange-500 mr-2'></i> Mode Edit Database";
@@ -1318,7 +1318,7 @@
     let dataRekapSaatIni = []; let bankSoalSaatIni = []; let barisEditAktif = 0; let detailEditAktif = [];
 
     async function tampilkanRekap() {
-      const kode = document.getElementById('select-rekap').value; if(!kode) return Swal.fire('Peringatan','Pilih paket dulu!','warning');
+      const kode = document.getElementById('select-rekap').value; if(!kode) return Swal.fire('Peringatan','Pilih soal dulu!','warning');
       const tbody = document.getElementById('tabel-rekap-nilai'); showLoader('Menarik rekap...');
       try {
         const resSoal = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getBankSoal', kode_soal: kode }) }); const resultSoal = await resSoal.json(); bankSoalSaatIni = resultSoal.data;
