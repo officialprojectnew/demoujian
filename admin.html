@@ -3817,12 +3817,12 @@
     function prosesResetDatabase() {
         Swal.fire({
             title: 'BAHAYA MENGHAPUS DATA!',
-            html: 'Tindakan ini akan <b>MENGHAPUS SEMUA DATA</b> di sistem.<br>(Kecuali data Akun Admin dan Konfigurasi Sekolah).<br><br>Apakah Anda sangat yakin?',
+            html: 'Tindakan ini akan <b>Menghapus Semua Data</b> di sistem.<br>Kecuali data Akun Admin dan Konfigurasi Sekolah.<br><br>Apakah Anda sangat yakin?',
             icon: 'error',
             showCancelButton: true,
             confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, Saya Yakin!'
+            confirmButtonText: 'Ya!'
         }).then((result) => {
             if(result.isConfirmed) {
                 // Keamanan Ganda: Minta admin mengetik kata khusus
