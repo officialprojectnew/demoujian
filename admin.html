@@ -785,6 +785,27 @@
                   <label class="text-sm font-bold text-gray-700">Nama Kepala Sekolah</label>
                   <input type="text" id="konf-nama-kepsek" class="w-full mt-1 p-3 border rounded-xl outline-none focus:border-blue-500" placeholder="Contoh: Nedi Iswandi, M.Pd">
                </div>
+               <!-- Form Tambahan Baru (NPSN & NSS) -->
+               <div class="grid grid-cols-2 gap-4">
+                  <div>
+                     <label class="text-sm font-bold text-gray-700">NPSN</label>
+                     <!-- Pembatasan: Hanya angka, maksimal 8 digit, jalankan fungsi cekNPSN() saat diketik -->
+                     <input type="text" id="konf-npsn" maxlength="8" oninput="this.value = this.value.replace(/[^0-9]/g, ''); cekNPSN()" class="w-full mt-1 p-3 border rounded-xl outline-none focus:border-blue-500 transition" placeholder="Contoh: 12345678">
+                     <!-- Pesan Peringatan -->
+                     <p id="err-npsn" class="text-xs text-red-500 font-semibold mt-1 hidden animate-pulse">NPSN harus tepat 8 digit angka!</p>
+                  </div>
+                  <div>
+                     <label class="text-sm font-bold text-gray-700">NSS</label>
+                     <!-- Pembatasan: Hanya angka, maksimal 12 digit, jalankan fungsi cekNSS() saat diketik -->
+                     <input type="text" id="konf-nss" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, ''); cekNSS()" class="w-full mt-1 p-3 border rounded-xl outline-none focus:border-blue-500 transition" placeholder="Contoh: 101010101010">
+                     <!-- Pesan Peringatan -->
+                     <p id="err-nss" class="text-xs text-red-500 font-semibold mt-1 hidden animate-pulse">NSS harus tepat 12 digit angka!</p>
+                  </div>
+               </div>
+               <div>
+                  <label class="text-sm font-bold text-gray-700">Alamat Lengkap</label>
+                  <textarea id="konf-alamat" class="w-full mt-1 p-3 border rounded-xl outline-none focus:border-blue-500 h-24" placeholder="Jalan Raya, Desa, Kecamatan..."></textarea>
+               </div>
             </div>
             
             <div class="space-y-4">
@@ -3339,6 +3360,31 @@
     // FITUR KONFIGURASI 
     // ==========================================
     let konfOldData = {logo: '', kop: '', ttd: ''};
+
+    // FUNGSI CEK DIGIT NPSN DAN NSS SECARA REAL-TIME
+    function cekNPSN() {
+        let val = document.getElementById('konf-npsn').value;
+        // Munculkan error jika sudah ada isinya tapi kurang dari 8 digit
+        if (val.length > 0 && val.length < 8) {
+            document.getElementById('err-npsn').classList.remove('hidden');
+            document.getElementById('konf-npsn').classList.add('border-red-500', 'bg-red-50');
+        } else {
+            document.getElementById('err-npsn').classList.add('hidden');
+            document.getElementById('konf-npsn').classList.remove('border-red-500', 'bg-red-50');
+        }
+    }
+
+    function cekNSS() {
+        let val = document.getElementById('konf-nss').value;
+        // Munculkan error jika sudah ada isinya tapi kurang dari 12 digit
+        if (val.length > 0 && val.length < 12) {
+            document.getElementById('err-nss').classList.remove('hidden');
+            document.getElementById('konf-nss').classList.add('border-red-500', 'bg-red-50');
+        } else {
+            document.getElementById('err-nss').classList.add('hidden');
+            document.getElementById('konf-nss').classList.remove('border-red-500', 'bg-red-50');
+        }
+    }
     
     async function loadKonfigurasiGlobal() {
         try {
@@ -3360,6 +3406,11 @@
             document.getElementById('konf-nama-sekolah').value = konf.nama_sekolah || '';
             document.getElementById('konf-nama-kepsek').value = konf.nama_kepsek || '';
             
+            // Isi Form Konfigurasi Tambahan
+            document.getElementById('konf-alamat').value = konf.alamat || '';
+            document.getElementById('konf-npsn').value = konf.npsn || '';
+            document.getElementById('konf-nss').value = konf.nss || '';
+
             konfOldData.logo = konf.logo || '';
             if(konfOldData.logo) { 
                 document.getElementById('preview-konf-logo').src = getDirectImageUrl(konfOldData.logo); 
@@ -3402,9 +3453,22 @@
     }
 
     async function simpanKonfigurasi() {
+        // Ambil nilai dari input form
+        let npsn = document.getElementById('konf-npsn').value;
+        let nss = document.getElementById('konf-nss').value;
+
+        // Validasi Pencegahan Simpan ke Server jika digit tidak sesuai
+        if (npsn && npsn.length !== 8) {
+            return Swal.fire('Data Tidak Valid', 'NPSN harus berjumlah tepat 8 digit angka!', 'warning');
+        }
+        if (nss && nss.length !== 12) {
+            return Swal.fire('Data Tidak Valid', 'NSS harus berjumlah tepat 12 digit angka!', 'warning');
+        }
+
         showLoader('Menyiapkan Berkas & Menyimpan...');
         
         try {
+            // ... (lanjutan kode proses upload file gambar logo, kop, ttd, dst tidak diubah) ...
             let fileLogo = document.getElementById('konf-logo').files[0];
             let fileKop = document.getElementById('konf-kop').files[0];
             let fileTtd = document.getElementById('konf-ttd').files[0];
@@ -3416,6 +3480,9 @@
             const data = {
                 nama_sekolah: document.getElementById('konf-nama-sekolah').value,
                 nama_kepsek: document.getElementById('konf-nama-kepsek').value,
+                alamat: document.getElementById('konf-alamat').value,
+                npsn: document.getElementById('konf-npsn').value,
+                nss: document.getElementById('konf-nss').value,
                 logo: base64Logo, old_logo: konfOldData.logo,
                 kop: base64Kop, old_kop: konfOldData.kop,
                 ttd: base64Ttd, old_ttd: konfOldData.ttd
