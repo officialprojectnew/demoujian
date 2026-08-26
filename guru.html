@@ -301,12 +301,15 @@
         <h2 class="text-2xl font-bold">Rekap & Nilai Ujian</h2>
         <button onclick="loadDropdownRekap()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg text-sm transition">🔄</button>
       </div>
-      <div class="mb-6 bg-gray-50 p-5 rounded-xl border flex items-end gap-4 shadow-sm">
-        <div class="flex-1">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Soal Ujian</label>
-          <select id="select-rekap" class="w-full p-2.5 border rounded-lg outline-none focus:border-blue-500 transition"><option value="">-- Muat Ulang Dulu --</option></select>
-        </div>
-        <button onclick="tampilkanRekap()" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow">Cari</button>
+      <div class="mb-6 bg-gray-50 p-5 rounded-xl border flex flex-col md:flex-row items-end gap-4 shadow-sm">
+          <div class="flex-1 w-full">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Soal Ujian</label>
+            <select id="select-rekap" class="w-full p-2.5 border rounded-lg outline-none focus:border-blue-500 transition"><option value="">-- Muat Ulang Dulu --</option></select>
+          </div>
+          <div class="flex gap-2 w-full md:w-auto">
+              <button onclick="tampilkanRekap()" class="flex-1 md:flex-none bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow whitespace-nowrap"><i class="fas fa-search mr-1"></i> Cari</button>
+              <button onclick="eksporExcelRekap('guru')" class="flex-1 md:flex-none bg-green-600 text-white px-4 py-2.5 rounded-lg font-bold hover:bg-green-700 transition shadow whitespace-nowrap"><i class="fas fa-file-excel mr-1"></i> Ekspor .xlsx</button>
+          </div>
       </div>
       <div class="overflow-x-auto border rounded-xl">
         <table class="w-full text-left border-collapse">
@@ -1363,8 +1366,11 @@
             <td class="p-4 text-center text-purple-600 bg-blue-50/10">${nilaiIsian}</td>
             <td class="p-4 text-center text-yellow-600 font-bold bg-blue-50/10 border-r">${nilaiEssay}</td>
             <td class="p-4 text-center font-bold text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
-            <td class="p-4 text-center"><button onclick="bukaEditPenilaian(${i})" class="bg-blue-600 text-white font-bold px-5 py-2 rounded-xl hover:bg-blue-700 shadow-md text-sm whitespace-nowrap transition">Nilai Essay</button></td>
-          </tr>`; 
+            <td class="p-4 text-center flex flex-col gap-2">
+                <button onclick="bukaEditPenilaian(${i})" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-blue-700 shadow-sm text-xs whitespace-nowrap transition">Nilai Essay</button>
+                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition"><i class="fas fa-download mr-1"></i></button>
+            </td>
+          </tr>`;
         }); 
         tbody.innerHTML = html;
       } catch(e) { tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-red-500">Gagal menarik data.</td></tr>`; } hideLoader();
@@ -1626,6 +1632,259 @@
             dashChartInstancesGuru.push(pieChart);
         });
       }
+
+async function cetakLembarJawaban(kode_soal, nis) {
+    showLoader('Menyiapkan Lembar Jawaban...');
+    try {
+        // Tarik data secara paralel (Ditambah data Jadwal & Master Kategori)
+        const [resRekap, resSoal, resSiswa, resKonf, resJadwal, resMaster] = await Promise.all([
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode_soal }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getBankSoal', kode_soal: kode_soal }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getKonfigurasi' }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getMasterUjian' }) }).then(r => r.json())
+        ]);
+
+        let dataSiswaUjian = resRekap.data.find(d => d.nis.toString() === nis.toString());
+        let bankSoal = resSoal.data;
+        let profilSiswa = resSiswa.data.find(s => s.nis.toString() === nis.toString()) || {};
+        let konf = resKonf.data || {};
+        let jadwalSemua = resJadwal.data || [];
+        let masterSemua = resMaster.data || [];
+
+        if(!dataSiswaUjian) throw new Error("Data ujian siswa tidak ditemukan");
+
+        let detailJawaban = [];
+        try { detailJawaban = JSON.parse(dataSiswaUjian.detail); } catch(e) {}
+
+        let kopUrl = konf.kop ? getDirectImageUrl(konf.kop) : '';
+        let namaSekolah = konf.nama_sekolah || 'NAMA SEKOLAH';
+
+        // 1. Dapatkan Tanggal Ujian Berdasarkan Jadwal
+        let jadwalSoal = jadwalSemua.find(j => j.kode_soal === kode_soal);
+        let tanggalUjianStr = '-';
+        if (jadwalSoal && jadwalSoal.tanggal) {
+            let d = new Date(jadwalSoal.tanggal);
+            if (!isNaN(d.getTime())) {
+                tanggalUjianStr = d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            } else {
+                tanggalUjianStr = jadwalSoal.tanggal;
+            }
+        }
+
+        // 2. Konversi Singkatan Kategori ke Nama Lengkap
+        let kategoriKode = kode_soal.split('_')[2] || kode_soal;
+        let kategoriObj = masterSemua.find(m => m.tipe === 'Kategori' && m.kode.toUpperCase() === kategoriKode.toUpperCase());
+        let kategoriNama = kategoriObj ? kategoriObj.nama : kategoriKode;
+
+        // Header dan Identitas Siswa
+        let html = `
+        <div style="padding: 10px;">
+            ${kopUrl ? `<img src="${kopUrl}" style="width:100%; max-height: 120px; object-fit: contain; margin-bottom: 15px; display:block;">` : `<h2 style="text-align:center; font-weight:bold; margin-bottom: 15px; text-transform: uppercase;">${namaSekolah}</h2>`}
+            
+            <h3 style="text-align: center; text-decoration: underline; margin-bottom: 25px;">LEMBAR JAWABAN SISWA</h3>
+
+            <table style="width: 100%; font-size: 14px; margin-bottom: 30px; line-height: 1.6;">
+                <tr><td style="width: 150px; font-weight: bold;">Nama Lengkap</td><td>: ${dataSiswaUjian.nama}</td><td style="width: 150px; font-weight: bold;">Mata Pelajaran</td><td>: ${kode_soal.split('_')[0] || kode_soal}</td></tr>
+                <tr><td style="font-weight: bold;">NIS / NISN</td><td>: ${dataSiswaUjian.nis} / ${profilSiswa.nisn || '-'}</td><td style="font-weight: bold;">Kategori Soal</td><td>: ${kategoriNama}</td></tr>
+                <tr><td style="font-weight: bold;">Kelas</td><td>: ${profilSiswa.kelas || '-'}</td><td style="font-weight: bold;">Tanggal Ujian</td><td>: ${tanggalUjianStr}</td></tr>
+            </table>
+
+            <div style="font-size: 14px; line-height: 1.5;">
+        `;
+
+        // Fungsi Helper untuk merapikan EYD (Memaksa huruf awal kapital)
+        function capitalizeEYD(str) {
+            if (!str) return '';
+            let temp = str.trim();
+            if (temp.startsWith('<')) return temp;
+            return temp.charAt(0).toUpperCase() + temp.slice(1);
+        }
+
+        // Render Butir Soal dan Logika Koreksi
+        bankSoal.forEach((soal, i) => {
+            let jwbSiswaObj = detailJawaban.find(d => d.no === (i + 1)) || detailJawaban[i] || {};
+            let jwbSiswaRaw = (jwbSiswaObj.jaw !== undefined ? jwbSiswaObj.jaw : (jwbSiswaObj.jawaban_siswa || '')).toString().trim();
+            let jwbSiswaHurufBesar = jwbSiswaRaw.toUpperCase();
+            let kunci = (soal.kunci || '').toString().toUpperCase().trim();
+            
+            let bobotMaks = parseFloat(soal.bobot || 10);
+            let skorSiswa = parseFloat(jwbSiswaObj.sk !== undefined ? jwbSiswaObj.sk : (jwbSiswaObj.skor || 0));
+
+            html += `
+            <div style="margin-bottom: 25px; page-break-inside: avoid; border-bottom: 1px dashed #cbd5e1; padding-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    
+                    <div style="display: flex; gap: 10px; flex: 1; align-items: baseline;">
+                        <div style="font-weight: bold; width: 25px;">${i + 1}.</div>
+                        <div class="question-text" style="flex: 1; padding-right: 15px;">
+                            ${soal.pertanyaan}
+                            ${soal.gambar ? `<img src="${getDirectImageUrl(soal.gambar)}" style="max-height: 200px; margin-top: 10px; margin-bottom: 15px; display:block;">` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Kotak Skor -->
+                    <div style="font-size: 12px; font-weight: bold; background: #f3f4f6; padding: 5px 10px; border: 1px solid #d1d5db; border-radius: 6px; white-space: nowrap;">
+                        Skor: ${skorSiswa} / ${bobotMaks}
+                    </div>
+                </div>
+                
+                <div style="margin-left: 35px;">
+            `;
+
+            if(soal.tipe === 'PG') {
+                let opsiDict = { 'A': soal.a || soal.opsi_a, 'B': soal.b || soal.opsi_b, 'C': soal.c || soal.opsi_c, 'D': soal.d || soal.opsi_d };
+                
+                ['A', 'B', 'C', 'D'].forEach(opt => {
+                    let textOpt = opsiDict[opt];
+                    if(!textOpt) return;
+                    
+                    let isChecked = (jwbSiswaHurufBesar === opt) ? 'checked="checked"' : '';
+
+                    html += `
+                    <div style="margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px;">
+                        <input type="radio" ${isChecked} style="margin-top: 3px; cursor: default;" onclick="return false;">
+                        <div style="font-weight: bold;">${opt}.</div>
+                        <div class="eyd-text">${capitalizeEYD(textOpt)}</div>
+                    </div>`;
+                });
+
+            } else if (soal.tipe === 'PGK') {
+                let jwbArr = jwbSiswaHurufBesar.split(',').map(s => s.trim());
+                let opsiDict = { 'A': soal.a || soal.opsi_a, 'B': soal.b || soal.opsi_b, 'C': soal.c || soal.opsi_c, 'D': soal.d || soal.opsi_d };
+                
+                ['A', 'B', 'C', 'D'].forEach(opt => {
+                    let textOpt = opsiDict[opt];
+                    if(!textOpt) return;
+                    
+                    let isChecked = jwbArr.includes(opt) ? 'checked="checked"' : '';
+
+                    html += `
+                    <div style="margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px;">
+                        <input type="checkbox" ${isChecked} style="margin-top: 3px; cursor: default;" onclick="return false;">
+                        <div style="font-weight: bold;">${opt}.</div>
+                        <div class="eyd-text">${capitalizeEYD(textOpt)}</div>
+                    </div>`;
+                });
+
+            } else if (soal.tipe === 'ISIAN') {
+                let isBenar = skorSiswa > 0; 
+                
+                if (isBenar) {
+                    html += `<div style="padding: 10px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px;"><b>Jawaban Siswa:</b> <span class="eyd-text">${capitalizeEYD(jwbSiswaRaw)}</span></div>`;
+                } else {
+                    html += `<div style="padding: 10px; background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; margin-bottom: 6px;"><b>Jawaban Siswa:</b> <span style="color: #dc2626;" class="eyd-text">${capitalizeEYD(jwbSiswaRaw) || '<i>(Kosong)</i>'}</span></div>`;
+                    html += `<div style="padding: 10px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px;"><b>Jawaban Benar:</b> <span style="color: #16a34a;" class="eyd-text">${capitalizeEYD(kunci)}</span></div>`;
+                }
+
+            } else if (soal.tipe === 'ESSAY') {
+                html += `<div style="padding: 12px; border: 1px dashed #9ca3af; background-color: #f9fafb; border-radius: 6px;"><b>Jawaban Siswa:</b><br><div style="margin-top: 5px;" class="eyd-text">${capitalizeEYD(jwbSiswaRaw) || '<i style="color:#9ca3af;">(Tidak dijawab)</i>'}</div></div>`;
+            }
+
+            html += `</div></div>`; 
+        });
+
+        // 3. Box Nilai Total (Semua Komponen Dipecah)
+        html += `
+                <div style="margin-top: 30px; border-top: 2px dashed #000; padding-top: 20px; display: flex; justify-content: flex-end;">
+                    <table style="width: 380px; font-size: 14px; border-collapse: collapse; border: 2px solid #000;">
+                        <tr><td style="padding: 8px 10px; font-weight: bold; border-bottom: 1px solid #000;">Nilai Pilihan Ganda</td><td style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #000; font-weight: bold;">${dataSiswaUjian.nilai_pg || 0}</td></tr>
+                        <tr><td style="padding: 8px 10px; font-weight: bold; border-bottom: 1px solid #000;">Nilai Pilihan Ganda Kompleks</td><td style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #000; font-weight: bold;">${dataSiswaUjian.nilai_pgk || 0}</td></tr>
+                        <tr><td style="padding: 8px 10px; font-weight: bold; border-bottom: 1px solid #000;">Nilai Isian Singkat</td><td style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #000; font-weight: bold;">${dataSiswaUjian.nilai_isian || 0}</td></tr>
+                        <tr><td style="padding: 8px 10px; font-weight: bold; border-bottom: 1px solid #000;">Nilai Uraian</td><td style="padding: 8px 10px; text-align: center; border-bottom: 1px solid #000; font-weight: bold;">${dataSiswaUjian.nilai_essay || 0}</td></tr>
+                        <tr style="background-color: #f3f4f6;"><td style="padding: 10px; font-weight: 900; font-size: 16px;">TOTAL SKOR AKHIR</td><td style="padding: 10px; text-align: center; font-weight: 900; font-size: 20px; color: #16a34a;">${dataSiswaUjian.total || 0}</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>`;
+
+        // TEKNIK IFRAME PORTRAIT
+        let iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+
+        let doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Lembar Jawaban - ${dataSiswaUjian.nama}</title>
+                <style>
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { font-family: 'Times New Roman', Times, serif; color: #000; background-color: #fff; margin: 0; padding: 0; }
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    .question-text p:first-child { margin-top: 0; }
+                    .question-text p:first-child::first-letter { text-transform: uppercase; }
+                    .eyd-text::first-letter { text-transform: uppercase; }
+                </style>
+            </head>
+            <body>
+                ${html}
+            </body>
+            </html>
+        `);
+        doc.close();
+
+        hideLoader();
+
+        setTimeout(() => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+        }, 1000);
+
+    } catch(e) {
+        hideLoader();
+        Swal.fire('Error', 'Gagal menyusun lembar jawaban: ' + e.message, 'error');
+    }
+}
+
+function eksporExcelRekap(tipeAktor) {
+    // Tentukan ID berdasarkan siapa yang sedang login (admin atau guru)
+    let tableId = tipeAktor === 'admin' ? 'tabel-rekap-nilai-admin' : 'tabel-rekap-nilai';
+    let selectId = tipeAktor === 'admin' ? 'select-rekap-admin' : 'select-rekap';
+    let kodeSoal = document.getElementById(selectId).value;
+
+    if (!kodeSoal) return Swal.fire('Info', 'Pilih kode soal dan klik cari terlebih dahulu.', 'info');
+
+    let tbody = document.getElementById(tableId);
+    // Jika ada atribut colspan, artinya tabel sedang menampilkan pesan kosong/error
+    if (tbody.querySelector('td[colspan]')) return Swal.fire('Info', 'Data kosong, tidak ada yang bisa diekspor.', 'info');
+
+    let dataToExport = [];
+    
+    // 1. Buat Header Tabel untuk Excel
+    dataToExport.push(["No", "NIS", "Nama Siswa", "Nilai PG", "Nilai PGK", "Nilai Isian", "Nilai Essay", "Total Nilai"]);
+
+    // 2. Looping baris tabel untuk mengambil data nilainya saja (mengabaikan tombol di kolom terakhir)
+    let rows = tbody.querySelectorAll('tr');
+    rows.forEach(tr => {
+        let cols = tr.querySelectorAll('td');
+        if (cols.length >= 8) { // Memastikan ini adalah baris data nilai yang valid
+            dataToExport.push([
+                cols[0].innerText.trim(), // No
+                cols[1].innerText.trim(), // NIS
+                cols[2].innerText.trim(), // Nama
+                Number(cols[3].innerText.trim()) || 0, // PG
+                Number(cols[4].innerText.trim()) || 0, // PGK
+                Number(cols[5].innerText.trim()) || 0, // Isian
+                Number(cols[6].innerText.trim()) || 0, // Essay
+                Number(cols[7].innerText.trim()) || 0  // Total
+            ]);
+        }
+    });
+
+    // 3. Konversi array ke format worksheet Excel dan download
+    let ws = XLSX.utils.aoa_to_sheet(dataToExport);
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Rekap Nilai");
+    XLSX.writeFile(wb, `Rekap_Nilai_${kodeSoal}.xlsx`);
+}
   </script>
 </body>
 </html>
