@@ -537,8 +537,22 @@
 
           <div class="overflow-x-auto border border-gray-200 rounded-xl">
             <table class="w-full text-left border-collapse whitespace-nowrap">
-              <thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b font-semibold">NIS</th><th class="p-4 border-b font-semibold">Nama Siswa</th><th class="p-4 border-b text-center font-semibold">PG</th><th class="p-4 border-b text-center font-semibold">Essay</th><th class="p-4 border-b text-center font-bold text-gray-800">Total</th></tr></thead>
-              <tbody id="tabel-rekap-nilai-admin"><tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">Pilih soal dan klik tampilkan.</td></tr></tbody>
+              <thead>
+                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider text-center">
+                  <th rowspan="2" class="p-4 border-b font-semibold">No</th>
+                  <th rowspan="2" class="p-4 border-b font-semibold">NIS</th>
+                  <th rowspan="2" class="p-4 border-b font-semibold text-left">Nama Siswa</th>
+                  <th colspan="4" class="p-2 border-b border-r font-bold text-gray-700 bg-blue-50/50">NILAI</th>
+                  <th rowspan="2" class="p-4 border-b font-bold text-gray-900 bg-gray-100">Total Nilai</th>
+                </tr>
+                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider text-center">
+                  <th class="p-2 border-b font-semibold bg-blue-50/30">PG</th>
+                  <th class="p-2 border-b font-semibold bg-blue-50/30">PGK</th>
+                  <th class="p-2 border-b font-semibold bg-blue-50/30">Isian</th>
+                  <th class="p-2 border-b border-r font-semibold bg-blue-50/30">Essay</th>
+                </tr>
+              </thead>
+              <tbody id="tabel-rekap-nilai-admin"><tr><td colspan="8" class="p-8 text-center text-gray-500 text-sm">Pilih soal dan klik tampilkan.</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -773,7 +787,28 @@
       <!-- MENU 7: KONFIGURASI SEKOLAH -->
       <div id="view-konfigurasi" class="admin-menu hidden">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
-          <h2 class="text-3xl font-bold text-gray-800 mb-6">Data Sekolah</h2>
+          <!-- KONFIGURASI AKUN ADMIN -->
+          <div class="mt-10 pt-8 border-t-2 border-dashed border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Keamanan Akun Administrator</h2>
+            <p class="text-sm text-gray-500 mb-6">Ubah username dan password untuk login ke Dashboard Admin. Kosongkan jika tidak ingin diubah.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-red-50 p-6 rounded-2xl border border-red-100 shadow-sm">
+               <div>
+                  <label class="text-sm font-bold text-gray-700">Username Baru</label>
+                  <input type="text" id="konf-admin-user" class="w-full mt-1 p-3 border border-red-200 rounded-xl outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition" placeholder="Ketik username baru">
+               </div>
+               <div>
+                  <label class="text-sm font-bold text-gray-700">Password Baru</label>
+                  <input type="password" id="konf-admin-pass" class="w-full mt-1 p-3 border border-red-200 rounded-xl outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition" placeholder="Ketik password baru">
+               </div>
+            </div>
+            
+            <div class="mt-5 text-right">
+                <button onclick="prosesUpdateAkunAdmin()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 shadow transition w-full md:w-auto"><i class="fas fa-user-lock mr-2"></i> Update Akun</button>
+            </div>
+          </div>
+          <div class="mt-10 pt-8 border-t-2 border-dashed border-gray-200"></div>
+          <h3 class="text-3xl font-bold text-gray-800 mb-6">Data Sekolah</h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-4">
@@ -829,7 +864,7 @@
           
           <div class="mt-6 pt-6 border-t border-gray-100 text-right">
             <button onclick="simpanKonfigurasi()" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition w-full md:w-auto"><i class="fas fa-save mr-2"></i> Simpan </button>
-          </div>
+           </div>
         </div>
       </div>
 
@@ -3595,6 +3630,67 @@
             Swal.fire('Error', 'Gagal menghubungi server. (Pastikan koneksi stabil)', 'error'); 
         }
     }
+
+    // ==========================================
+    // FUNGSI UPDATE AKUN ADMINISTRATOR
+    // ==========================================
+    async function prosesUpdateAkunAdmin() {
+        const newUser = document.getElementById('konf-admin-user').value.trim();
+        const newPass = document.getElementById('konf-admin-pass').value.trim();
+
+        if(!newUser && !newPass) {
+            return Swal.fire('Info', 'Harap isi Username atau Password baru jika ingin mengubahnya.', 'info');
+        }
+
+        Swal.fire({
+            title: 'Ubah Akun Admin?',
+            text: "Setelah akun berhasil diubah, Anda akan dipaksa logout untuk login kembali menggunakan kredensial yang baru.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, Ubah & Logout'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                showLoader('Memperbarui Akun...');
+                try {
+                    // user.id diambil dari session login saat ini
+                    const payloadData = {
+                        old_username: user.id, 
+                        new_username: newUser || user.id, // Jika kosong, gunakan yang lama
+                        new_password: newPass || "" // Jika kosong, tidak diubah di server
+                    };
+                    
+                    const res = await fetch(GAS_URL, { 
+                        method: 'POST', 
+                        body: JSON.stringify({ action: 'updateAkunAdmin', data: payloadData }) 
+                    });
+                    
+                    const resJson = await res.json();
+                    hideLoader();
+                    
+                    if(resJson.status === 'success') {
+                        Swal.fire({
+                            title: 'Berhasil!', 
+                            text: 'Akun admin telah diperbarui. Silakan login kembali.', 
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then(() => {
+                            // Panggil fungsi logout() bawaan sistem untuk membersihkan sesi
+                            logout(); 
+                        });
+                    } else {
+                        Swal.fire('Gagal', resJson.pesan, 'error');
+                    }
+                } catch (e) {
+                    hideLoader();
+                    Swal.fire('Error', 'Gagal terhubung ke server saat memperbarui akun.', 'error');
+                }
+            }
+        });
+    }
+
+
 
     // === PERBAIKAN DASHBOARD LOADING AWAL === //
     function initApp() {

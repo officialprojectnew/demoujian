@@ -314,7 +314,21 @@
 
           Swal.fire({
             title: 'Konfirmasi Ujian',
-            html: `<div class="text-left mt-2"><table class="w-full border-collapse swal-table"><tr><td>Nama</td><td>: <span class="font-bold">${user.nama}</span></td></tr><tr><td>Kelas</td><td>: ${dataUjian.kelas}</td></tr><tr><td>Mapel</td><td>: ${dataUjian.mapel}</td></tr><tr><td>Waktu</td><td>: ${dataUjian.waktu} Menit</td></tr></table><br><p class="text-xs text-red-600 text-center font-bold">*Anda wajib memberikan Izin Kamera setelah mengklik Mulai Ujian.</p></div>`,
+            html: `<div class="text-left mt-2">
+                    <table class="w-full border-collapse swal-table">
+                      <tr><td td class="py-3 font-bold text-gray-500 w-20">Nama</td>
+                          <td class="py-3 font-bold text-gray-500 w-4">:</td>
+                          <td class="py-3 font-bold text-gray-900" ><span class="font-bold">${user.nama}</span></td></tr>
+                      <tr><td class="py-3 font-bold text-gray-500 w-20">Kelas</td>
+                          <td class="py-3 font-bold text-gray-500 w-4">:</td>
+                          <td class="py-3 font-bold text-gray-900" ><span class="font-bold">${dataUjian.kelas}</span></td></tr>
+                      <tr><td class="py-3 font-bold text-gray-500 w-20">Mapel</td>
+                          <td class="py-3 font-bold text-gray-500 w-4">:</td>
+                          <td class="py-3 font-bold text-gray-900" ><span class="font-bold">${dataUjian.mapel}</span></td></tr>
+                      <tr><td class="py-3 font-bold text-gray-500 w-20">Waktu</td>
+                          <td class="py-3 font-bold text-gray-500 w-4">:</td>
+                          <td class="py-3 font-bold text-gray-900" ><span class="font-bold">${dataUjian.waktu} Menit</span></td></tr>
+                      </table><br><p class="text-xs text-red-600 text-center font-bold">*Anda wajib memberikan Izin Kamera setelah mengklik Mulai Ujian.</p></div>`,
             icon: 'info', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Mulai Ujian', allowOutsideClick: false
           }).then((res) => { if (res.isConfirmed) initCameraAndStart(token, parseInt(dataUjian.waktu) * 60, true); });
         } else { Swal.fire('Ditolak!', result.pesan, 'error'); }
