@@ -1919,7 +1919,7 @@ function eksporExcelRekap(tipeAktor) {
     XLSX.utils.book_append_sheet(wb, ws, "Rekap Nilai");
     XLSX.writeFile(wb, `Rekap_Nilai_${kodeSoal}.xlsx`);
 }
-function cetakRekapPDF(tipeAktor) {
+async function cetakRekapPDF(tipeAktor) {
     let tableId = tipeAktor === 'admin' ? 'tabel-rekap-nilai-admin' : 'tabel-rekap-nilai';
     let selectId = tipeAktor === 'admin' ? 'select-rekap-admin' : 'select-rekap';
     let kodeSoal = document.getElementById(selectId).value;
@@ -1929,90 +1929,138 @@ function cetakRekapPDF(tipeAktor) {
     let tbody = document.getElementById(tableId);
     if (tbody.querySelector('td[colspan]')) return Swal.fire('Info', 'Data kosong, tidak ada yang bisa dicetak.', 'info');
 
-    let trs = tbody.querySelectorAll('tr');
-    let rowsHtml = '';
-    
-    // Ambil data setiap baris dan masukkan ke format tabel khusus cetak
-    trs.forEach(tr => {
-        let cols = tr.querySelectorAll('td');
-        if (cols.length >= 8) {
-            rowsHtml += `
-            <tr>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[0].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[1].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px;">${cols[2].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[3].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[4].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[5].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[6].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold; color: #16a34a;">${cols[7].innerText.trim()}</td>
-            </tr>`;
-        }
-    });
-
-    let html = `
-        <div style="font-family: 'Times New Roman', Times, serif; color: #000; padding: 10px;">
-            <h3 style="text-align: center; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">REKAPITULASI NILAI UJIAN</h3>
-            <h4 style="text-align: center; margin-top: 0; margin-bottom: 20px;">KODE SOAL: ${kodeSoal}</h4>
-            
-            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                <thead>
-                    <tr style="background-color: #f3f4f6;">
-                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">No</th>
-                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">NISN</th>
-                        <th rowspan="2" style="border: 1px solid #000; padding: 8px; text-align: left;">Nama Lengkap Siswa</th>
-                        <th colspan="4" style="border: 1px solid #000; padding: 8px;">Rincian Nilai</th>
-                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">Total Nilai Akhir</th>
-                    </tr>
-                    <tr style="background-color: #f3f4f6;">
-                        <th style="border: 1px solid #000; padding: 6px;">PG</th>
-                        <th style="border: 1px solid #000; padding: 6px;">PGK</th>
-                        <th style="border: 1px solid #000; padding: 6px;">Isian</th>
-                        <th style="border: 1px solid #000; padding: 6px;">Essay</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rowsHtml}
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    // Buat iframe tersembunyi
-    let iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.width = '0px';
-    iframe.style.height = '0px';
-    iframe.style.border = 'none';
-    document.body.appendChild(iframe);
-
-    let doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Cetak Rekap Nilai - ${kodeSoal}</title>
-            <style>
-                @page { size: A4 portrait; margin: 15mm; }
-                body { margin: 0; padding: 0; }
-                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            </style>
-        </head>
-        <body>
-            ${html}
-        </body>
-        </html>
-    `);
-    doc.close();
-
     showLoader('Menyiapkan Dokumen PDF...');
-    setTimeout(() => {
+    try {
+        // Tarik data Ujian, Jadwal, dan Master untuk keperluan Header PDF secara paralel
+        const [resUjian, resJadwal, resMaster] = await Promise.all([
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getMasterUjian' }) }).then(r => r.json())
+        ]);
+
+        let ujianSemua = resUjian.data || [];
+        let jadwalSemua = resJadwal.data || [];
+        let masterSemua = resMaster.data || [];
+
+        // 1. Ekstrak Mata Pelajaran & Kelas
+        let ujianInfo = ujianSemua.find(u => u.kode === kodeSoal) || { mapel: kodeSoal.split('_')[0] || kodeSoal, kelas: kodeSoal.split('_')[1] || '-' };
+        
+        // 2. Dapatkan Tanggal Ujian
+        let jadwalSoal = jadwalSemua.find(j => j.kode_soal === kodeSoal);
+        let tanggalUjianStr = '-';
+        if (jadwalSoal && jadwalSoal.tanggal) {
+            let d = new Date(jadwalSoal.tanggal);
+            if (!isNaN(d.getTime())) {
+                tanggalUjianStr = d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            } else {
+                tanggalUjianStr = jadwalSoal.tanggal;
+            }
+        }
+
+        // 3. Konversi Singkatan Kategori dan Tahun Ajaran
+        let kategoriKode = kodeSoal.split('_')[2] || '-';
+        let tahunKode = kodeSoal.split('_')[3] || '-';
+        
+        let kategoriObj = masterSemua.find(m => m.tipe === 'Kategori' && m.kode.toUpperCase() === kategoriKode.toUpperCase());
+        let kategoriNama = kategoriObj ? kategoriObj.nama : kategoriKode;
+
+        let tahunObj = masterSemua.find(m => m.tipe === 'Tahun' && m.kode.toUpperCase() === tahunKode.toUpperCase());
+        let tahunNama = tahunObj ? tahunObj.nama : tahunKode;
+
+        let trs = tbody.querySelectorAll('tr');
+        let rowsHtml = '';
+        
+        // Ambil data setiap baris dan masukkan ke format tabel khusus cetak
+        trs.forEach(tr => {
+            let cols = tr.querySelectorAll('td');
+            if (cols.length >= 8) {
+                rowsHtml += `
+                <tr>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[0].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[1].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px;">${cols[2].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[3].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[4].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[5].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[6].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold; color: #16a34a;">${cols[7].innerText.trim()}</td>
+                </tr>`;
+            }
+        });
+
+        let html = `
+            <div style="font-family: 'Times New Roman', Times, serif; color: #000; padding: 10px;">
+                <h3 style="text-align: center; font-weight: bold; margin-bottom: 25px; text-transform: uppercase;">REKAPITULASI HASIL UJIAN</h3>
+                
+                <table style="width: 100%; font-size: 13px; margin-bottom: 20px; line-height: 1.6; border: none;">
+                    <tr><td style="width: 130px; font-weight: bold;">Mata Pelajaran</td><td>: ${ujianInfo.mapel}</td><td style="width: 130px; font-weight: bold;">Tanggal Ujian</td><td>: ${tanggalUjianStr}</td></tr>
+                    <tr><td style="font-weight: bold;">Kelas</td><td>: ${ujianInfo.kelas}</td><td style="font-weight: bold;">Tahun Ajaran</td><td>: ${tahunNama}</td></tr>
+                    <tr><td style="font-weight: bold;">Kategori Soal</td><td>: ${kategoriNama}</td><td></td><td></td></tr>
+                </table>
+                
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background-color: #f3f4f6;">
+                            <th rowspan="2" style="border: 1px solid #000; padding: 8px;">No</th>
+                            <th rowspan="2" style="border: 1px solid #000; padding: 8px;">NISN</th>
+                            <th rowspan="2" style="border: 1px solid #000; padding: 8px; text-align: left;">Nama Lengkap Siswa</th>
+                            <th colspan="4" style="border: 1px solid #000; padding: 8px;">Rincian Nilai</th>
+                            <th rowspan="2" style="border: 1px solid #000; padding: 8px;">Total Nilai Akhir</th>
+                        </tr>
+                        <tr style="background-color: #f3f4f6;">
+                            <th style="border: 1px solid #000; padding: 6px;">PG</th>
+                            <th style="border: 1px solid #000; padding: 6px;">PGK</th>
+                            <th style="border: 1px solid #000; padding: 6px;">Isian</th>
+                            <th style="border: 1px solid #000; padding: 6px;">Essay</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        // Buat iframe tersembunyi
+        let iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+
+        let doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Rekap Nilai - ${ujianInfo.mapel} Kelas ${ujianInfo.kelas}</title>
+                <style>
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { margin: 0; padding: 0; }
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                </style>
+            </head>
+            <body>
+                ${html}
+            </body>
+            </html>
+        `);
+        doc.close();
+
+        // Jeda 1 detik agar browser menyiapkan layout dengan baik
+        setTimeout(() => {
+            hideLoader();
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print(); 
+            setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+        }, 1000);
+
+    } catch(e) {
         hideLoader();
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print(); // Memanggil dialog print browser, pilih "Save as PDF"
-        setTimeout(() => { document.body.removeChild(iframe); }, 1000);
-    }, 1000);
+        Swal.fire('Error', 'Gagal menyiapkan dokumen PDF: ' + e.message, 'error');
+    }
 }
   </script>
 </body>

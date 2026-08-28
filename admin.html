@@ -2881,7 +2881,7 @@
             <td class="p-4 text-center font-bold text-yellow-600 bg-blue-50/10 border-r">${nilaiEssay}</td>
             <td class="p-4 text-center font-black text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
             <td class="p-4 text-center">
-                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition"><i class="fas fa-download mr-1"></i> Download Jawaban</button>
+                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition"><i class="fas fa-download mr-1"></i></button>
             </td>
           </tr>`; 
         }); 
@@ -3056,34 +3056,154 @@
     }
 
     // B. MENU ANALISA JAWABAN
-    prosesAnalisaJawaban
-    // Fungsi Cetak Template Khusus (Landscape & Auto-Resize)
-    function cetakArea(areaId, orientation = 'portrait') {
-        let printArea = document.getElementById('print-area');
-        let contentNode = document.getElementById(areaId).cloneNode(true);
+    async function prosesAnalisaJawaban() {
+      const kode = document.getElementById('an-jawaban-mapel').value;
+      const kkm = parseFloat(document.getElementById('input-kkm-jawaban').value) || 65; 
+      
+      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
+      
+      showLoader('Menganalisis Jawaban...');
+      try {
+        const [resRekap, resSiswa] = await Promise.all([
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }).then(r => r.json())
+        ]);
         
-        contentNode.querySelectorAll('.print-show').forEach(el => el.classList.remove('hidden'));
-        
-        let orientationStyle = orientation === 'landscape' 
-            ? `<style>
-                @page { size: A4 landscape !important; margin: 10mm; } 
-                .print-table { width: 100%; table-layout: auto; word-wrap: break-word; }
-                .print-table th, .print-table td { font-size: 9px !important; padding: 3px !important; border: 1px solid #ccc; }
-                .print-bg-blue { background-color: #2563eb !important; -webkit-print-color-adjust: exact !important; }
-               </style>` 
-            : '';
+        let result = resRekap;
+        let dataSiswa = resSiswa.data || [];
+        hideLoader();
 
-        printArea.innerHTML = `
-           ${orientationStyle}
-           <div style="font-family: Arial, sans-serif; padding: 0; color: #000; background-color: #fff; width: 100%;">
-             ${contentNode.innerHTML}
-           </div>
+        if(result.data.length === 0) {
+            document.getElementById('tabel-analisa-jawaban-container').innerHTML = `<p class="text-center text-red-500 italic mt-10">Belum ada data pengerjaan ujian.</p>`;
+            document.getElementById('kesimpulan-analisa-jawaban-container').classList.add('hidden'); return;
+        }
+
+        let sampleDetail = [];
+        try { sampleDetail = JSON.parse(result.data[0].detail); } catch(e){}
+        let jumlahSoal = sampleDetail.length;
+        if(jumlahSoal === 0) return Swal.fire('Error', 'Detail jawaban tidak ditemukan.', 'error');
+
+        let examInfo = globalAnalisaExams.find(e => e.kode === kode) || { mapel: '-', kelas: '-' };
+        
+        let katKode = document.getElementById('an-jawaban-kategori').value;
+        let katObj = globalKategoriMaster.find(k => k.kode === katKode);
+        let kategoriStr = katObj ? katObj.nama : katKode;
+        let thnObj = globalTahunMaster.length > 0 ? globalTahunMaster[0].nama : '2026/2027';
+
+        let printHeader = `
+          <div class="mb-4 text-left text-sm print-show hidden border-b pb-4 border-gray-300">
+            <table class="w-full md:w-1/2 font-bold text-gray-800">
+              <tr><td class="w-40">Mata Pelajaran</td><td>: ${examInfo.mapel}</td></tr>
+              <tr><td>Kelas</td><td>: ${examInfo.kelas}</td></tr>
+              <tr><td>Kategori Ujian</td><td>: ${kategoriStr}</td></tr>
+              <tr><td>Tahun Ajaran</td><td>: ${thnObj}</td></tr>
+            </table>
+          </div>
         `;
-        
-        window.print();
-        printArea.innerHTML = ''; 
-    }
 
+        let htmlTable = `
+        <table class="w-full text-left border-collapse text-xs border border-gray-300 print-table">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center w-8">No</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center w-24">NISN</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center w-48">NAMA SISWA</th>
+                    <th colspan="${jumlahSoal}" class="border border-gray-300 p-2 text-center">Skor Tiap Nomor</th>
+                    <th colspan="4" class="border border-gray-300 p-2 text-center bg-blue-50/50">Rincian Nilai</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center">Total Nilai</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center">KETUNTASAN</th>
+                </tr>
+                <tr class="bg-gray-100">`;
+        
+        for(let i=1; i<=jumlahSoal; i++) htmlTable += `<th class="border border-gray-300 p-1 text-center font-bold w-6">${i}</th>`;
+        htmlTable += `
+                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">PG</th>
+                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">PGK</th>
+                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">Isian</th>
+                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">Essay</th>
+                </tr>
+            </thead><tbody>`;
+
+        let statTuntas = 0, statGagal = 0, siswaRemedial = [];
+        let skorPerSoal = Array(jumlahSoal).fill(0), countPerSoal = Array(jumlahSoal).fill(0); 
+
+        result.data.forEach((s, idx) => {
+            let detail = [];
+            try { detail = JSON.parse(s.detail); } catch(e){}
+            
+            let siswaDb = dataSiswa.find(x => x.nis.toString() === s.nis.toString()) || {};
+            let nisn = siswaDb.nisn || '-';
+            
+            let htmlRow = `<tr>
+                <td class="border border-gray-300 p-2 text-center">${idx + 1}</td>
+                <td class="border border-gray-300 p-2 text-center font-semibold text-gray-700">${nisn}</td>
+                <td class="border border-gray-300 p-2 font-semibold text-gray-800 min-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis">${s.nama}</td>`;
+
+            for(let i=0; i<jumlahSoal; i++) {
+                let soal = detail.find(d => d.no === (i+1));
+                let skor = soal ? parseFloat(soal.sk || 0) : 0;
+                let maxSkorItem = 10; 
+                skorPerSoal[i] += skor;
+                countPerSoal[i] += maxSkorItem;
+                htmlRow += `<td class="border border-gray-300 p-1 text-center ${skor == 0 ? 'text-red-500' : 'text-gray-700'}">${skor}</td>`;
+            }
+
+            let nilaiPg = s.nilai_pg !== undefined ? s.nilai_pg : (s.pg || 0);
+            let nilaiPgk = s.nilai_pgk !== undefined ? s.nilai_pgk : (s.pgk || 0);
+            let nilaiIsian = s.nilai_isian !== undefined ? s.nilai_isian : (s.isian || 0);
+            let nilaiEssay = s.nilai_essay !== undefined ? s.nilai_essay : (s.essay || 0);
+            let totalSistem = s.total !== undefined ? s.total : (nilaiPg + nilaiPgk + nilaiIsian + nilaiEssay);
+
+            let isTuntas = totalSistem >= kkm; 
+            if(isTuntas) statTuntas++; else { statGagal++; siswaRemedial.push(s.nama); }
+
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-blue-600 bg-blue-50/10">${nilaiPg}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-indigo-600 bg-blue-50/10">${nilaiPgk}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-purple-600 bg-blue-50/10">${nilaiIsian}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-yellow-600 bg-blue-50/10">${nilaiEssay}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-black text-green-600 bg-gray-50/50">${totalSistem}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold ${isTuntas ? 'text-green-600' : 'text-red-600'}">${isTuntas ? 'YA' : 'TDK'}</td>`;
+            htmlRow += `</tr>`;
+            htmlTable += htmlRow;
+        });
+
+        htmlTable += `</tbody></table>`;
+        document.getElementById('tabel-analisa-jawaban-container').innerHTML = printHeader + htmlTable;
+        document.getElementById('kesimpulan-analisa-jawaban-container').classList.remove('hidden');
+        
+        let totalSiswa = result.data.length;
+        let persenTuntasKlasikal = ((statTuntas / totalSiswa) * 100).toFixed(1);
+        
+        document.getElementById('an-jml-siswa').innerText = totalSiswa;
+        document.getElementById('an-jml-tuntas').innerText = statTuntas;
+        document.getElementById('an-jml-gagal').innerText = statGagal;
+
+        let elKlasikal = document.getElementById('an-klasikal');
+        if(parseFloat(persenTuntasKlasikal) >= 85) { 
+            elKlasikal.innerText = "YA";
+            elKlasikal.className = "font-bold px-2 py-1 bg-green-100 text-green-700 rounded border border-green-300";
+        } else {
+            elKlasikal.innerText = "TIDAK";
+            elKlasikal.className = "font-bold px-2 py-1 bg-red-100 text-red-700 rounded border border-red-300";
+        }
+
+        let soalSulit = [];
+        for(let i=0; i<jumlahSoal; i++) {
+            let persentaseKebenaran = countPerSoal[i] > 0 ? (skorPerSoal[i] / countPerSoal[i]) * 100 : 0;
+            if(persentaseKebenaran < 65) soalSulit.push(i + 1);
+        }
+        document.getElementById('an-soal-sulit').innerText = soalSulit.length > 0 ? soalSulit.join(", ") : "Tidak ada";
+
+        let htmlRemedial = "";
+        if(siswaRemedial.length > 0) {
+            siswaRemedial.forEach(nama => htmlRemedial += `<li>${nama}</li>`);
+        } else {
+            htmlRemedial = "<li class='text-green-600 list-none font-bold'><i class='fas fa-check-circle mr-1'></i> Semua siswa tuntas</li>";
+        }
+        document.getElementById('an-siswa-remedial').innerHTML = htmlRemedial;
+        
+      } catch(e) { hideLoader(); Swal.fire('Error', 'Terjadi kesalahan saat memproses data.', 'error'); }
+    }
     // ==========================================
     // FITUR BERITA ACARA DAN ABSEN
     // ==========================================
@@ -4197,7 +4317,7 @@ function eksporExcelRekap(tipeAktor) {
     XLSX.writeFile(wb, `Rekap_Nilai_${kodeSoal}.xlsx`);
 }
 
-function cetakRekapPDF(tipeAktor) {
+async function cetakRekapPDF(tipeAktor) {
     let tableId = tipeAktor === 'admin' ? 'tabel-rekap-nilai-admin' : 'tabel-rekap-nilai';
     let selectId = tipeAktor === 'admin' ? 'select-rekap-admin' : 'select-rekap';
     let kodeSoal = document.getElementById(selectId).value;
@@ -4207,90 +4327,138 @@ function cetakRekapPDF(tipeAktor) {
     let tbody = document.getElementById(tableId);
     if (tbody.querySelector('td[colspan]')) return Swal.fire('Info', 'Data kosong, tidak ada yang bisa dicetak.', 'info');
 
-    let trs = tbody.querySelectorAll('tr');
-    let rowsHtml = '';
-    
-    // Ambil data setiap baris dan masukkan ke format tabel khusus cetak
-    trs.forEach(tr => {
-        let cols = tr.querySelectorAll('td');
-        if (cols.length >= 8) {
-            rowsHtml += `
-            <tr>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[0].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[1].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px;">${cols[2].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[3].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[4].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[5].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[6].innerText.trim()}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold; color: #16a34a;">${cols[7].innerText.trim()}</td>
-            </tr>`;
-        }
-    });
-
-    let html = `
-        <div style="font-family: 'Times New Roman', Times, serif; color: #000; padding: 10px;">
-            <h3 style="text-align: center; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">REKAPITULASI NILAI UJIAN</h3>
-            <h4 style="text-align: center; margin-top: 0; margin-bottom: 20px;">KODE SOAL: ${kodeSoal}</h4>
-            
-            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                <thead>
-                    <tr style="background-color: #f3f4f6;">
-                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">No</th>
-                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">NISN</th>
-                        <th rowspan="2" style="border: 1px solid #000; padding: 8px; text-align: left;">Nama Lengkap Siswa</th>
-                        <th colspan="4" style="border: 1px solid #000; padding: 8px;">Rincian Nilai</th>
-                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">Total Nilai Akhir</th>
-                    </tr>
-                    <tr style="background-color: #f3f4f6;">
-                        <th style="border: 1px solid #000; padding: 6px;">PG</th>
-                        <th style="border: 1px solid #000; padding: 6px;">PGK</th>
-                        <th style="border: 1px solid #000; padding: 6px;">Isian</th>
-                        <th style="border: 1px solid #000; padding: 6px;">Essay</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rowsHtml}
-                </tbody>
-            </table>
-        </div>
-    `;
-
-    // Buat iframe tersembunyi
-    let iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.width = '0px';
-    iframe.style.height = '0px';
-    iframe.style.border = 'none';
-    document.body.appendChild(iframe);
-
-    let doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Cetak Rekap Nilai - ${kodeSoal}</title>
-            <style>
-                @page { size: A4 portrait; margin: 15mm; }
-                body { margin: 0; padding: 0; }
-                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            </style>
-        </head>
-        <body>
-            ${html}
-        </body>
-        </html>
-    `);
-    doc.close();
-
     showLoader('Menyiapkan Dokumen PDF...');
-    setTimeout(() => {
+    try {
+        // Tarik data Ujian, Jadwal, dan Master untuk keperluan Header PDF secara paralel
+        const [resUjian, resJadwal, resMaster] = await Promise.all([
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getMasterUjian' }) }).then(r => r.json())
+        ]);
+
+        let ujianSemua = resUjian.data || [];
+        let jadwalSemua = resJadwal.data || [];
+        let masterSemua = resMaster.data || [];
+
+        // 1. Ekstrak Mata Pelajaran & Kelas
+        let ujianInfo = ujianSemua.find(u => u.kode === kodeSoal) || { mapel: kodeSoal.split('_')[0] || kodeSoal, kelas: kodeSoal.split('_')[1] || '-' };
+        
+        // 2. Dapatkan Tanggal Ujian
+        let jadwalSoal = jadwalSemua.find(j => j.kode_soal === kodeSoal);
+        let tanggalUjianStr = '-';
+        if (jadwalSoal && jadwalSoal.tanggal) {
+            let d = new Date(jadwalSoal.tanggal);
+            if (!isNaN(d.getTime())) {
+                tanggalUjianStr = d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            } else {
+                tanggalUjianStr = jadwalSoal.tanggal;
+            }
+        }
+
+        // 3. Konversi Singkatan Kategori dan Tahun Ajaran
+        let kategoriKode = kodeSoal.split('_')[2] || '-';
+        let tahunKode = kodeSoal.split('_')[3] || '-';
+        
+        let kategoriObj = masterSemua.find(m => m.tipe === 'Kategori' && m.kode.toUpperCase() === kategoriKode.toUpperCase());
+        let kategoriNama = kategoriObj ? kategoriObj.nama : kategoriKode;
+
+        let tahunObj = masterSemua.find(m => m.tipe === 'Tahun' && m.kode.toUpperCase() === tahunKode.toUpperCase());
+        let tahunNama = tahunObj ? tahunObj.nama : tahunKode;
+
+        let trs = tbody.querySelectorAll('tr');
+        let rowsHtml = '';
+        
+        // Ambil data setiap baris dan masukkan ke format tabel khusus cetak
+        trs.forEach(tr => {
+            let cols = tr.querySelectorAll('td');
+            if (cols.length >= 8) {
+                rowsHtml += `
+                <tr>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[0].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[1].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px;">${cols[2].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[3].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[4].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[5].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[6].innerText.trim()}</td>
+                    <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold; color: #16a34a;">${cols[7].innerText.trim()}</td>
+                </tr>`;
+            }
+        });
+
+        let html = `
+            <div style="font-family: 'Times New Roman', Times, serif; color: #000; padding: 10px;">
+                <h3 style="text-align: center; font-weight: bold; margin-bottom: 25px; text-transform: uppercase;">REKAPITULASI HASIL UJIAN</h3>
+                
+                <table style="width: 100%; font-size: 13px; margin-bottom: 20px; line-height: 1.6; border: none;">
+                    <tr><td style="width: 130px; font-weight: bold;">Mata Pelajaran</td><td>: ${ujianInfo.mapel}</td><td style="width: 130px; font-weight: bold;">Tanggal Ujian</td><td>: ${tanggalUjianStr}</td></tr>
+                    <tr><td style="font-weight: bold;">Kelas</td><td>: ${ujianInfo.kelas}</td><td style="font-weight: bold;">Tahun Ajaran</td><td>: ${tahunNama}</td></tr>
+                    <tr><td style="font-weight: bold;">Kategori Soal</td><td>: ${kategoriNama}</td><td></td><td></td></tr>
+                </table>
+                
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                    <thead>
+                        <tr style="background-color: #f3f4f6;">
+                            <th rowspan="2" style="border: 1px solid #000; padding: 8px;">No</th>
+                            <th rowspan="2" style="border: 1px solid #000; padding: 8px;">NISN</th>
+                            <th rowspan="2" style="border: 1px solid #000; padding: 8px; text-align: left;">Nama Lengkap Siswa</th>
+                            <th colspan="4" style="border: 1px solid #000; padding: 8px;">Rincian Nilai</th>
+                            <th rowspan="2" style="border: 1px solid #000; padding: 8px;">Total Nilai Akhir</th>
+                        </tr>
+                        <tr style="background-color: #f3f4f6;">
+                            <th style="border: 1px solid #000; padding: 6px;">PG</th>
+                            <th style="border: 1px solid #000; padding: 6px;">PGK</th>
+                            <th style="border: 1px solid #000; padding: 6px;">Isian</th>
+                            <th style="border: 1px solid #000; padding: 6px;">Essay</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rowsHtml}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        // Buat iframe tersembunyi
+        let iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+
+        let doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Rekap Nilai - ${ujianInfo.mapel} Kelas ${ujianInfo.kelas}</title>
+                <style>
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { margin: 0; padding: 0; }
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                </style>
+            </head>
+            <body>
+                ${html}
+            </body>
+            </html>
+        `);
+        doc.close();
+
+        // Jeda 1 detik agar browser menyiapkan layout dengan baik
+        setTimeout(() => {
+            hideLoader();
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print(); 
+            setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+        }, 1000);
+
+    } catch(e) {
         hideLoader();
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print(); // Memanggil dialog print browser, pilih "Save as PDF"
-        setTimeout(() => { document.body.removeChild(iframe); }, 1000);
-    }, 1000);
+        Swal.fire('Error', 'Gagal menyiapkan dokumen PDF: ' + e.message, 'error');
+    }
 }
 
     // Eksekusi fungsi inisialisasi ketika DOM Website siap
