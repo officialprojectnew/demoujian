@@ -544,7 +544,7 @@
               <thead>
                 <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider text-center">
                   <th rowspan="2" class="p-4 border-b font-semibold">No</th>
-                  <th rowspan="2" class="p-4 border-b font-semibold">NIS</th>
+                  <th rowspan="2" class="p-4 border-b font-semibold">NISN</th>
                   <th rowspan="2" class="p-4 border-b font-semibold text-left">Nama Siswa</th>
                   <th colspan="4" class="p-2 border-b border-r font-bold text-gray-700 bg-blue-50/50">NILAI</th>
                   <th rowspan="2" class="p-4 border-b font-bold text-gray-900 bg-gray-100">Total Nilai</th>
@@ -2847,15 +2847,23 @@
       const tbody = document.getElementById('tabel-rekap-nilai-admin'); 
       showLoader('Menarik Nilai...'); 
       try { 
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }); 
-        const result = await res.json(); 
+        // Tarik rekap nilai dan profil siswa secara bersamaan
+        const [resNilai, resSiswa] = await Promise.all([
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }).then(r => r.json())
+        ]);
+        
+        allSiswaData = resSiswa.data || [];
         hideLoader(); 
         
-        if(result.data.length === 0) return tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500">Belum ada siswa yang ikut ujian ini.</td></tr>`; 
+        if(resNilai.data.length === 0) return tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-gray-500">Belum ada siswa yang ikut ujian ini.</td></tr>`; 
         
         let html = ''; 
-        result.data.forEach((s, i) => { 
-          // Ambil nilai masing-masing komponen (gunakan 0 jika propertinya belum ada)
+        resNilai.data.forEach((s, i) => { 
+          // Pencocokan NIS untuk mendapatkan NISN
+          let siswaDb = allSiswaData.find(x => x.nis.toString() === s.nis.toString()) || {};
+          let nisn = siswaDb.nisn || '-';
+
           let nilaiPg = s.nilai_pg !== undefined ? s.nilai_pg : (s.pg || 0);
           let nilaiPgk = s.nilai_pgk !== undefined ? s.nilai_pgk : (s.pgk || 0);
           let nilaiIsian = s.nilai_isian !== undefined ? s.nilai_isian : (s.isian || 0);
@@ -2865,7 +2873,7 @@
           html += `
           <tr class="border-b hover:bg-gray-50">
             <td class="p-4 text-center text-sm">${i + 1}</td>
-            <td class="p-4 text-sm font-semibold">${s.nis}</td>
+            <td class="p-4 text-sm font-semibold">${nisn}</td>
             <td class="p-4 text-sm font-bold text-gray-800">${s.nama}</td>
             <td class="p-4 text-center font-bold text-blue-600 bg-blue-50/10">${nilaiPg}</td>
             <td class="p-4 text-center font-bold text-indigo-600 bg-blue-50/10">${nilaiPgk}</td>
@@ -2873,9 +2881,9 @@
             <td class="p-4 text-center font-bold text-yellow-600 bg-blue-50/10 border-r">${nilaiEssay}</td>
             <td class="p-4 text-center font-black text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
             <td class="p-4 text-center">
-                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition"><i class="fas fa-download mr-1"></i></button>
+                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition"><i class="fas fa-download mr-1"></i> Download Jawaban</button>
             </td>
-          </tr>`;
+          </tr>`; 
         }); 
         tbody.innerHTML = html; 
       } catch(e) { hideLoader(); } 
@@ -3048,145 +3056,7 @@
     }
 
     // B. MENU ANALISA JAWABAN
-    async function prosesAnalisaJawaban() {
-      const kode = document.getElementById('an-jawaban-mapel').value;
-      const kkm = parseFloat(document.getElementById('input-kkm-jawaban').value) || 65; 
-      
-      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
-      
-      showLoader('Menganalisis Jawaban...');
-      try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) });
-        const result = await res.json();
-        hideLoader();
-
-        if(result.data.length === 0) {
-            document.getElementById('tabel-analisa-jawaban-container').innerHTML = `<p class="text-center text-red-500 italic mt-10">Belum ada data pengerjaan ujian.</p>`;
-            document.getElementById('kesimpulan-analisa-jawaban-container').classList.add('hidden'); return;
-        }
-
-        let sampleDetail = [];
-        try { sampleDetail = JSON.parse(result.data[0].detail); } catch(e){}
-        let jumlahSoal = sampleDetail.length;
-        if(jumlahSoal === 0) return Swal.fire('Error', 'Detail jawaban tidak ditemukan.', 'error');
-
-        let examInfo = globalAnalisaExams.find(e => e.kode === kode) || { mapel: '-', kelas: '-' };
-        
-        let katKode = document.getElementById('an-jawaban-kategori').value;
-        let katObj = globalKategoriMaster.find(k => k.kode === katKode);
-        let kategoriStr = katObj ? katObj.nama : katKode;
-        let thnObj = globalTahunMaster.length > 0 ? globalTahunMaster[0].nama : '2026/2027';
-
-        let printHeader = `
-          <div class="mb-4 text-left text-sm print-show hidden border-b pb-4 border-gray-300">
-            <table class="w-full md:w-1/2 font-bold text-gray-800">
-              <tr><td class="w-40">Mata Pelajaran</td><td>: ${examInfo.mapel}</td></tr>
-              <tr><td>Kelas</td><td>: ${examInfo.kelas}</td></tr>
-              <tr><td>Kategori Ujian</td><td>: ${kategoriStr}</td></tr>
-              <tr><td>Tahun Ajaran</td><td>: ${thnObj}</td></tr>
-            </table>
-          </div>
-        `;
-
-        let htmlTable = `
-        <table class="w-full text-left border-collapse text-xs border border-gray-300 print-table">
-            <thead>
-                <tr class="bg-gray-100">
-                    <th rowspan="2" class="border border-gray-300 p-2 text-center w-8">No</th>
-                    <th rowspan="2" class="border border-gray-300 p-2 text-center w-48">NAMA SISWA</th>
-                    <th colspan="${jumlahSoal}" class="border border-gray-300 p-2 text-center">Skor Tiap Nomor</th>
-                    <th colspan="4" class="border border-gray-300 p-2 text-center bg-blue-50/50">Rincian Nilai</th>
-                    <th rowspan="2" class="border border-gray-300 p-2 text-center">Total Nilai</th>
-                    <th rowspan="2" class="border border-gray-300 p-2 text-center">KETUNTASAN</th>
-                </tr>
-                <tr class="bg-gray-100">`;
-        
-        for(let i=1; i<=jumlahSoal; i++) htmlTable += `<th class="border border-gray-300 p-1 text-center font-bold w-6">${i}</th>`;
-        htmlTable += `
-                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">PG</th>
-                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">PGK</th>
-                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">Isian</th>
-                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">Essay</th>
-                </tr>
-            </thead><tbody>`;
-
-        let statTuntas = 0, statGagal = 0, siswaRemedial = [];
-        let skorPerSoal = Array(jumlahSoal).fill(0), countPerSoal = Array(jumlahSoal).fill(0); 
-
-        result.data.forEach((s, idx) => {
-            let detail = [];
-            try { detail = JSON.parse(s.detail); } catch(e){}
-            
-            let htmlRow = `<tr>
-                <td class="border border-gray-300 p-2 text-center">${idx + 1}</td>
-                <td class="border border-gray-300 p-2 font-semibold text-gray-800 min-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis">${s.nama}</td>`;
-
-            for(let i=0; i<jumlahSoal; i++) {
-                let soal = detail.find(d => d.no === (i+1));
-                let skor = soal ? parseFloat(soal.sk || 0) : 0;
-                let maxSkorItem = 10; 
-                skorPerSoal[i] += skor;
-                countPerSoal[i] += maxSkorItem;
-                htmlRow += `<td class="border border-gray-300 p-1 text-center ${skor == 0 ? 'text-red-500' : 'text-gray-700'}">${skor}</td>`;
-            }
-
-            // Memisahkan nilai dari rekapan
-            let nilaiPg = s.nilai_pg !== undefined ? s.nilai_pg : (s.pg || 0);
-            let nilaiPgk = s.nilai_pgk !== undefined ? s.nilai_pgk : (s.pgk || 0);
-            let nilaiIsian = s.nilai_isian !== undefined ? s.nilai_isian : (s.isian || 0);
-            let nilaiEssay = s.nilai_essay !== undefined ? s.nilai_essay : (s.essay || 0);
-            let totalSistem = s.total !== undefined ? s.total : (nilaiPg + nilaiPgk + nilaiIsian + nilaiEssay);
-
-            let isTuntas = totalSistem >= kkm; 
-            if(isTuntas) statTuntas++; else { statGagal++; siswaRemedial.push(s.nama); }
-
-            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-blue-600 bg-blue-50/10">${nilaiPg}</td>`;
-            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-indigo-600 bg-blue-50/10">${nilaiPgk}</td>`;
-            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-purple-600 bg-blue-50/10">${nilaiIsian}</td>`;
-            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-yellow-600 bg-blue-50/10">${nilaiEssay}</td>`;
-            htmlRow += `<td class="border border-gray-300 p-2 text-center font-black text-green-600 bg-gray-50/50">${totalSistem}</td>`;
-            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold ${isTuntas ? 'text-green-600' : 'text-red-600'}">${isTuntas ? 'YA' : 'TDK'}</td>`;
-            htmlRow += `</tr>`;
-            htmlTable += htmlRow;
-        });
-
-        htmlTable += `</tbody></table>`;
-        document.getElementById('tabel-analisa-jawaban-container').innerHTML = printHeader + htmlTable;
-        document.getElementById('kesimpulan-analisa-jawaban-container').classList.remove('hidden');
-        
-        let totalSiswa = result.data.length;
-        let persenTuntasKlasikal = ((statTuntas / totalSiswa) * 100).toFixed(1);
-        
-        document.getElementById('an-jml-siswa').innerText = totalSiswa;
-        document.getElementById('an-jml-tuntas').innerText = statTuntas;
-        document.getElementById('an-jml-gagal').innerText = statGagal;
-
-        let elKlasikal = document.getElementById('an-klasikal');
-        if(parseFloat(persenTuntasKlasikal) >= 85) { 
-            elKlasikal.innerText = "YA";
-            elKlasikal.className = "font-bold px-2 py-1 bg-green-100 text-green-700 rounded border border-green-300";
-        } else {
-            elKlasikal.innerText = "TIDAK";
-            elKlasikal.className = "font-bold px-2 py-1 bg-red-100 text-red-700 rounded border border-red-300";
-        }
-
-        let soalSulit = [];
-        for(let i=0; i<jumlahSoal; i++) {
-            let persentaseKebenaran = countPerSoal[i] > 0 ? (skorPerSoal[i] / countPerSoal[i]) * 100 : 0;
-            if(persentaseKebenaran < 65) soalSulit.push(i + 1);
-        }
-        document.getElementById('an-soal-sulit').innerText = soalSulit.length > 0 ? soalSulit.join(", ") : "Tidak ada";
-
-        let htmlRemedial = "";
-        if(siswaRemedial.length > 0) {
-            siswaRemedial.forEach(nama => htmlRemedial += `<li>${nama}</li>`);
-        } else {
-            htmlRemedial = "<li class='text-green-600 list-none font-bold'><i class='fas fa-check-circle mr-1'></i> Semua siswa tuntas</li>";
-        }
-        document.getElementById('an-siswa-remedial').innerHTML = htmlRemedial;
-        
-      } catch(e) { hideLoader(); Swal.fire('Error', 'Terjadi kesalahan saat memproses data.', 'error'); }
-    }
+    prosesAnalisaJawaban
     // Fungsi Cetak Template Khusus (Landscape & Auto-Resize)
     function cetakArea(areaId, orientation = 'portrait') {
         let printArea = document.getElementById('print-area');
@@ -4300,7 +4170,7 @@ function eksporExcelRekap(tipeAktor) {
     let dataToExport = [];
     
     // 1. Buat Header Tabel untuk Excel
-    dataToExport.push(["No", "NIS", "Nama Siswa", "Nilai PG", "Nilai PGK", "Nilai Isian", "Nilai Essay", "Total Nilai"]);
+    dataToExport.push(["No", "NISN", "Nama Siswa", "Nilai PG", "Nilai PGK", "Nilai Isian", "Nilai Essay", "Total Nilai"]);
 
     // 2. Looping baris tabel untuk mengambil data nilainya saja (mengabaikan tombol di kolom terakhir)
     let rows = tbody.querySelectorAll('tr');
@@ -4367,7 +4237,7 @@ function cetakRekapPDF(tipeAktor) {
                 <thead>
                     <tr style="background-color: #f3f4f6;">
                         <th rowspan="2" style="border: 1px solid #000; padding: 8px;">No</th>
-                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">NIS</th>
+                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">NISN</th>
                         <th rowspan="2" style="border: 1px solid #000; padding: 8px; text-align: left;">Nama Lengkap Siswa</th>
                         <th colspan="4" style="border: 1px solid #000; padding: 8px;">Rincian Nilai</th>
                         <th rowspan="2" style="border: 1px solid #000; padding: 8px;">Total Nilai Akhir</th>

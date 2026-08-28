@@ -317,7 +317,7 @@
           <thead>
             <tr class="bg-gray-100 text-gray-700 text-sm text-center">
               <th rowspan="2" class="p-4 border-b w-12 text-center">No</th>
-              <th rowspan="2" class="p-4 border-b text-center">NIS</th>
+              <th rowspan="2" class="p-4 border-b text-center">NISN</th>
               <th rowspan="2" class="p-4 border-b text-left">Nama Siswa</th>
               <th colspan="4" class="p-2 border-b border-r font-bold text-gray-800 bg-blue-50/50">NILAI</th>
               <th rowspan="2" class="p-4 border-b font-bold bg-gray-100">Total</th>
@@ -704,16 +704,21 @@
     }
 
     // B. MENU ANALISA JAWABAN
-    async function prosesAnalisaJawabanGuru() {
+    async function prosesAnalisaJawabanGuru() { // <- Ubah jadi prosesAnalisaJawabanGuru() untuk file guru.html
       const kode = document.getElementById('an-jawaban-mapel').value;
       const kkm = parseFloat(document.getElementById('input-kkm-jawaban').value) || 65; 
       
-      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter soal ujian terlebih dahulu!', 'info');
+      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
       
       showLoader('Menganalisis Jawaban...');
       try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) });
-        const result = await res.json();
+        const [resRekap, resSiswa] = await Promise.all([
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }).then(r => r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }).then(r => r.json())
+        ]);
+        
+        let result = resRekap;
+        let dataSiswa = resSiswa.data || [];
         hideLoader();
 
         if(result.data.length === 0) {
@@ -726,12 +731,13 @@
         let jumlahSoal = sampleDetail.length;
         if(jumlahSoal === 0) return Swal.fire('Error', 'Detail jawaban tidak ditemukan.', 'error');
 
-        let examInfo = globalAnalisaExamsGuru.find(e => e.kode === kode) || { mapel: '-', kelas: '-' };
+        // Gunakan globalAnalisaExams (admin.html) atau globalAnalisaExamsGuru (guru.html)
+        let examInfo = (typeof globalAnalisaExams !== 'undefined' ? globalAnalisaExams : globalAnalisaExamsGuru).find(e => e.kode === kode) || { mapel: '-', kelas: '-' };
         
         let katKode = document.getElementById('an-jawaban-kategori').value;
-        let katObj = masterDataCache.kategori.find(k => k.kode === katKode);
+        let katObj = (typeof globalKategoriMaster !== 'undefined' ? globalKategoriMaster : masterDataCache.kategori).find(k => k.kode === katKode);
         let kategoriStr = katObj ? katObj.nama : katKode;
-        let thnObj = masterDataCache.tahun.length > 0 ? masterDataCache.tahun[0].nama : '2026/2027';
+        let thnObj = (typeof globalTahunMaster !== 'undefined' ? globalTahunMaster : masterDataCache.tahun).length > 0 ? (typeof globalTahunMaster !== 'undefined' ? globalTahunMaster[0].nama : masterDataCache.tahun[0].nama) : '2026/2027';
 
         let printHeader = `
           <div class="mb-4 text-left text-sm print-show hidden border-b pb-4 border-gray-300">
@@ -749,6 +755,7 @@
             <thead>
                 <tr class="bg-gray-100">
                     <th rowspan="2" class="border border-gray-300 p-2 text-center w-8">No</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center w-24">NISN</th>
                     <th rowspan="2" class="border border-gray-300 p-2 text-center w-48">NAMA SISWA</th>
                     <th colspan="${jumlahSoal}" class="border border-gray-300 p-2 text-center">Skor Tiap Nomor</th>
                     <th colspan="4" class="border border-gray-300 p-2 text-center bg-blue-50/50">Rincian Nilai</th>
@@ -773,8 +780,12 @@
             let detail = [];
             try { detail = JSON.parse(s.detail); } catch(e){}
             
+            let siswaDb = dataSiswa.find(x => x.nis.toString() === s.nis.toString()) || {};
+            let nisn = siswaDb.nisn || '-';
+            
             let htmlRow = `<tr>
                 <td class="border border-gray-300 p-2 text-center">${idx + 1}</td>
+                <td class="border border-gray-300 p-2 text-center font-semibold text-gray-700">${nisn}</td>
                 <td class="border border-gray-300 p-2 font-semibold text-gray-800 min-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis">${s.nama}</td>`;
 
             for(let i=0; i<jumlahSoal; i++) {
@@ -786,7 +797,6 @@
                 htmlRow += `<td class="border border-gray-300 p-1 text-center ${skor == 0 ? 'text-red-500' : 'text-gray-700'}">${skor}</td>`;
             }
 
-            // Memisahkan nilai dari rekapan
             let nilaiPg = s.nilai_pg !== undefined ? s.nilai_pg : (s.pg || 0);
             let nilaiPgk = s.nilai_pgk !== undefined ? s.nilai_pgk : (s.pgk || 0);
             let nilaiIsian = s.nilai_isian !== undefined ? s.nilai_isian : (s.isian || 0);
@@ -1351,17 +1361,28 @@
     let dataRekapSaatIni = []; let bankSoalSaatIni = []; let barisEditAktif = 0; let detailEditAktif = [];
 
     async function tampilkanRekap() {
-      const kode = document.getElementById('select-rekap').value; if(!kode) return Swal.fire('Peringatan','Pilih paket dulu!','warning');
-      const tbody = document.getElementById('tabel-rekap-nilai'); showLoader('Menarik rekap...');
+      const kode = document.getElementById('select-rekap').value; 
+      if(!kode) return Swal.fire('Peringatan','Pilih paket dulu!','warning');
+      const tbody = document.getElementById('tabel-rekap-nilai'); 
+      showLoader('Menarik rekap...');
       try {
-        const resSoal = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getBankSoal', kode_soal: kode }) }); const resultSoal = await resSoal.json(); bankSoalSaatIni = resultSoal.data;
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }); const result = await res.json(); dataRekapSaatIni = result.data;
+        const [resSoal, resRekap, resSiswa] = await Promise.all([
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getBankSoal', kode_soal: kode }) }).then(r=>r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }).then(r=>r.json()),
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }).then(r=>r.json())
+        ]);
         
-        // Ubah colspan pesan error menjadi 9
+        bankSoalSaatIni = resSoal.data;
+        dataRekapSaatIni = resRekap.data;
+        let dataSiswa = resSiswa.data || [];
+        
         if(dataRekapSaatIni.length === 0) { hideLoader(); return tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-gray-500">Belum ada siswa yang mengerjakan ujian.</td></tr>`; }
         
         let html = ''; 
         dataRekapSaatIni.forEach((s, i) => { 
+          let siswaDb = dataSiswa.find(x => x.nis.toString() === s.nis.toString()) || {};
+          let nisn = siswaDb.nisn || '-';
+
           let nilaiPg = s.nilai_pg !== undefined ? s.nilai_pg : (s.pg || 0);
           let nilaiPgk = s.nilai_pgk !== undefined ? s.nilai_pgk : (s.pgk || 0);
           let nilaiIsian = s.nilai_isian !== undefined ? s.nilai_isian : (s.isian || 0);
@@ -1371,7 +1392,7 @@
           html += `
           <tr class="border-b hover:bg-gray-50">
             <td class="p-4 text-center text-sm font-bold">${i + 1}</td>
-            <td class="p-4 text-center">${s.nis}</td>
+            <td class="p-4 text-center font-semibold">${nisn}</td>
             <td class="p-4 font-semibold">${s.nama}</td>
             <td class="p-4 text-center text-blue-600 bg-blue-50/10">${nilaiPg}</td>
             <td class="p-4 text-center text-indigo-600 bg-blue-50/10">${nilaiPgk}</td>
@@ -1380,12 +1401,13 @@
             <td class="p-4 text-center font-bold text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
             <td class="p-4 text-center flex flex-col gap-2">
                 <button onclick="bukaEditPenilaian(${i})" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-blue-700 shadow-sm text-xs whitespace-nowrap transition">Nilai Essay</button>
-                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition"><i class="fas fa-download mr-1"></i></button>
+                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition"><i class="fas fa-download mr-1"></i> Jawaban</button>
             </td>
-          </tr>`;
+          </tr>`; 
         }); 
         tbody.innerHTML = html;
-      } catch(e) { tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-red-500">Gagal menarik data.</td></tr>`; } hideLoader();
+      } catch(e) { tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-red-500">Gagal menarik data.</td></tr>`; } 
+      hideLoader();
     }
 
     function bukaEditPenilaian(index) {
@@ -1871,7 +1893,7 @@ function eksporExcelRekap(tipeAktor) {
     let dataToExport = [];
     
     // 1. Buat Header Tabel untuk Excel
-    dataToExport.push(["No", "NIS", "Nama Siswa", "Nilai PG", "Nilai PGK", "Nilai Isian", "Nilai Essay", "Total Nilai"]);
+    dataToExport.push(["No", "NISN", "Nama Siswa", "Nilai PG", "Nilai PGK", "Nilai Isian", "Nilai Essay", "Total Nilai"]);
 
     // 2. Looping baris tabel untuk mengambil data nilainya saja (mengabaikan tombol di kolom terakhir)
     let rows = tbody.querySelectorAll('tr');
@@ -1937,7 +1959,7 @@ function cetakRekapPDF(tipeAktor) {
                 <thead>
                     <tr style="background-color: #f3f4f6;">
                         <th rowspan="2" style="border: 1px solid #000; padding: 8px;">No</th>
-                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">NIS</th>
+                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">NISN</th>
                         <th rowspan="2" style="border: 1px solid #000; padding: 8px; text-align: left;">Nama Lengkap Siswa</th>
                         <th colspan="4" style="border: 1px solid #000; padding: 8px;">Rincian Nilai</th>
                         <th rowspan="2" style="border: 1px solid #000; padding: 8px;">Total Nilai Akhir</th>
