@@ -534,8 +534,9 @@
             </div>
             <div class="flex gap-2 w-full md:w-auto">
                 <button onclick="tampilkanRekapAdmin()" class="flex-1 md:flex-none bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-search mr-2"></i>Cari</button>
-                <button onclick="eksporExcelRekap('admin')" class="flex-1 md:flex-none bg-green-600 text-white px-5 py-3 rounded-xl font-bold hover:bg-green-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-file-excel mr-2"></i>Ekspor .xlsx</button>
-            </div>
+                <button onclick="eksporExcelRekap('admin')" class="flex-1 md:flex-none bg-green-600 text-white px-5 py-3 rounded-xl font-bold hover:bg-green-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-file-excel mr-2"></i></button>
+                <button onclick="cetakRekapPDF('admin')" class="flex-1 md:flex-none bg-red-600 text-white px-5 py-3 rounded-xl font-bold hover:bg-red-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-file-pdf mr-2"></i></button>
+              </div>
           </div>
 
           <div class="overflow-x-auto border border-gray-200 rounded-xl">
@@ -3094,14 +3095,20 @@
                     <th rowspan="2" class="border border-gray-300 p-2 text-center w-8">No</th>
                     <th rowspan="2" class="border border-gray-300 p-2 text-center w-48">NAMA SISWA</th>
                     <th colspan="${jumlahSoal}" class="border border-gray-300 p-2 text-center">Skor Tiap Nomor</th>
-                    <th rowspan="2" class="border border-gray-300 p-2 text-center">Jlh Skor</th>
-                    <th rowspan="2" class="border border-gray-300 p-2 text-center">NILAI</th>
+                    <th colspan="4" class="border border-gray-300 p-2 text-center bg-blue-50/50">Rincian Nilai</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center">Total Nilai</th>
                     <th rowspan="2" class="border border-gray-300 p-2 text-center">KETUNTASAN</th>
                 </tr>
                 <tr class="bg-gray-100">`;
         
         for(let i=1; i<=jumlahSoal; i++) htmlTable += `<th class="border border-gray-300 p-1 text-center font-bold w-6">${i}</th>`;
-        htmlTable += `</tr></thead><tbody>`;
+        htmlTable += `
+                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">PG</th>
+                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">PGK</th>
+                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">Isian</th>
+                    <th class="border border-gray-300 p-1 text-center font-semibold bg-blue-50/30">Essay</th>
+                </tr>
+            </thead><tbody>`;
 
         let statTuntas = 0, statGagal = 0, siswaRemedial = [];
         let skorPerSoal = Array(jumlahSoal).fill(0), countPerSoal = Array(jumlahSoal).fill(0); 
@@ -3113,25 +3120,31 @@
             let htmlRow = `<tr>
                 <td class="border border-gray-300 p-2 text-center">${idx + 1}</td>
                 <td class="border border-gray-300 p-2 font-semibold text-gray-800 min-w-[120px] whitespace-nowrap overflow-hidden text-ellipsis">${s.nama}</td>`;
-            
-            let skorTotal = 0, maxSkorMungkin = 0;
 
             for(let i=0; i<jumlahSoal; i++) {
                 let soal = detail.find(d => d.no === (i+1));
                 let skor = soal ? parseFloat(soal.sk || 0) : 0;
                 let maxSkorItem = 10; 
-                skorTotal += skor;
-                maxSkorMungkin += maxSkorItem;
                 skorPerSoal[i] += skor;
                 countPerSoal[i] += maxSkorItem;
                 htmlRow += `<td class="border border-gray-300 p-1 text-center ${skor == 0 ? 'text-red-500' : 'text-gray-700'}">${skor}</td>`;
             }
 
-            let isTuntas = skorTotal >= kkm; 
+            // Memisahkan nilai dari rekapan
+            let nilaiPg = s.nilai_pg !== undefined ? s.nilai_pg : (s.pg || 0);
+            let nilaiPgk = s.nilai_pgk !== undefined ? s.nilai_pgk : (s.pgk || 0);
+            let nilaiIsian = s.nilai_isian !== undefined ? s.nilai_isian : (s.isian || 0);
+            let nilaiEssay = s.nilai_essay !== undefined ? s.nilai_essay : (s.essay || 0);
+            let totalSistem = s.total !== undefined ? s.total : (nilaiPg + nilaiPgk + nilaiIsian + nilaiEssay);
+
+            let isTuntas = totalSistem >= kkm; 
             if(isTuntas) statTuntas++; else { statGagal++; siswaRemedial.push(s.nama); }
 
-            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold">${skorTotal}</td>`;
-            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-blue-600">${s.nilai_pg}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-blue-600 bg-blue-50/10">${nilaiPg}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-indigo-600 bg-blue-50/10">${nilaiPgk}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-purple-600 bg-blue-50/10">${nilaiIsian}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-yellow-600 bg-blue-50/10">${nilaiEssay}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-black text-green-600 bg-gray-50/50">${totalSistem}</td>`;
             htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold ${isTuntas ? 'text-green-600' : 'text-red-600'}">${isTuntas ? 'YA' : 'TDK'}</td>`;
             htmlRow += `</tr>`;
             htmlTable += htmlRow;
@@ -3174,7 +3187,6 @@
         
       } catch(e) { hideLoader(); Swal.fire('Error', 'Terjadi kesalahan saat memproses data.', 'error'); }
     }
-
     // Fungsi Cetak Template Khusus (Landscape & Auto-Resize)
     function cetakArea(areaId, orientation = 'portrait') {
         let printArea = document.getElementById('print-area');
@@ -4313,6 +4325,102 @@ function eksporExcelRekap(tipeAktor) {
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Rekap Nilai");
     XLSX.writeFile(wb, `Rekap_Nilai_${kodeSoal}.xlsx`);
+}
+
+function cetakRekapPDF(tipeAktor) {
+    let tableId = tipeAktor === 'admin' ? 'tabel-rekap-nilai-admin' : 'tabel-rekap-nilai';
+    let selectId = tipeAktor === 'admin' ? 'select-rekap-admin' : 'select-rekap';
+    let kodeSoal = document.getElementById(selectId).value;
+
+    if (!kodeSoal) return Swal.fire('Info', 'Pilih kode soal dan klik cari terlebih dahulu.', 'info');
+
+    let tbody = document.getElementById(tableId);
+    if (tbody.querySelector('td[colspan]')) return Swal.fire('Info', 'Data kosong, tidak ada yang bisa dicetak.', 'info');
+
+    let trs = tbody.querySelectorAll('tr');
+    let rowsHtml = '';
+    
+    // Ambil data setiap baris dan masukkan ke format tabel khusus cetak
+    trs.forEach(tr => {
+        let cols = tr.querySelectorAll('td');
+        if (cols.length >= 8) {
+            rowsHtml += `
+            <tr>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[0].innerText.trim()}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[1].innerText.trim()}</td>
+                <td style="border: 1px solid #000; padding: 6px;">${cols[2].innerText.trim()}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[3].innerText.trim()}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[4].innerText.trim()}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[5].innerText.trim()}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${cols[6].innerText.trim()}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold; color: #16a34a;">${cols[7].innerText.trim()}</td>
+            </tr>`;
+        }
+    });
+
+    let html = `
+        <div style="font-family: 'Times New Roman', Times, serif; color: #000; padding: 10px;">
+            <h3 style="text-align: center; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">REKAPITULASI NILAI UJIAN</h3>
+            <h4 style="text-align: center; margin-top: 0; margin-bottom: 20px;">KODE SOAL: ${kodeSoal}</h4>
+            
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="background-color: #f3f4f6;">
+                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">No</th>
+                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">NIS</th>
+                        <th rowspan="2" style="border: 1px solid #000; padding: 8px; text-align: left;">Nama Lengkap Siswa</th>
+                        <th colspan="4" style="border: 1px solid #000; padding: 8px;">Rincian Nilai</th>
+                        <th rowspan="2" style="border: 1px solid #000; padding: 8px;">Total Nilai Akhir</th>
+                    </tr>
+                    <tr style="background-color: #f3f4f6;">
+                        <th style="border: 1px solid #000; padding: 6px;">PG</th>
+                        <th style="border: 1px solid #000; padding: 6px;">PGK</th>
+                        <th style="border: 1px solid #000; padding: 6px;">Isian</th>
+                        <th style="border: 1px solid #000; padding: 6px;">Essay</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rowsHtml}
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    // Buat iframe tersembunyi
+    let iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0px';
+    iframe.style.height = '0px';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+
+    let doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Cetak Rekap Nilai - ${kodeSoal}</title>
+            <style>
+                @page { size: A4 portrait; margin: 15mm; }
+                body { margin: 0; padding: 0; }
+                * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            </style>
+        </head>
+        <body>
+            ${html}
+        </body>
+        </html>
+    `);
+    doc.close();
+
+    showLoader('Menyiapkan Dokumen PDF...');
+    setTimeout(() => {
+        hideLoader();
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print(); // Memanggil dialog print browser, pilih "Save as PDF"
+        setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+    }, 1000);
 }
 
     // Eksekusi fungsi inisialisasi ketika DOM Website siap
