@@ -49,13 +49,17 @@
   </div>
 
   <!-- ================= SIDEBAR GURU ================= -->
-  <div class="w-64 bg-[#1e293b] text-gray-400 flex flex-col h-full z-20 shadow-xl overflow-y-auto">
+  <!-- OVERLAY MOBILE -->
+  <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden"></div>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar" class="w-64 bg-[#1e293b] text-gray-400 flex flex-col h-[100dvh] z-40 shadow-xl fixed md:relative transform -translate-x-full md:translate-x-0 transition-all duration-300 ease-in-out shrink-0">
     
     <div class="p-6 text-xl font-bold text-white border-b border-slate-700/50 mb-2 sticky top-0 bg-[#1e293b] z-10 flex items-center gap-3">
       <i class="fas fa-chalkboard-teacher text-blue-500"></i> Admin Guru
     </div>
     
-    <div class="flex-1 py-2 flex flex-col gap-1 pr-4">
+    <div class="flex-1 py-2 flex flex-col gap-1 pr-4 overflow-y-auto">
       <button onclick="switchMenu('guru-dashboard')" id="btn-guru-dashboard" class="menu-active w-full text-left px-6 py-3 rounded-r-full hover:bg-slate-800 hover:text-white transition-all text-sm font-medium flex items-center">
         <i class="fas fa-home mr-3 w-5 text-center"></i> Dashboard
       </button>
@@ -78,7 +82,7 @@
       </button>
     </div>
 
-    <div class="p-5 border-t border-slate-700/50 mt-auto bg-[#1e293b] sticky bottom-0">
+    <div class="p-5 border-t border-slate-700/50 mt-auto bg-[#1e293b]">
       <p class="text-xs text-slate-400 mb-1">Login sebagai :</p>
       <p class="font-bold text-sm mb-4 text-white truncate" id="nama-guru-login">Guru</p>
       <button onclick="logout()" class="w-full flex items-center justify-center gap-2 py-2.5 bg-red-500/10 text-red-500 font-bold rounded-xl hover:bg-red-500 hover:text-white transition-colors text-sm">
@@ -88,8 +92,19 @@
     
   </div>
 
-  <div class="flex-1 p-8 overflow-y-auto w-full relative">
-    <!-- MENU 0: DASHBOARD -->
+  <div class="flex-1 flex flex-col h-[100dvh] relative overflow-y-auto w-full">
+    
+    <!-- TOPBAR TOGGLE -->
+    <div class="bg-white px-4 md:px-6 py-3 border-b flex items-center sticky top-0 z-30 shadow-sm">
+        <button onclick="toggleSidebar()" class="text-gray-600 hover:text-blue-600 focus:outline-none text-xl px-2 mr-3 transition-transform hover:scale-110">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h2 class="font-bold text-gray-800 text-sm md:text-base">Panel Guru</h2>
+    </div>
+
+    <!-- Wrapper padding untuk isi -->
+    <div class="p-6 md:p-8 w-full relative flex-1">
+      <!-- MENU 0: DASHBOARD -->
     <div id="guru-dashboard" class="guru-menu block bg-white p-6 rounded-xl shadow-sm border border-gray-100">
        <div class="mb-6 border-b border-gray-100 pb-4">
          <h2 class="text-3xl font-bold text-gray-800">Dashboard Guru</h2>
@@ -519,7 +534,7 @@
     </div>
 
   </div>
-
+  </div>
   <script src="script.js"></script>
   <script>
     const user = checkAuth('guru');
@@ -2452,6 +2467,22 @@ areaDropUtama.addEventListener('drop', async function(e) {
         }
     }
 }, false);
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    // Deteksi ukuran layar
+    if (window.innerWidth < 768) {
+        // Mode HP: Tampilkan/Sembunyikan panel secara melayang (slide)
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+    } else {
+        // Mode Komputer: Lebarkan/Sempitkan panel ke samping 
+        sidebar.classList.toggle('md:translate-x-0');
+        sidebar.classList.toggle('md:-ml-64');
+    }
+}
 
   </script>
 </body>
