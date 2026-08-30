@@ -24,7 +24,7 @@
     @keyframes slideDown { 0% { opacity: 0; transform: scaleY(0); } 100% { opacity: 1; transform: scaleY(1); } }
   </style>
 </head>
-<body class="flex flex-col h-screen justify-between overflow-hidden relative">
+<body class="flex flex-col h-screen min-h-[100dvh] justify-between overflow-hidden relative">
 
   <!-- WEBCAM HIDDEN ELEMENTS UNTUK CAPTURE -->
   <video id="webcam" autoplay playsinline class="hidden"></video>
@@ -151,7 +151,7 @@
     <div id="view-ujian" class="hidden flex-1 flex-col md:flex-row p-4 md:p-6 gap-6 max-w-7xl mx-auto w-full h-full overflow-hidden">
       
       <!-- KIRI: KONTEN SOAL -->
-      <div class="flex-1 bg-white rounded-3xl shadow-sm border border-gray-200 p-5 md:p-8 flex flex-col justify-between overflow-y-auto relative h-full">
+      <div class="flex-1 bg-white rounded-3xl shadow-sm border border-gray-200 p-5 pb-10 md:p-8 mb-4 md:mb-0 flex flex-col justify-between overflow-y-auto relative h-full">
         <div>
           <!-- Header Soal -->
           <div class="flex flex-wrap justify-between items-center border-b pb-4 mb-5 gap-2">
@@ -175,7 +175,7 @@
         </div>
 
         <!-- Navigasi Bawah -->
-        <div class="flex justify-between items-center border-t pt-5 mt-6 gap-2">
+        <div class="flex flex-wrap justify-between items-center border-t pt-5 mt-6 gap-2">
           <button onclick="soalSebelumnya()" id="btn-prev" class="px-4 md:px-6 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 text-xs md:text-sm transition shadow-sm border border-gray-200 whitespace-nowrap">← Back</button>
           <label class="flex items-center justify-center gap-2 bg-yellow-50 hover:bg-yellow-100 text-yellow-800 px-4 md:px-6 py-3 rounded-xl cursor-pointer font-bold text-xs md:text-sm transition shadow-sm border border-yellow-300">
             <input type="checkbox" id="chk-ragu" onchange="toggleRaguRagu()" class="w-4 h-4 md:w-5 md:h-5 accent-yellow-600 rounded"> Ragu
@@ -455,8 +455,24 @@
       } else if (s.tipe === 'ISIAN') { htmlOpsi = `<input type="text" id="input-isian" value="${jawabanSiswa[index] || ''}" oninput="simpanJawabanIsian(this.value)" placeholder="Ketik jawaban singkat..." class="w-full p-4 border-2 border-gray-300 rounded-xl focus:border-blue-500 outline-none text-base md:text-lg font-medium shadow-sm">`; } 
       else if (s.tipe === 'ESSAY') { htmlOpsi = `<textarea rows="6" id="input-essay" oninput="simpanJawabanIsian(this.value)" placeholder="Ketik jawaban essai dengan jelas..." class="w-full p-4 border-2 border-gray-300 rounded-xl focus:border-blue-500 outline-none text-sm md:text-base shadow-sm leading-relaxed">${jawabanSiswa[index] || ''}</textarea>`; }
 
-      containerOpsi.innerHTML = htmlOpsi; document.getElementById('chk-ragu').checked = statusRagu[index] || false; renderNavGrid();
-      document.getElementById('dropdown-soal-hp').classList.add('hidden');
+        containerOpsi.innerHTML = htmlOpsi; document.getElementById('chk-ragu').checked = statusRagu[index] || false; renderNavGrid();
+        document.getElementById('dropdown-soal-hp').classList.add('hidden');
+
+        // === TAMBAHKAN KODE INI DI SINI ===
+        const btnNext = document.getElementById('btn-next');
+        if (indexAktif === listSoal.length - 1) {
+            // Jika soal terakhir, ubah tombol jadi Selesai warna hijau
+            btnNext.innerHTML = 'Selesai ✓';
+            btnNext.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            btnNext.classList.add('bg-green-600', 'hover:bg-green-700');
+            btnNext.onclick = konfirmasiSelesaiUjian;
+        } else {
+            // Jika bukan soal terakhir, kembalikan ke Next warna biru
+            btnNext.innerHTML = 'Next →';
+            btnNext.classList.remove('bg-green-600', 'hover:bg-green-700');
+            btnNext.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            btnNext.onclick = soalSelanjutnya;
+        }
     }
 
     function simpanJawaban(jaw) { jawabanSiswa[indexAktif] = jaw; renderNavGrid(); setTimeout(()=>soalSelanjutnya(), 300); }
