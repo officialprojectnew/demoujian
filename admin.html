@@ -2894,7 +2894,7 @@
             <td class="p-4 text-center font-bold text-yellow-600 bg-blue-50/10 border-r">${nilaiEssay}</td>
             <td class="p-4 text-center font-black text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
             <td class="p-4 text-center">
-                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition"><i class="fas fa-download mr-1"></i></button>
+                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition">Lembar Jawaban</button>
             </td>
           </tr>`; 
         }); 
@@ -3189,7 +3189,7 @@
             htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-purple-600 bg-blue-50/10">${nilaiIsian}</td>`;
             htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-yellow-600 bg-blue-50/10">${nilaiEssay}</td>`;
             htmlRow += `<td class="border border-gray-300 p-2 text-center font-black text-green-600 bg-gray-50/50">${totalSistem}</td>`;
-            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold ${isTuntas ? 'text-green-600' : 'text-red-600'}">${isTuntas ? 'YA' : 'TDK'}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold ${isTuntas ? 'text-green-600' : 'text-red-600'}">${isTuntas ? 'Ya' : 'Tidak'}</td>`;
             htmlRow += `</tr>`;
             htmlTable += htmlRow;
         });
