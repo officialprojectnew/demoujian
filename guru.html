@@ -453,7 +453,7 @@
               <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
               <select id="an-soal-kategori" onchange="filterAnalisaKelasGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"></select>
             </div>
-            <div class="w-full lg:w-24">
+            <div class="flex-1 w-full">
               <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
               <select id="an-soal-kelas" onchange="filterAnalisaMapelGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-Pilih-</option></select>
             </div>
@@ -643,8 +643,9 @@
     // A. MENU ANALISA SOAL
     async function prosesAnalisaSoalGuru() {
       const kode = document.getElementById('an-soal-mapel').value;
-      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter soal ujian terlebih dahulu!', 'info');
+      const kkm = parseFloat(document.getElementById('input-kkm-soal').value) || 65; // <-- BARIS INI WAJIB ADA
       
+      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter soal ujian terlebih dahulu!', 'info');
       showLoader('Menganalisis Butir Soal...');
       try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) });
@@ -716,7 +717,7 @@
                      <div class="w-1/2 bg-gray-200 rounded-full h-2.5">
                         <div class="bg-blue-600 h-2.5 rounded-full print-bg-blue" style="width: ${persen}%"></div>
                      </div>
-                     <span class="font-bold">${persen.toFixed(1)}%</span>
+                     <span class="font-bold">${persen.toFixed(1)}</span>
                    </div>
                 </td>
                 <td class="border border-gray-300 p-3 text-center font-bold ${isTuntas ? 'text-green-600' : 'text-red-600'}">${isTuntas ? 'TUNTAS' : 'PERLU PERBAIKAN'}</td>
