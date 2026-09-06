@@ -448,23 +448,25 @@
         <button onclick="cetakAreaGuru('area-cetak-soal')" class="bg-green-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><i class="fas fa-print mr-2"></i>Print</button>
       </div>
       
-      <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
-            <select id="an-soal-kategori" onchange="filterAnalisaKelasGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white"></select>
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
-            <select id="an-soal-kelas" onchange="filterAnalisaMapelGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white"><option value="">-- Pilih Kategori --</option></select>
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
-            <select id="an-soal-mapel" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white"><option value="">-- Pilih Kategori --</option></select>
-          </div>
-          <button onclick="prosesAnalisaSoalGuru()" class="bg-blue-600 text-white w-full px-4 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide"><i class="fas fa-search mr-2"></i>Cari</button>
+      <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col lg:flex-row gap-4 items-end">
+            <div class="flex-1 w-full">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
+              <select id="an-soal-kategori" onchange="filterAnalisaKelasGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"></select>
+            </div>
+            <div class="w-full lg:w-24">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
+              <select id="an-soal-kelas" onchange="filterAnalisaMapelGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-Pilih-</option></select>
+            </div>
+            <div class="flex-1 w-full">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
+              <select id="an-soal-mapel" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih --</option></select>
+            </div>
+            <div class="w-full lg:w-24">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Batas KKM</label>
+              <input type="number" id="input-kkm-soal" value="65" class="w-full p-3 border border-gray-300 rounded-xl outline-none text-center font-bold text-blue-600 shadow-sm bg-white">
+            </div>
+            <button onclick="prosesAnalisaSoalGuru()" class="bg-blue-600 text-white w-full lg:w-auto px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-search mr-2"></i>Cari</button>
         </div>
-      </div>
 
       <div id="area-cetak-soal" class="bg-white p-4 border rounded-xl overflow-x-auto min-h-[400px]">
         <h3 class="font-bold text-lg text-center mb-4 hidden print-show" style="text-decoration: underline;">ANALISA BUTIR SOAL</h3>
@@ -694,7 +696,7 @@
             <thead>
                 <tr class="bg-gray-100">
                     <th class="border border-gray-300 p-3 text-center w-12">No. Soal</th>
-                    <th class="border border-gray-300 p-3 text-center">Persentase Daya Serap (Standar 65%)</th>
+                    <th class="border border-gray-300 p-3 text-center">Persentase Daya Serap (Standar ${kkm})</th>
                     <th class="border border-gray-300 p-3 text-center">Ketuntasan Butir Soal</th>
                 </tr>
             </thead>
@@ -703,7 +705,7 @@
         let tuntasKlasikal = 0, tidakTuntasKlasikal = 0;
         for(let i=0; i<jumlahSoal; i++) {
             let persen = countPerSoal[i] > 0 ? (skorPerSoal[i] / countPerSoal[i]) * 100 : 0;
-            let isTuntas = persen >= 65; 
+            let isTuntas = persen >= kkm; 
             
             if(isTuntas) tuntasKlasikal++; else tidakTuntasKlasikal++;
 
@@ -727,8 +729,8 @@
             <h4 class="font-bold text-blue-800 mb-2">Kesimpulan Analisa Soal:</h4>
             <ul class="list-disc ml-5 text-sm text-blue-900">
                <li>Total Butir Soal: <b>${jumlahSoal}</b></li>
-               <li>Soal Tuntas (Daya serap >= 65%): <b class="text-green-600">${tuntasKlasikal} Soal</b></li>
-               <li>Soal Perlu Perbaikan (Daya serap < 65%): <b class="text-red-600">${tidakTuntasKlasikal} Soal</b></li>
+               <li>Soal Tuntas (Daya serap >= ${kkm}): <b class="text-green-600">${tuntasKlasikal} Soal</b></li>
+               <li>Soal Perlu Perbaikan Klasikal (Daya serap < ${kkm}): <b class="text-red-600">${tidakTuntasKlasikal} Soal</b></li>
             </ul>
           </div>
         `;
@@ -739,8 +741,8 @@
 
     // B. MENU ANALISA JAWABAN
     async function prosesAnalisaJawabanGuru() { // <- Ubah jadi prosesAnalisaJawabanGuru() untuk file guru.html
-      const kode = document.getElementById('an-jawaban-mapel').value;
-      const kkm = parseFloat(document.getElementById('input-kkm-jawaban').value) || 65; 
+      const kode = document.getElementById('an-soal-mapel').value;
+      const kkm = parseFloat(document.getElementById('input-kkm-soal').value) || 65; // <--- TAMBAH BARIS INI
       
       if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
       

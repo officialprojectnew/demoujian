@@ -28,7 +28,14 @@
     /* CSS KHUSUS UNTUK PRINT KARTU & DOKUMEN */
     @media print {
       body > *:not(#print-area) { display: none !important; }
-      body { background-color: #fff; margin: 0; padding: 0; }
+      body { 
+            background-color: #ffffff !important; 
+            margin: 0 !important; 
+            padding: 0 !important;
+            display: block !important;
+            height: auto !important;
+            overflow: visible !important;
+            }
       #print-area { display: block !important; width: 100%; margin: 0; padding: 0; }
       @page { size: A4 portrait; margin: 5mm; }
       .print-card-wrapper { break-inside: avoid; page-break-inside: avoid; }
@@ -586,23 +593,25 @@
             <button onclick="cetakArea('area-cetak-soal', 'landscape')" class="bg-green-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><i class="fas fa-print mr-2"></i>Print</button>
           </div>
           
-          <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
-                <select id="an-soal-kategori" onchange="filterAnalisaKelas('soal')" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"></select>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
-                <select id="an-soal-kelas" onchange="filterAnalisaMapel('soal')" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih Kategori --</option></select>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
-                <select id="an-soal-mapel" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih Kategori --</option></select>
-              </div>
-              <button onclick="prosesAnalisaSoal()" class="bg-blue-600 text-white w-full px-4 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide"><i class="fas fa-search mr-2"></i>Cari</button>
+          <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col lg:flex-row gap-4 items-end">
+            <div class="flex-1 w-full">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
+              <select id="an-soal-kategori" onchange="filterAnalisaKelasGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"></select>
             </div>
-          </div>
+            <div class="w-full lg:w-24">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
+              <select id="an-soal-kelas" onchange="filterAnalisaMapelGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-Pilih-</option></select>
+            </div>
+            <div class="flex-1 w-full">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
+              <select id="an-soal-mapel" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih --</option></select>
+            </div>
+            <div class="w-full lg:w-24">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Batas KKM</label>
+              <input type="number" id="input-kkm-soal" value="65" class="w-full p-3 border border-gray-300 rounded-xl outline-none text-center font-bold text-blue-600 shadow-sm bg-white">
+            </div>
+            <button onclick="prosesAnalisaSoalGuru()" class="bg-blue-600 text-white w-full lg:w-auto px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-search mr-2"></i>Cari</button>
+        </div>
 
           <div id="area-cetak-soal" class="bg-white p-4 border rounded-xl overflow-x-auto min-h-[400px]">
             <h3 class="font-bold text-lg text-center mb-4 hidden print-show" style="text-decoration: underline;">ANALISA BUTIR SOAL</h3>
@@ -631,7 +640,7 @@
             </div>
             <div class="w-full lg:w-24">
               <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
-              <select id="an-jawaban-kelas" onchange="filterAnalisaMapel('jawaban')" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-Pilih-</option></select>
+              <select id="an-jawaban-kelas" onchange="filterAnalisaMapel('jawaban')" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-Pilih Kategori-</option></select>
             </div>
             <div class="flex-1 w-full">
               <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
@@ -665,8 +674,7 @@
                        <tr><td>b. Banyaknya siswa yang tuntas</td><td>: <span id="an-jml-tuntas" class="font-bold text-green-600">0</span> orang</td></tr>
                        <tr><td>c. Banyaknya siswa yang belum tuntas</td><td>: <span id="an-jml-gagal" class="font-bold text-red-600">0</span> orang</td></tr>
                     </table>
-                    <p class="mt-2">1.2 Klasikal (Minimal 85%) : <span id="an-klasikal" class="font-bold px-2 py-1 rounded">TIDAK</span></p>
-                  </div>
+                    <p class="mt-2">1.2 Klasikal (Minimal <span id="teks-batas-klasikal">85</span>%) : <span id="an-klasikal" class="font-bold px-2 py-1 rounded">TIDAK</span></p>                  </div>
                 </div>
                 <div>
                   <p class="font-bold text-gray-700 text-sm">2. Kesimpulan / Program Perbaikan</p>
@@ -2929,10 +2937,10 @@
         document.getElementById('an-jawaban-kategori').innerHTML = optKat;
         
         document.getElementById('an-soal-kelas').innerHTML = '<option value="">-- Pilih Kategori --</option>';
-        document.getElementById('an-soal-mapel').innerHTML = '<option value="">-- Pilih Kelas --</option>';
+        document.getElementById('an-soal-mapel').innerHTML = '<option value="">-- Pilih Kategori --</option>';
         
         document.getElementById('an-jawaban-kelas').innerHTML = '<option value="">-- Pilih Kategori --</option>';
-        document.getElementById('an-jawaban-mapel').innerHTML = '<option value="">-- Pilih Kelas --</option>';
+        document.getElementById('an-jawaban-mapel').innerHTML = '<option value="">-- Pilih Kategori --</option>';
       } catch(e) {}
     }
 
@@ -2940,7 +2948,7 @@
         let katKode = document.getElementById(`an-${tipe}-kategori`).value;
         if(!katKode) {
             document.getElementById(`an-${tipe}-kelas`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
-            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
             return;
         }
         let filtered = globalAnalisaExams.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()));
@@ -2948,7 +2956,7 @@
         let optKls = '<option value="">-- Pilih Kelas --</option>';
         [...kelasSet].sort().forEach(k => optKls += `<option value="${k}">${k}</option>`);
         document.getElementById(`an-${tipe}-kelas`).innerHTML = optKls;
-        document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
+        document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
     }
 
     function filterAnalisaMapel(tipe) {
@@ -2959,7 +2967,7 @@
             return;
         }
         let filtered = globalAnalisaExams.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()) && e.kelas === kls);
-        let optMapel = '<option value="">-- Pilih Mata Pelajaran --</option>';
+        let optMapel = '<option value="">-- Pilih Kategori --</option>';
         filtered.forEach(e => optMapel += `<option value="${e.kode}">${e.mapel} (${e.kode})</option>`);
         document.getElementById(`an-${tipe}-mapel`).innerHTML = optMapel;
     }
@@ -3020,7 +3028,7 @@
             <thead>
                 <tr class="bg-gray-100">
                     <th class="border border-gray-300 p-3 text-center w-12">No. Soal</th>
-                    <th class="border border-gray-300 p-3 text-center">Persentase Daya Serap (Standar 65%)</th>
+                    <th class="border border-gray-300 p-3 text-center">Persentase Daya Serap (Standar ${kkm})</th>
                     <th class="border border-gray-300 p-3 text-center">Ketuntasan Butir Soal (Klasikal)</th>
                 </tr>
             </thead>
@@ -3029,7 +3037,7 @@
         let tuntasKlasikal = 0, tidakTuntasKlasikal = 0;
         for(let i=0; i<jumlahSoal; i++) {
             let persen = countPerSoal[i] > 0 ? (skorPerSoal[i] / countPerSoal[i]) * 100 : 0;
-            let isTuntas = persen >= 65; 
+            let isTuntas = persen >= kkm;
             
             if(isTuntas) tuntasKlasikal++; else tidakTuntasKlasikal++;
 
@@ -3053,8 +3061,8 @@
             <h4 class="font-bold text-blue-800 mb-2">Kesimpulan Analisa Soal:</h4>
             <ul class="list-disc ml-5 text-sm text-blue-900">
                <li>Total Butir Soal: <b>${jumlahSoal}</b></li>
-               <li>Soal Tuntas (Daya serap >= 65%): <b class="text-green-600">${tuntasKlasikal} Soal</b></li>
-               <li>Soal Perlu Perbaikan Klasikal (Daya serap < 65%): <b class="text-red-600">${tidakTuntasKlasikal} Soal</b></li>
+               <li>Soal Tuntas (Daya serap >= ${kkm}): <b class="text-green-600">${tuntasKlasikal} Soal</b></li>
+               <li>Soal Perlu Perbaikan Klasikal (Daya serap < ${kkm}): <b class="text-red-600">${tidakTuntasKlasikal} Soal</b></li>
             </ul>
           </div>
         `;
@@ -3065,9 +3073,8 @@
 
     // B. MENU ANALISA JAWABAN
     async function prosesAnalisaJawaban() {
-      const kode = document.getElementById('an-jawaban-mapel').value;
-      const kkm = parseFloat(document.getElementById('input-kkm-jawaban').value) || 65; 
-      
+      const kode = document.getElementById('an-soal-mapel').value;
+      const kkm = parseFloat(document.getElementById('input-kkm-soal').value) || 65; // <--- TAMBAH BARIS INI
       if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
       
       showLoader('Menganalisis Jawaban...');
@@ -3185,9 +3192,10 @@
         document.getElementById('an-jml-siswa').innerText = totalSiswa;
         document.getElementById('an-jml-tuntas').innerText = statTuntas;
         document.getElementById('an-jml-gagal').innerText = statGagal;
+        document.getElementById('teks-batas-klasikal').innerText = kkm;
 
         let elKlasikal = document.getElementById('an-klasikal');
-        if(parseFloat(persenTuntasKlasikal) >= 85) { 
+        if(parseFloat(persenTuntasKlasikal) >= kkm) { 
             elKlasikal.innerText = "YA";
             elKlasikal.className = "font-bold px-2 py-1 bg-green-100 text-green-700 rounded border border-green-300";
         } else {
@@ -4120,7 +4128,6 @@
         // Header dan Identitas Siswa
         let html = `
         <div style="padding: 10px;">
-            ${kopUrl ? `<img src="${kopUrl}" style="width:100%; max-height: 120px; object-fit: contain; margin-bottom: 15px; display:block;">` : `<h2 style="text-align:center; font-weight:bold; margin-bottom: 15px; text-transform: uppercase;">${namaSekolah}</h2>`}
             
             <h3 style="text-align: center; text-decoration: underline; margin-bottom: 25px;">LEMBAR JAWABAN SISWA</h3>
 
@@ -4260,6 +4267,30 @@
                     .question-text p:first-child { margin-top: 0; }
                     .question-text p:first-child::first-letter { text-transform: uppercase; }
                     .eyd-text::first-letter { text-transform: uppercase; }
+                    
+                    /* --- TAMBAHAN CSS UNTUK GAMBAR & OPSI --- */
+                    .question-text img {
+                        max-height: 180px !important;
+                        max-width: 100% !important;
+                        object-fit: contain !important;
+                        display: block;
+                        margin: 10px 0;
+                    }
+                    .eyd-text {
+                        display: flex !important;
+                        flex-direction: column !important;
+                        gap: 8px; 
+                        margin-top: 1px;
+                    }
+                    .eyd-text img {
+                        max-height: 120px !important;
+                        max-width: 150px !important;
+                        object-fit: contain !important;
+                        align-self: flex-start !important; 
+                        margin: 0 !important;
+                        border-radius: 4px;
+                        border: 1px solid #e5e7eb; 
+                    }
                 </style>
             </head>
             <body>
