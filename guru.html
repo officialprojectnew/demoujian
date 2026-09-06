@@ -484,11 +484,11 @@
             </div>
             <div class="w-full lg:w-24">
               <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
-              <select id="an-jawaban-kelas" onchange="filterAnalisaMapelGuru('jawaban')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-Pilih-</option></select>
+              <select id="an-jawaban-kelas" onchange="filterAnalisaMapelGuru('jawaban')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-Pilih Kategori-</option></select>
             </div>
             <div class="flex-1 w-full">
               <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
-              <select id="an-jawaban-mapel" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih --</option></select>
+              <select id="an-jawaban-mapel" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih Kategori--</option></select>
             </div>
             <div class="w-full lg:w-24">
               <label class="block text-sm font-semibold text-gray-700 mb-2">Batas KKM</label>
@@ -596,10 +596,10 @@
         document.getElementById('an-jawaban-kategori').innerHTML = optKat;
         
         document.getElementById('an-soal-kelas').innerHTML = '<option value="">-- Pilih Kategori --</option>';
-        document.getElementById('an-soal-mapel').innerHTML = '<option value="">-- Pilih Kelas --</option>';
+        document.getElementById('an-soal-mapel').innerHTML = '<option value="">-- Pilih Kategotri --</option>';
         
         document.getElementById('an-jawaban-kelas').innerHTML = '<option value="">-- Pilih Kategori --</option>';
-        document.getElementById('an-jawaban-mapel').innerHTML = '<option value="">-- Pilih Kelas --</option>';
+        document.getElementById('an-jawaban-mapel').innerHTML = '<option value="">-- Pilih Kategori --</option>';
       } catch(e) {}
     }
 
@@ -607,12 +607,12 @@
         let katKode = document.getElementById(`an-${tipe}-kategori`).value;
         if(!katKode) {
             document.getElementById(`an-${tipe}-kelas`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
-            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
             return;
         }
         let filtered = globalAnalisaExamsGuru.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()));
         let kelasSet = new Set(filtered.map(e => e.kelas));
-        let optKls = '<option value="">-- Pilih Kelas --</option>';
+        let optKls = '<option value="">-- Pilih Kategori --</option>';
         [...kelasSet].sort().forEach(k => optKls += `<option value="${k}">${k}</option>`);
         document.getElementById(`an-${tipe}-kelas`).innerHTML = optKls;
         document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
@@ -626,7 +626,7 @@
             return;
         }
         let filtered = globalAnalisaExamsGuru.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()) && e.kelas === kls);
-        let optMapel = '<option value="">-- Pilih Mata Pelajaran --</option>';
+        let optMapel = '<option value="">-- Pilih Kategori --</option>';
         filtered.forEach(e => optMapel += `<option value="${e.kode}">${e.mapel} (${e.kode})</option>`);
         document.getElementById(`an-${tipe}-mapel`).innerHTML = optMapel;
     }
