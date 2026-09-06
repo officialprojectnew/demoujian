@@ -553,7 +553,7 @@
             </div>
             <div class="flex gap-2 w-full md:w-auto">
                 <button onclick="tampilkanRekapAdmin()" class="flex-1 md:flex-none bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-search mr-2"></i>Cari</button>
-                <button onclick="eksporExcelRekap('admin')" class="flex-1 md:flex-none bg-green-600 text-white px-5 py-3 rounded-xl font-bold hover:bg-green-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-file-excel mr-2"></i></button>
+                <button onclick="eksporExcelRekap('admin')" class="flex-1 md:flex-none bg-green-600 text-white px-5 py-3 rounded-xl font-bold hover:bg-green-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-file-excel mr-2"></i>Export</button>
                 <button onclick="cetakRekapPDF('admin')" class="flex-1 md:flex-none bg-red-600 text-white px-5 py-3 rounded-xl font-bold hover:bg-red-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-print mr-2"></i>Print</button>
               </div>
           </div>
@@ -595,19 +595,19 @@
           
           <div class="mb-6 bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col lg:flex-row gap-4 items-end">
             <div class="flex-1 w-full">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
-              <select id="an-soal-kategori" onchange="filterAnalisaKelasGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"></select>
-            </div>
-            <div class="w-full w-full">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
-              <select id="an-jawaban-kelas" onchange="filterAnalisaMapel('jawaban')" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih Kategori --</option></select>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
+                <select id="an-soal-kategori" onchange="filterAnalisaKelas('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"></select>
             </div>
             <div class="flex-1 w-full">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
-              <select id="an-jawaban-mapel" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih Kategori --</option></select>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
+                <select id="an-soal-kelas" onchange="filterAnalisaMapel('soal')" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih Kategori --</option></select>
             </div>
-            <button onclick="prosesAnalisaSoalGuru()" class="bg-blue-600 text-white w-full lg:w-auto px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-search mr-2"></i>Cari</button>
-        </div>
+            <div class="flex-1 w-full">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
+                <select id="an-soal-mapel" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih Kategori --</option></select>
+            </div>
+            <button onclick="prosesAnalisaSoal()" class="bg-blue-600 text-white w-full lg:w-auto px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-search mr-2"></i>Cari</button>
+            </div>
 
           <div id="area-cetak-soal" class="bg-white p-4 border rounded-xl overflow-x-auto min-h-[400px]">
             <h3 class="font-bold text-lg text-center mb-4 hidden print-show" style="text-decoration: underline;">ANALISA BUTIR SOAL</h3>
@@ -634,7 +634,7 @@
               <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
               <select id="an-jawaban-kategori" onchange="filterAnalisaKelas('jawaban')" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"></select>
             </div>
-            <div class="w-full lg:w-24">
+            <div class="flex-1 w-full">
               <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
               <select id="an-jawaban-kelas" onchange="filterAnalisaMapel('jawaban')" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-Pilih Kategori-</option></select>
             </div>
@@ -671,7 +671,9 @@
                        <tr><td>c. Banyaknya siswa yang belum tuntas</td><td>: <span id="an-jml-gagal" class="font-bold text-red-600">0</span> orang</td></tr>
                     </table>
                     <p class="mt-2">1.2 Batas KKM <span id="teks-batas-klasikal">85</span> : <span id="an-klasikal" class="font-bold px-2 py-1 rounded">TIDAK</span></p>
-                </div>
+                  </div>
+                </div> <!-- INI ADALAH PENUTUP DIV class="mb-4" YANG SEBELUMNYA HILANG -->
+                
                 <div>
                   <p class="font-bold text-gray-700 text-sm">2. Kesimpulan / Program Perbaikan</p>
                   <div class="ml-4 text-sm text-gray-600 space-y-2 mt-2">
@@ -801,10 +803,11 @@
         </div>
       </div>
 
-      <!-- MENU 7: KONFIGURASI SEKOLAH -->
+     <!-- MENU 7: KONFIGURASI SEKOLAH -->
       <div id="view-konfigurasi" class="admin-menu hidden">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
           
+          <!-- DATA SEKOLAH DI BAWAH -->
           <h3 class="text-3xl font-bold text-gray-800 mb-6">Data Sekolah</h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -817,20 +820,15 @@
                   <label class="text-sm font-bold text-gray-700">Nama Kepala Sekolah</label>
                   <input type="text" id="konf-nama-kepsek" class="w-full mt-1 p-3 border rounded-xl outline-none focus:border-blue-500" placeholder="Contoh: Nedi Iswandi, M.Pd">
                </div>
-               <!-- Form Tambahan Baru (NPSN & NSS) -->
                <div class="grid grid-cols-2 gap-4">
                   <div>
                      <label class="text-sm font-bold text-gray-700">NPSN</label>
-                     <!-- Pembatasan: Hanya angka, maksimal 8 digit, jalankan fungsi cekNPSN() saat diketik -->
                      <input type="text" id="konf-npsn" maxlength="8" oninput="this.value = this.value.replace(/[^0-9]/g, ''); cekNPSN()" class="w-full mt-1 p-3 border rounded-xl outline-none focus:border-blue-500 transition" placeholder="Contoh: 12345678">
-                     <!-- Pesan Peringatan -->
                      <p id="err-npsn" class="text-xs text-red-500 font-semibold mt-1 hidden animate-pulse">NPSN harus tepat 8 digit angka!</p>
                   </div>
                   <div>
                      <label class="text-sm font-bold text-gray-700">NSS</label>
-                     <!-- Pembatasan: Hanya angka, maksimal 12 digit, jalankan fungsi cekNSS() saat diketik -->
                      <input type="text" id="konf-nss" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, ''); cekNSS()" class="w-full mt-1 p-3 border rounded-xl outline-none focus:border-blue-500 transition" placeholder="Contoh: 101010101010">
-                     <!-- Pesan Peringatan -->
                      <p id="err-nss" class="text-xs text-red-500 font-semibold mt-1 hidden animate-pulse">NSS harus tepat 12 digit angka!</p>
                   </div>
                </div>
@@ -860,10 +858,11 @@
           </div>
           
           <div class="mt-6 pt-6 border-t border-gray-100 text-right">
-            <button onclick="simpanKonfigurasi()" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition w-full md:w-auto"><i class="fas fa-save mr-2"></i> Simpan </button>
+            <button onclick="simpanKonfigurasi()" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition w-full md:w-auto"><i class="fas fa-save mr-2"></i> Simpan Sekolah</button>
            </div>
-           <!-- KONFIGURASI AKUN ADMIN -->
-          <div class="mt-10 pt-8 border-t-2 border-dashed border-gray-200">
+
+           <!-- KONFIGURASI AKUN ADMIN DI ATAS -->
+          <div class="mb-10 pb-8 border-b-2 border-dashed border-gray-200">
             <h2 class="text-2xl font-bold text-gray-800 mb-2">Keamanan Akun Administrator</h2>
             <p class="text-sm text-gray-500 mb-6">Ubah username dan password untuk login ke Dashboard Admin. Kosongkan jika tidak ingin diubah.</p>
             
@@ -882,11 +881,13 @@
                 <button onclick="prosesUpdateAkunAdmin()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 shadow transition w-full md:w-auto"><i class="fas fa-user-lock mr-2"></i> Update Akun</button>
             </div>
           </div>
+
         </div>
       </div>
 
     </div>
   </div>
+           
 
   <!-- KUMPULAN MODAL -->
   
@@ -2909,6 +2910,7 @@
     let globalTahunMaster = [];
 
     // Mengambil dan menyiapkan data filter (Kategori -> Kelas -> Mapel)
+    // Mengambil dan menyiapkan data filter (Kategori -> Kelas -> Mapel)
     async function loadDataFilterAnalisa() {
       try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) });
@@ -2916,14 +2918,15 @@
         globalAnalisaExams = result.data || [];
         
         let optKat = '<option value="">-- Pilih Kategori --</option>';
-        if (globalKategoriMaster.length > 0) {
+        // Pastikan menarik dari globalKategoriMaster jika tersedia
+        if (globalKategoriMaster && globalKategoriMaster.length > 0) {
             globalKategoriMaster.forEach(c => {
                optKat += `<option value="${c.kode}">${c.nama} (${c.kode})</option>`;
             });
         } else {
             let categories = new Set();
             globalAnalisaExams.forEach(e => {
-                let cat = e.kode.split(/[-_ ]/)[0]; 
+                let cat = e.kode.split(/[-_ ]/)[2]; // Indeks ke-2 adalah kategori pada format MAPEL_KELAS_KAT_TAHUN
                 if(cat) categories.add(cat);
             });
             [...categories].sort().forEach(c => optKat += `<option value="${c}">${c}</option>`);
@@ -2947,23 +2950,35 @@
             document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
             return;
         }
-        let filtered = globalAnalisaExams.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()));
+        // Filter ujian berdasarkan kategori yang dipilih (Kategori ada di indeks ke-2 dari kode soal)
+        let filtered = globalAnalisaExams.filter(e => {
+            let parts = e.kode.split('_');
+            return parts.length > 2 && parts[2].toUpperCase() === katKode.toUpperCase();
+        });
+        
         let kelasSet = new Set(filtered.map(e => e.kelas));
-        let optKls = '<option value="">-- Pilih Kategori --</option>';
+        let optKls = '<option value="">-- Pilih Kelas --</option>';
         [...kelasSet].sort().forEach(k => optKls += `<option value="${k}">${k}</option>`);
         document.getElementById(`an-${tipe}-kelas`).innerHTML = optKls;
-        document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
+        document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
     }
 
     function filterAnalisaMapel(tipe) {
         let katKode = document.getElementById(`an-${tipe}-kategori`).value;
         let kls = document.getElementById(`an-${tipe}-kelas`).value;
         if(!kls) {
-            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
+            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
             return;
         }
-        let filtered = globalAnalisaExams.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()) && e.kelas === kls);
-        let optMapel = '<option value="">-- Pilih Kategori --</option>';
+        
+        // Filter ujian berdasarkan Kategori DAN Kelas
+        let filtered = globalAnalisaExams.filter(e => {
+            let parts = e.kode.split('_');
+            let isKatMatch = parts.length > 2 && parts[2].toUpperCase() === katKode.toUpperCase();
+            return isKatMatch && e.kelas === kls;
+        });
+        
+        let optMapel = '<option value="">-- Pilih Mata Pelajaran --</option>';
         filtered.forEach(e => optMapel += `<option value="${e.kode}">${e.mapel} (${e.kode})</option>`);
         document.getElementById(`an-${tipe}-mapel`).innerHTML = optMapel;
     }
@@ -3070,8 +3085,8 @@
 
     // B. MENU ANALISA JAWABAN
     async function prosesAnalisaJawaban() {
-      const kode = document.getElementById('an-soal-mapel').value;
-      const kkm = parseFloat(document.getElementById('input-kkm-soal').value) || 65; // <--- TAMBAH BARIS INI
+      const kode = document.getElementById('an-jawaban-mapel').value;
+      const kkm = parseFloat(document.getElementById('input-kkm-jawaban').value) || 65;
       if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
       
       showLoader('Menganalisis Jawaban...');
