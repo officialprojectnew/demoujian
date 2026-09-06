@@ -4532,6 +4532,41 @@ function toggleSidebar() {
     }
 }
 
+// ==========================================
+    // FUNGSI PRINT AREA (ANALISA SOAL & JAWABAN)
+    // ==========================================
+    function cetakArea(elementId, orientation = 'portrait') {
+        const elemenCetak = document.getElementById(elementId);
+        
+        if (!elemenCetak) {
+            Swal.fire('Error', 'Area yang akan dicetak tidak ditemukan!', 'error');
+            return;
+        }
+
+        const printArea = document.getElementById('print-area');
+        
+        // Atur orientasi kertas cetak (portrait/landscape)
+        const styleHalaman = `<style>@page { size: A4 ${orientation}; margin: 10mm; }</style>`;
+        
+        // Salin isi dari elemen yang ingin dicetak ke dalam kontainer print
+        printArea.innerHTML = styleHalaman + elemenCetak.innerHTML;
+        
+        // Tampilkan judul/header yang sebelumnya disembunyikan (class 'print-show')
+        const elemenTersembunyi = printArea.querySelectorAll('.print-show');
+        elemenTersembunyi.forEach(el => {
+            el.classList.remove('hidden');
+            el.classList.add('block');
+        });
+
+        // Jeda sebentar agar browser merender tampilan sebelum memanggil dialog print
+        setTimeout(() => {
+            window.print();
+            // Bersihkan kembali print-area setelah selesai
+            printArea.innerHTML = '';
+        }, 500);
+    }
+
+
     // Eksekusi fungsi inisialisasi ketika DOM Website siap
     document.addEventListener("DOMContentLoaded", initApp);
   </script>
