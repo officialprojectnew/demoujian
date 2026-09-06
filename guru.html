@@ -121,7 +121,7 @@
                 <div class="overflow-hidden">
                    <p class="text-xs text-green-100 uppercase tracking-wider font-bold mb-1">Biodata Guru</p>
                    <h3 class="text-xl font-black truncate" id="dash-nama-guru">Memuat...</h3>
-                   <p class="text-sm font-medium mt-0.5 bg-green-700/50 inline-block px-2 py-0.5 rounded">ID : <span id="dash-id-guru">...</span></p>
+                   <p class="text-sm font-medium mt-0.5 px-2 py-0.5 rounded">ID : <span id="dash-id-guru">...</span></p>
                 </div>
              </div>
           </div>
@@ -303,7 +303,7 @@
     <div id="guru-edit-soal" class="guru-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Manajemen Edit Soal</h2>
-        <button onclick="loadEditSoal()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-blue-200 text-sm transition">🔄</button>
+        <button onclick="loadEditSoal()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-blue-200 text-sm transition"><i class="fas fa-sync-alt"></i></button>
       </div>
       <div class="overflow-x-auto border border-gray-200 rounded-xl">
         <table class="w-full text-left border-collapse">
@@ -328,7 +328,7 @@
     <div id="guru-rekap-ujian" class="guru-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Rekap & Nilai Ujian</h2>
-        <button onclick="loadDropdownRekap()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg text-sm transition">🔄</button>
+        <button onclick="loadDropdownRekap()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg text-sm transition">i class="fas fa-sync-alt"></i></button>
       </div>
       <div class="mb-6 bg-gray-50 p-5 rounded-xl border flex flex-col md:flex-row items-end gap-4 shadow-sm">
           <div class="flex-1 w-full">
@@ -426,7 +426,7 @@
 
         <div class="pt-6 flex gap-3">
           <button onclick="tutupModalSetup()" class="flex-1 bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition">Batal</button>
-          <button onclick="terapkanParameter()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Terapkan Setup</button>
+          <button onclick="terapkanParameter()" class="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">Terapkan</button>
         </div>
       </div>
     </div>
@@ -436,7 +436,7 @@
       <div class="flex justify-between items-center mb-6">
         <div>
           <h2 class="text-3xl font-bold text-gray-800">Analisa Soal</h2>
-          <p class="text-sm text-gray-500 mt-1">Analisis tingkat ketuntasan setiap butir soal secara klasikal (Hanya untuk soal buatan Anda).</p>
+          <p class="text-sm text-gray-500 mt-1">Analisis tingkat ketuntasan setiap butir soal (Hanya untuk soal buatan Anda).</p>
         </div>
         <button onclick="cetakAreaGuru('area-cetak-soal')" class="bg-green-600 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-green-700 transition shadow-sm text-sm"><i class="fas fa-print mr-2"></i>Print</button>
       </div>
@@ -482,7 +482,7 @@
               <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
               <select id="an-jawaban-kategori" onchange="filterAnalisaKelasGuru('jawaban')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"></select>
             </div>
-            <div class="w-full lg:w-24">
+            <div class="flex-1 w-full">
               <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
               <select id="an-jawaban-kelas" onchange="filterAnalisaMapelGuru('jawaban')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-Pilih Kategori-</option></select>
             </div>
@@ -518,13 +518,13 @@
                    <tr><td>b. Banyaknya siswa yang tuntas</td><td>: <span id="an-jml-tuntas" class="font-bold text-green-600">0</span> orang</td></tr>
                    <tr><td>c. Banyaknya siswa yang belum tuntas</td><td>: <span id="an-jml-gagal" class="font-bold text-red-600">0</span> orang</td></tr>
                 </table>
-                <p class="mt-2">1.2 Klasikal (Minimal 85%) : <span id="an-klasikal" class="font-bold px-2 py-1 rounded">TIDAK</span></p>
+                <p class="mt-2">1.2 Minimal 85% : <span id="an-klasikal" class="font-bold px-2 py-1 rounded">TIDAK</span></p>
               </div>
             </div>
             <div>
               <p class="font-bold text-gray-700 text-sm">2. Kesimpulan / Program Perbaikan</p>
               <div class="ml-4 text-sm text-gray-600 space-y-2 mt-2">
-                <p>a. Perlu perbaikan secara klasikal untuk soal nomor : <b id="an-soal-sulit" class="text-red-600">-</b></p>
+                <p>a. Perlu perbaikan untuk soal nomor : <b id="an-soal-sulit" class="text-red-600">-</b></p>
                 <p>b. Siswa yang perlu perbaikan (karena belum tuntas) :</p>
                 <ul id="an-siswa-remedial" class="list-decimal ml-6 mt-1 text-red-600 font-semibold"></ul>
               </div>
@@ -596,7 +596,7 @@
         document.getElementById('an-jawaban-kategori').innerHTML = optKat;
         
         document.getElementById('an-soal-kelas').innerHTML = '<option value="">-- Pilih Kategori --</option>';
-        document.getElementById('an-soal-mapel').innerHTML = '<option value="">-- Pilih Kategotri --</option>';
+        document.getElementById('an-soal-mapel').innerHTML = '<option value="">-- Pilih Kategori --</option>';
         
         document.getElementById('an-jawaban-kelas').innerHTML = '<option value="">-- Pilih Kategori --</option>';
         document.getElementById('an-jawaban-mapel').innerHTML = '<option value="">-- Pilih Kategori --</option>';
@@ -615,14 +615,14 @@
         let optKls = '<option value="">-- Pilih Kategori --</option>';
         [...kelasSet].sort().forEach(k => optKls += `<option value="${k}">${k}</option>`);
         document.getElementById(`an-${tipe}-kelas`).innerHTML = optKls;
-        document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
+        document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
     }
 
     function filterAnalisaMapelGuru(tipe) {
         let katKode = document.getElementById(`an-${tipe}-kategori`).value;
         let kls = document.getElementById(`an-${tipe}-kelas`).value;
         if(!kls) {
-            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
             return;
         }
         let filtered = globalAnalisaExamsGuru.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()) && e.kelas === kls);
@@ -688,7 +688,7 @@
                 <tr class="bg-gray-100">
                     <th class="border border-gray-300 p-3 text-center w-12">No. Soal</th>
                     <th class="border border-gray-300 p-3 text-center">Persentase Daya Serap (Standar 65%)</th>
-                    <th class="border border-gray-300 p-3 text-center">Ketuntasan Butir Soal (Klasikal)</th>
+                    <th class="border border-gray-300 p-3 text-center">Ketuntasan Butir Soal</th>
                 </tr>
             </thead>
             <tbody>`;
@@ -721,7 +721,7 @@
             <ul class="list-disc ml-5 text-sm text-blue-900">
                <li>Total Butir Soal: <b>${jumlahSoal}</b></li>
                <li>Soal Tuntas (Daya serap >= 65%): <b class="text-green-600">${tuntasKlasikal} Soal</b></li>
-               <li>Soal Perlu Perbaikan Klasikal (Daya serap < 65%): <b class="text-red-600">${tidakTuntasKlasikal} Soal</b></li>
+               <li>Soal Perlu Perbaikan (Daya serap < 65%): <b class="text-red-600">${tidakTuntasKlasikal} Soal</b></li>
             </ul>
           </div>
         `;
@@ -783,11 +783,11 @@
                 <tr class="bg-gray-100">
                     <th rowspan="2" class="border border-gray-300 p-2 text-center w-8">No</th>
                     <th rowspan="2" class="border border-gray-300 p-2 text-center w-24">NISN</th>
-                    <th rowspan="2" class="border border-gray-300 p-2 text-center w-48">NAMA SISWA</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center w-48">Nama Siswa</th>
                     <th colspan="${jumlahSoal}" class="border border-gray-300 p-2 text-center">Skor Tiap Nomor</th>
                     <th colspan="4" class="border border-gray-300 p-2 text-center bg-blue-50/50">Rincian Nilai</th>
-                    <th rowspan="2" class="border border-gray-300 p-2 text-center">Total Nilai</th>
-                    <th rowspan="2" class="border border-gray-300 p-2 text-center">KETUNTASAN</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center">Total</th>
+                    <th rowspan="2" class="border border-gray-300 p-2 text-center">Ketuntasan</th>
                 </tr>
                 <tr class="bg-gray-100">`;
         
@@ -838,7 +838,7 @@
             htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-purple-600 bg-blue-50/10">${nilaiIsian}</td>`;
             htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold text-yellow-600 bg-blue-50/10">${nilaiEssay}</td>`;
             htmlRow += `<td class="border border-gray-300 p-2 text-center font-black text-green-600 bg-gray-50/50">${totalSistem}</td>`;
-            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold ${isTuntas ? 'text-green-600' : 'text-red-600'}">${isTuntas ? 'YA' : 'TDK'}</td>`;
+            htmlRow += `<td class="border border-gray-300 p-2 text-center font-bold ${isTuntas ? 'text-green-600' : 'text-red-600'}">${isTuntas ? 'Ya' : 'Tidak'}</td>`;
             htmlRow += `</tr>`;
             htmlTable += htmlRow;
         });
@@ -1092,7 +1092,7 @@
                 
                 <div id="placeholder_opsi_${o}" class="pointer-events-none text-blue-500 flex flex-col items-center">
                     <i class="fas fa-image mb-1 text-xl"></i>
-                    <span class="text-xs font-semibold">Drop Gambar${o}</span>
+                    <span class="text-xs font-semibold">Drop Gambar ${o}</span>
                 </div>
                 
                 <img id="preview_opsi_${o}" src="" class="hidden mx-auto max-h-20 rounded shadow-sm border border-gray-200 relative z-10">
@@ -1264,7 +1264,7 @@
     function batalEditKeranjang() {
   indexEditKeranjang = null; 
   document.getElementById('btn-tambah-keranjang').classList.remove('hidden');
-  document.getElementById('btn-tambah-keranjang').innerHTML = `<i class="fas fa-arrow-down mr-2"></i> Tambah Soal`;
+  document.getElementById('btn-tambah-keranjang').innerHTML = `Tambah Soal`;
   document.getElementById('btn-update-db').classList.add('hidden');
   document.getElementById('btn-batal-edit-keranjang').classList.add('hidden'); 
   document.getElementById('label-nomor-soal').innerHTML = `<i class="fas fa-pen mr-2 text-blue-500"></i> Ketik Soal`;
@@ -1663,7 +1663,7 @@
             <td class="p-4 text-center font-bold text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
             <td class="p-4 text-center flex flex-col gap-2">
                 <button onclick="bukaEditPenilaian(${i})" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-blue-700 shadow-sm text-xs whitespace-nowrap transition">Nilai Essay</button>
-                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition"><i class="fas fa-download mr-1"></i> Jawaban</button>
+                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition">Lembar Jawaban</button>
             </td>
           </tr>`; 
         }); 
