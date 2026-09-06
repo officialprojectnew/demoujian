@@ -259,7 +259,7 @@
         
         <div id="placeholder-gambar-utama" class="flex flex-col items-center justify-center pointer-events-none">
             <i class="fas fa-clipboard text-3xl text-blue-400 mb-2"></i>
-            <span class="text-sm font-semibold text-blue-700">Tarik & Jatuhkan Gambar Disini</span>
+            <span class="text-sm font-semibold text-blue-700">Drop Gambar</span>
         </div>
 
         <img id="preview-gambar-soal" src="" class="hidden mx-auto max-h-48 rounded-lg shadow-sm border border-gray-200 relative z-10">
@@ -273,7 +273,7 @@
         <!-- TOMBOL DINAMIS: TAMBAH KE KERANJANG ATAU UPDATE DB -->
         <div class="flex gap-3">
           <button id="btn-tambah-keranjang" onclick="tambahkanKeDaftar()" class="flex-1 bg-yellow-500 text-white font-bold py-3.5 rounded-xl hover:bg-yellow-600 transition shadow text-base tracking-wide">
-            <i class="fas fa-arrow-down mr-2"></i> Tambah Soal
+          Tambah Soal
           </button>
           
           <button id="btn-update-db" onclick="updateLangsungKeDB()" class="hidden flex-1 bg-green-600 text-white font-bold py-3.5 rounded-xl hover:bg-green-700 transition shadow text-base tracking-wide">
@@ -295,7 +295,7 @@
       </div>
       
       <button onclick="simpanPaketDenganValidasi()" id="btn-simpan-final" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition shadow-lg text-lg hidden tracking-wide">
-        <i class="fas fa-save mr-2"></i> Save Database
+        Save Database
       </button>
     </div>
 
@@ -337,7 +337,7 @@
           </div>
           <div class="flex gap-2 w-full md:w-auto">
               <button onclick="tampilkanRekap()" class="flex-1 md:flex-none bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition shadow whitespace-nowrap"><i class="fas fa-search mr-1"></i> Cari</button>
-              <button onclick="eksporExcelRekap('guru')" class="flex-1 md:flex-none bg-green-600 text-white px-4 py-2.5 rounded-lg font-bold hover:bg-green-700 transition shadow whitespace-nowrap"><i class="fas fa-file-excel mr-1"></i></button>
+              <button onclick="eksporExcelRekap('guru')" class="flex-1 md:flex-none bg-green-600 text-white px-4 py-2.5 rounded-lg font-bold hover:bg-green-700 transition shadow whitespace-nowrap"><i class="fas fa-file-excel mr-1"></i>Export</button>
               <button onclick="cetakRekapPDF('guru')" class="flex-1 md:flex-none bg-red-600 text-white px-4 py-2.5 rounded-lg font-bold hover:bg-red-700 transition shadow whitespace-nowrap"><i class="fas fa-print mr-2"></i>Print</button>
           </div>
       </div>
@@ -376,8 +376,8 @@
         </div>
         <div class="p-6 overflow-y-auto flex-1 space-y-4 bg-gray-100" id="container-detail-jawaban"></div>
         <div class="p-5 border-t flex justify-between items-center bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-          <div class="font-bold text-gray-700 text-lg flex items-center">Total Nilai Akhir: <span id="modal-total-skor" class="text-blue-600 text-4xl ml-3 font-black">0</span></div>
-          <div class="flex gap-3"><button onclick="tutupModalPenilaian()" class="px-6 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition">Batal</button><button onclick="simpanEditPenilaian()" id="btn-simpan-penilaian" class="px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-md transition">Simpan Nilai Manual</button></div>
+          <div class="font-bold text-gray-700 text-lg flex items-center">Nilai Akhir : <span id="modal-total-skor" class="text-blue-600 text-4xl ml-3 font-black">0</span></div>
+          <div class="flex gap-3"><button onclick="tutupModalPenilaian()" class="px-6 py-3 bg-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-300 transition">Batal</button><button onclick="simpanEditPenilaian()" id="btn-simpan-penilaian" class="px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-md transition">Simpan</button></div>
         </div>
       </div>
     </div>
@@ -1092,7 +1092,7 @@
                 
                 <div id="placeholder_opsi_${o}" class="pointer-events-none text-blue-500 flex flex-col items-center">
                     <i class="fas fa-image mb-1 text-xl"></i>
-                    <span class="text-xs font-semibold">Sisipkan / Drop Gambar Opsi ${o}</span>
+                    <span class="text-xs font-semibold">Drop Gambar${o}</span>
                 </div>
                 
                 <img id="preview_opsi_${o}" src="" class="hidden mx-auto max-h-20 rounded shadow-sm border border-gray-200 relative z-10">
@@ -1564,7 +1564,7 @@
     }
 
     async function masukModeEditPaket(p) { 
-      Swal.fire({ title: 'Tarik Soal?', text: "Seluruh soal ditarik ke Editor. Anda bisa mengedit & menyimpan soal", icon: 'question', showCancelButton: true, confirmButtonText: 'Ya' }).then(async (result) => {
+      Swal.fire({ title: 'Edit Soal?', text: "Seluruh soal ditarik ke Editor. Anda bisa mengedit & menyimpan soal", icon: 'question', showCancelButton: true, confirmButtonText: 'Ya' }).then(async (result) => {
         if (result.isConfirmed) {
           isEditMode=true; switchMenu('guru-buat-soal'); 
           document.getElementById('title-buat-soal').innerHTML = "<i class='fas fa-database text-orange-500 mr-2'></i> Mode Edit Database";
@@ -2081,7 +2081,7 @@ async function cetakLembarJawaban(kode_soal, nis) {
                 let isBenar = skorSiswa > 0; 
                 
                 if (isBenar) {
-                    html += `<div style="padding: 10px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px;"><b>Jawaban Siswa:</b> <span class="eyd-text">${capitalizeEYD(jwbSiswaRaw)}</span></div>`;
+                    html += `<div style="padding: 10px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px;"><b>Jawaban Siswa :</b> <span class="eyd-text">${capitalizeEYD(jwbSiswaRaw)}</span></div>`;
                 } else {
                     html += `<div style="padding: 10px; background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; margin-bottom: 6px;"><b>Jawaban Siswa:</b> <span style="color: #dc2626;" class="eyd-text">${capitalizeEYD(jwbSiswaRaw) || '<i>(Kosong)</i>'}</span></div>`;
                     html += `<div style="padding: 10px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px;"><b>Jawaban Benar:</b> <span style="color: #16a34a;" class="eyd-text">${capitalizeEYD(kunci)}</span></div>`;
