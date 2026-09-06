@@ -598,17 +598,13 @@
               <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori Ujian</label>
               <select id="an-soal-kategori" onchange="filterAnalisaKelasGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"></select>
             </div>
-            <div class="w-full lg:w-24">
+            <div class="w-full w-full">
               <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
-              <select id="an-soal-kelas" onchange="filterAnalisaMapelGuru('soal')" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-Pilih-</option></select>
+              <select id="an-jawaban-kelas" onchange="filterAnalisaMapel('jawaban')" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih Kategori --</option></select>
             </div>
             <div class="flex-1 w-full">
               <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
-              <select id="an-soal-mapel" class="w-full p-3 border border-gray-300 rounded-xl outline-none focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih --</option></select>
-            </div>
-            <div class="w-full lg:w-24">
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Batas KKM</label>
-              <input type="number" id="input-kkm-soal" value="65" class="w-full p-3 border border-gray-300 rounded-xl outline-none text-center font-bold text-blue-600 shadow-sm bg-white">
+              <select id="an-jawaban-mapel" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition bg-white shadow-sm"><option value="">-- Pilih Kategori --</option></select>
             </div>
             <button onclick="prosesAnalisaSoalGuru()" class="bg-blue-600 text-white w-full lg:w-auto px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition tracking-wide whitespace-nowrap"><i class="fas fa-search mr-2"></i>Cari</button>
         </div>
@@ -674,7 +670,7 @@
                        <tr><td>b. Banyaknya siswa yang tuntas</td><td>: <span id="an-jml-tuntas" class="font-bold text-green-600">0</span> orang</td></tr>
                        <tr><td>c. Banyaknya siswa yang belum tuntas</td><td>: <span id="an-jml-gagal" class="font-bold text-red-600">0</span> orang</td></tr>
                     </table>
-                    <p class="mt-2">1.2 Klasikal (Minimal <span id="teks-batas-klasikal">85</span>%) : <span id="an-klasikal" class="font-bold px-2 py-1 rounded">TIDAK</span></p>                  </div>
+                    <p class="mt-2">1.2 Batas KKM <span id="teks-batas-klasikal">85</span> : <span id="an-klasikal" class="font-bold px-2 py-1 rounded">TIDAK</span></p>
                 </div>
                 <div>
                   <p class="font-bold text-gray-700 text-sm">2. Kesimpulan / Program Perbaikan</p>
@@ -808,27 +804,7 @@
       <!-- MENU 7: KONFIGURASI SEKOLAH -->
       <div id="view-konfigurasi" class="admin-menu hidden">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
-          <!-- KONFIGURASI AKUN ADMIN -->
-          <div class="mt-10 pt-8 border-t-2 border-dashed border-gray-200">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Keamanan Akun Administrator</h2>
-            <p class="text-sm text-gray-500 mb-6">Ubah username dan password untuk login ke Dashboard Admin. Kosongkan jika tidak ingin diubah.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-red-50 p-6 rounded-2xl border border-red-100 shadow-sm">
-               <div>
-                  <label class="text-sm font-bold text-gray-700">Username Baru</label>
-                  <input type="text" id="konf-admin-user" class="w-full mt-1 p-3 border border-red-200 rounded-xl outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition" placeholder="Ketik username baru">
-               </div>
-               <div>
-                  <label class="text-sm font-bold text-gray-700">Password Baru</label>
-                  <input type="password" id="konf-admin-pass" class="w-full mt-1 p-3 border border-red-200 rounded-xl outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition" placeholder="Ketik password baru">
-               </div>
-            </div>
-            
-            <div class="mt-5 text-right">
-                <button onclick="prosesUpdateAkunAdmin()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 shadow transition w-full md:w-auto"><i class="fas fa-user-lock mr-2"></i> Update Akun</button>
-            </div>
-          </div>
-          <div class="mt-10 pt-8 border-t-2 border-dashed border-gray-200"></div>
+          
           <h3 class="text-3xl font-bold text-gray-800 mb-6">Data Sekolah</h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -886,6 +862,26 @@
           <div class="mt-6 pt-6 border-t border-gray-100 text-right">
             <button onclick="simpanKonfigurasi()" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow transition w-full md:w-auto"><i class="fas fa-save mr-2"></i> Simpan </button>
            </div>
+           <!-- KONFIGURASI AKUN ADMIN -->
+          <div class="mt-10 pt-8 border-t-2 border-dashed border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Keamanan Akun Administrator</h2>
+            <p class="text-sm text-gray-500 mb-6">Ubah username dan password untuk login ke Dashboard Admin. Kosongkan jika tidak ingin diubah.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-red-50 p-6 rounded-2xl border border-red-100 shadow-sm">
+               <div>
+                  <label class="text-sm font-bold text-gray-700">Username Baru</label>
+                  <input type="text" id="konf-admin-user" class="w-full mt-1 p-3 border border-red-200 rounded-xl outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition" placeholder="Ketik username baru">
+               </div>
+               <div>
+                  <label class="text-sm font-bold text-gray-700">Password Baru</label>
+                  <input type="password" id="konf-admin-pass" class="w-full mt-1 p-3 border border-red-200 rounded-xl outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 transition" placeholder="Ketik password baru">
+               </div>
+            </div>
+            
+            <div class="mt-5 text-right">
+                <button onclick="prosesUpdateAkunAdmin()" class="bg-red-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-700 shadow transition w-full md:w-auto"><i class="fas fa-user-lock mr-2"></i> Update Akun</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2953,7 +2949,7 @@
         }
         let filtered = globalAnalisaExams.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()));
         let kelasSet = new Set(filtered.map(e => e.kelas));
-        let optKls = '<option value="">-- Pilih Kelas --</option>';
+        let optKls = '<option value="">-- Pilih Kategori --</option>';
         [...kelasSet].sort().forEach(k => optKls += `<option value="${k}">${k}</option>`);
         document.getElementById(`an-${tipe}-kelas`).innerHTML = optKls;
         document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
@@ -2963,7 +2959,7 @@
         let katKode = document.getElementById(`an-${tipe}-kategori`).value;
         let kls = document.getElementById(`an-${tipe}-kelas`).value;
         if(!kls) {
-            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
             return;
         }
         let filtered = globalAnalisaExams.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()) && e.kelas === kls);
@@ -2975,8 +2971,9 @@
     // A. MENU ANALISA SOAL
     async function prosesAnalisaSoal() {
       const kode = document.getElementById('an-soal-mapel').value;
-      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
+      const kkm = parseFloat(document.getElementById('input-kkm-jawaban').value) || 65; // Mengambil KKM dari menu Analisa Jawaban
       
+      if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
       showLoader('Menganalisis Butir Soal...');
       try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) });
@@ -3037,7 +3034,7 @@
         let tuntasKlasikal = 0, tidakTuntasKlasikal = 0;
         for(let i=0; i<jumlahSoal; i++) {
             let persen = countPerSoal[i] > 0 ? (skorPerSoal[i] / countPerSoal[i]) * 100 : 0;
-            let isTuntas = persen >= kkm;
+            let isTuntas = persen >= kkm; // Menggunakan variabel kkm
             
             if(isTuntas) tuntasKlasikal++; else tidakTuntasKlasikal++;
 
@@ -3048,7 +3045,7 @@
                      <div class="w-1/2 bg-gray-200 rounded-full h-2.5">
                         <div class="bg-blue-600 h-2.5 rounded-full print-bg-blue" style="width: ${persen}%"></div>
                      </div>
-                     <span class="font-bold">${persen.toFixed(1)}%</span>
+                     <span class="font-bold">${persen.toFixed(1)}</span> <!-- Persen dihilangkan -->
                    </div>
                 </td>
                 <td class="border border-gray-300 p-3 text-center font-bold ${isTuntas ? 'text-green-600' : 'text-red-600'}">${isTuntas ? 'TUNTAS' : 'PERLU PERBAIKAN'}</td>
@@ -4276,20 +4273,24 @@
                         display: block;
                         margin: 10px 0;
                     }
+                    
+                    /* Membuat pembungkus teks dan gambar menjadi kolom vertikal */
                     .eyd-text {
                         display: flex !important;
                         flex-direction: column !important;
-                        gap: 8px; 
+                        gap: 8px; /* Jarak antara teks dan gambar */
                         margin-top: 1px;
                     }
+                    
+                    /* Mengatur posisi gambar di pilihan ganda */
                     .eyd-text img {
                         max-height: 120px !important;
                         max-width: 150px !important;
                         object-fit: contain !important;
-                        align-self: flex-start !important; 
+                        align-self: flex-start !important; /* Gambar rata kiri sejajar dengan teks */
                         margin: 0 !important;
                         border-radius: 4px;
-                        border: 1px solid #e5e7eb; 
+                        border: 1px solid #e5e7eb; /* Garis tepi tipis agar lebih rapi */
                     }
                 </style>
             </head>
