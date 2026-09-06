@@ -525,7 +525,7 @@
                    <tr><td>b. Banyaknya siswa yang tuntas</td><td>: <span id="an-jml-tuntas" class="font-bold text-green-600">0</span> orang</td></tr>
                    <tr><td>c. Banyaknya siswa yang belum tuntas</td><td>: <span id="an-jml-gagal" class="font-bold text-red-600">0</span> orang</td></tr>
                 </table>
-                <p class="mt-2">1.2  Batas KKM <span id="teks-batas-klasikal">85</span>% : <span id="an-klasikal" class="font-bold px-2 py-1 rounded">TIDAK</span></p>
+                <p class="mt-2">1.2  Batas KKM <span id="teks-batas-klasikal">85</span> : <span id="an-klasikal" class="font-bold px-2 py-1 rounded">TIDAK</span></p>
               </div>
             </div>
             <div>
@@ -2139,6 +2139,25 @@ async function cetakLembarJawaban(kode_soal, nis) {
                     .question-text p:first-child { margin-top: 0; }
                     .question-text p:first-child::first-letter { text-transform: uppercase; }
                     .eyd-text::first-letter { text-transform: uppercase; }
+                    
+                    /* --- TAMBAHAN CSS UNTUK GAMBAR --- */
+                    /* Gambar di Pertanyaan Utama */
+                    .question-text img {
+                        max-height: 180px !important;
+                        max-width: 100% !important;
+                        object-fit: contain !important;
+                        display: block;
+                        margin: 10px 0;
+                    }
+                    /* Gambar di Pilihan Jawaban (A, B, C, D) */
+                    .eyd-text img {
+                        max-height: 100px !important;
+                        max-width: 150px !important;
+                        object-fit: contain !important;
+                        vertical-align: middle;
+                        margin-left: 10px;
+                        border-radius: 4px;
+                    }
                 </style>
             </head>
             <body>
