@@ -23,7 +23,14 @@
     /* CSS KHUSUS UNTUK PRINT ANALISA GURU */
     @media print {
       body > *:not(#print-area) { display: none !important; }
-      body { background-color: #fff; margin: 0; padding: 0; }
+      body { 
+              background-color: #ffffff !important; 
+              margin: 0 !important; 
+              padding: 0 !important;
+              display: block !important;
+              height: auto !important;
+              overflow: visible !important;
+            }
       #print-area { display: block !important; width: 100%; margin: 0; padding: 0; }
       @page { size: A4 landscape !important; margin: 10mm; }
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -328,7 +335,7 @@
     <div id="guru-rekap-ujian" class="guru-menu hidden bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">Rekap & Nilai Ujian</h2>
-        <button onclick="loadDropdownRekap()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg text-sm transition">i class="fas fa-sync-alt"></i></button>
+        <button onclick="loadDropdownRekap()" class="bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-lg text-sm transition"><i class="fas fa-sync-alt"></i></button>
       </div>
       <div class="mb-6 bg-gray-50 p-5 rounded-xl border flex flex-col md:flex-row items-end gap-4 shadow-sm">
           <div class="flex-1 w-full">
