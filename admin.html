@@ -313,7 +313,15 @@
               </div>
               <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
                 <table class="w-full text-left border-collapse whitespace-nowrap">
-                  <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b text-center font-semibold">Foto</th><th class="p-4 border-b font-semibold">NIS</th><th class="p-4 border-b font-semibold">Nama Lengkap</th><th class="p-4 border-b font-semibold">NISN</th><th class="p-4 border-b font-semibold">Kelas</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+                  <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider">
+                    <th class="p-4 border-b text-center font-semibold" border-r >No</th>
+                    <th class="p-4 border-b text-center font-semibold">Foto</th>
+                    <th class="p-4 border-b font-semibold">NIS</th>
+                    <th class="p-4 border-b font-semibold">Nama Lengkap</th>
+                    <th class="p-4 border-b font-semibold">NISN</th>
+                    <th class="p-4 border-b font-semibold">Kelas</th>
+                    <th class="p-4 border-b font-semibold">Password</th>
+                    <th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
                   <tbody id="tabel-rekap-siswa"><tr><td colspan="8" class="p-8 text-center text-gray-500 text-sm">Pilih kelas terlebih dahulu.</td></tr></tbody>
                 </table>
               </div>
@@ -345,7 +353,15 @@
 
             <div class="overflow-x-auto border border-gray-200 rounded-xl bg-white shadow-sm">
               <table class="w-full text-left border-collapse whitespace-nowrap">
-                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider"><th class="p-4 border-b text-center font-semibold">No</th><th class="p-4 border-b text-center font-semibold">Foto</th><th class="p-4 border-b font-semibold">NIP</th><th class="p-4 border-b font-semibold">Nama Guru</th><th class="p-4 border-b font-semibold">Username</th><th class="p-4 border-b font-semibold">Password</th><th class="p-4 border-b text-center font-semibold">Aksi</th></tr></thead>
+                <thead><tr class="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider">
+                        <th class="p-4 border-b text-center font-semibold">No</th>
+                        <th class="p-4 border-b text-center font-semibold">Foto</th>
+                        <th class="p-4 border-b font-semibold">NIP</th>
+                        <th class="p-4 border-b font-semibold">Nama Guru</th>
+                        <th class="p-4 border-b font-semibold">Username</th>
+                        <th class="p-4 border-b font-semibold">Password</th>
+                        <th class="p-4 border-b text-center font-semibold">Aksi</th>
+                    </tr></thead>
                 <tbody id="tabel-rekap-guru"><tr><td colspan="7" class="p-8 text-center text-gray-500 text-sm">Klik Refresh Data...</td></tr></tbody>
               </table>
             </div>
@@ -4538,41 +4554,69 @@ function toggleSidebar() {
     // FUNGSI PRINT AREA (ANALISA SOAL & JAWABAN)
     // ==========================================
     function cetakArea(elementId, orientation = 'portrait') {
-            const elemenCetak = document.getElementById(elementId);
-            
-            if (!elemenCetak) {
-                Swal.fire('Error', 'Area yang akan dicetak tidak ditemukan!', 'error');
-                return;
-            }
+        const elemenCetak = document.getElementById(elementId);
+        
+        if (!elemenCetak) {
+            Swal.fire('Error', 'Area yang akan dicetak tidak ditemukan!', 'error');
+            return;
+        }
 
-            // Tampilkan loading progress agar admin tahu proses sedang berjalan
-            showLoader('Menyiapkan Dokumen Cetak...');
+        showLoader('Menyiapkan Dokumen Cetak...');
 
-            const printArea = document.getElementById('print-area');
-            
-            // Atur orientasi kertas cetak (portrait/landscape)
-            const styleHalaman = `<style>@page { size: A4 ${orientation}; margin: 10mm; }</style>`;
-            
-            // Salin isi dari elemen yang ingin dicetak ke dalam kontainer print
-            printArea.innerHTML = styleHalaman + elemenCetak.innerHTML;
-            
-            // Tampilkan judul/header yang sebelumnya disembunyikan (class 'print-show')
-            const elemenTersembunyi = printArea.querySelectorAll('.print-show');
-            elemenTersembunyi.forEach(el => {
-                el.classList.remove('hidden');
-                el.classList.add('block');
-            });
+        const clone = elemenCetak.cloneNode(true);
+        
+        const elemenTersembunyi = clone.querySelectorAll('.print-show');
+        elemenTersembunyi.forEach(el => {
+            el.classList.remove('hidden');
+            el.classList.add('block');
+        });
 
-            // Berikan jeda sejenak untuk memastikan browser selesai merender dan menutup loader sebelum memunculkan jendela print
+        let iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+
+        let doc = iframe.contentWindow.document;
+        doc.open();
+        // Penambahan backslash pada <\/script> agar tidak memutus HTML
+        doc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Cetak Dokumen</title>
+                <script src="https://cdn.tailwindcss.com"><\/script>
+                <style>
+                    @page { size: A4 ${orientation}; margin: 10mm; }
+                    body { 
+                        background-color: #ffffff !important; 
+                        color: #000 !important;
+                        -webkit-print-color-adjust: exact !important; 
+                        print-color-adjust: exact !important;
+                        font-family: 'Poppins', sans-serif;
+                    }
+                    .print-bg-blue { background-color: #2563eb !important; }
+                </style>
+            </head>
+            <body class="p-6 bg-white">
+                ${clone.innerHTML}
+            </body>
+            </html>
+        `);
+        doc.close();
+
+        setTimeout(() => {
+            hideLoader();
+            
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            
             setTimeout(() => {
-                hideLoader(); // Sembunyikan loading
-                window.print();
-                
-                // Bersihkan kembali print-area setelah selesai
-                setTimeout(() => {
-                    printArea.innerHTML = '';
-                }, 500);
-            }, 800);
+                document.body.removeChild(iframe);
+            }, 1000);
+            
+        }, 1200);
     }
 
 
