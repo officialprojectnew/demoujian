@@ -558,27 +558,29 @@
               </div>
           </div>
 
-          <div class="overflow-x-auto border border-gray-200 rounded-xl">
-            <table class="w-full text-left border-collapse whitespace-nowrap">
-              <thead>
-                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider text-center">
-                  <th rowspan="2" class="p-4 border-b font-semibold">No</th>
-                  <th rowspan="2" class="p-4 border-b font-semibold">NISN</th>
-                  <th rowspan="2" class="p-4 border-b font-semibold text-left">Nama Siswa</th>
-                  <th colspan="4" class="p-2 border-b border-r font-bold text-gray-700 bg-blue-50/50">NILAI</th>
-                  <th rowspan="2" class="p-4 border-b font-bold text-gray-900 bg-gray-100">Total Nilai</th>
-                  <th rowspan="2" class="p-4 border-b font-semibold text-left text-center">Aksi</th>
-                </tr>
-                <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider text-center">
-                  <th class="p-2 border-b font-semibold bg-blue-50/30">PG</th>
-                  <th class="p-2 border-b font-semibold bg-blue-50/30">PGK</th>
-                  <th class="p-2 border-b font-semibold bg-blue-50/30">Isian</th>
-                  <th class="p-2 border-b border-r font-semibold bg-blue-50/30">Essay</th>
-                </tr>
-              </thead>
-              <tbody id="tabel-rekap-nilai-admin"><tr><td colspan="8" class="p-8 text-center text-gray-500 text-sm">Pilih soal dan klik tampilkan.</td></tr></tbody>
-            </table>
-          </div>
+            <div class="overflow-x-auto border border-gray-200 rounded-xl">
+                <table class="w-full text-left border-collapse whitespace-nowrap">
+                    <thead>
+                    <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider text-center">
+                        <th rowspan="2" class="p-4 border-b border-r border-gray-200 font-semibold">No</th>
+                        <th rowspan="2" class="p-4 border-b border-r border-gray-200 font-semibold">NISN</th>
+                        <th rowspan="2" class="p-4 border-b border-r border-gray-200 font-semibold text-left">Nama Siswa</th>
+                        <th colspan="4" class="p-2 border-b border-r border-gray-200 font-bold text-gray-700 bg-blue-50/50">NILAI</th>
+                        <th rowspan="2" class="p-4 border-b border-r border-gray-200 font-bold text-gray-900 bg-gray-100">Total Nilai</th>
+                        <th rowspan="2" class="p-4 border-b border-gray-200 font-semibold text-left text-center">Aksi</th>
+                    </tr>
+                    <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider text-center">
+                        <th class="p-2 border-b border-r border-gray-200 font-semibold bg-blue-50/30">PG</th>
+                        <th class="p-2 border-b border-r border-gray-200 font-semibold bg-blue-50/30">PGK</th>
+                        <th class="p-2 border-b border-r border-gray-200 font-semibold bg-blue-50/30">Isian</th>
+                        <th class="p-2 border-b border-r border-gray-200 font-semibold bg-blue-50/30">Essay</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabel-rekap-nilai-admin">
+                    <tr><td colspan="9" class="p-8 text-center text-gray-500 text-sm">Pilih soal dan klik tampilkan.</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
       </div>
 
@@ -2884,19 +2886,19 @@
           let totalNilai = s.total !== undefined ? s.total : (nilaiPg + nilaiPgk + nilaiIsian + nilaiEssay);
 
           html += `
-          <tr class="border-b hover:bg-gray-50">
-            <td class="p-4 text-center text-sm">${i + 1}</td>
-            <td class="p-4 text-sm font-semibold">${nisn}</td>
-            <td class="p-4 text-sm font-bold text-gray-800">${s.nama}</td>
-            <td class="p-4 text-center font-bold text-blue-600 bg-blue-50/10">${nilaiPg}</td>
-            <td class="p-4 text-center font-bold text-indigo-600 bg-blue-50/10">${nilaiPgk}</td>
-            <td class="p-4 text-center font-bold text-purple-600 bg-blue-50/10">${nilaiIsian}</td>
-            <td class="p-4 text-center font-bold text-yellow-600 bg-blue-50/10 border-r">${nilaiEssay}</td>
-            <td class="p-4 text-center font-black text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
-            <td class="p-4 text-center">
-                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition">Lembar Jawaban</button>
-            </td>
-          </tr>`; 
+            <tr class="border-b border-gray-200 hover:bg-gray-50">
+                <td class="p-4 text-center text-sm border-r border-gray-200">${i + 1}</td>
+                <td class="p-4 text-sm font-semibold border-r border-gray-200">${nisn}</td>
+                <td class="p-4 text-sm font-bold text-gray-800 border-r border-gray-200">${s.nama}</td>
+                <td class="p-4 text-center font-bold text-blue-600 bg-blue-50/10 border-r border-gray-200">${nilaiPg}</td>
+                <td class="p-4 text-center font-bold text-indigo-600 bg-blue-50/10 border-r border-gray-200">${nilaiPgk}</td>
+                <td class="p-4 text-center font-bold text-purple-600 bg-blue-50/10 border-r border-gray-200">${nilaiIsian}</td>
+                <td class="p-4 text-center font-bold text-yellow-600 bg-blue-50/10 border-r border-gray-200">${nilaiEssay}</td>
+                <td class="p-4 text-center font-black text-green-600 text-lg bg-gray-50/50 border-r border-gray-200">${totalNilai}</td>
+                <td class="p-4 text-center">
+                    <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition">Lembar Jawaban</button>
+                </td>
+            </tr>`;
         }); 
         tbody.innerHTML = html; 
       } catch(e) { hideLoader(); } 
@@ -2960,7 +2962,7 @@
         let optKls = '<option value="">-- Pilih Kelas --</option>';
         [...kelasSet].sort().forEach(k => optKls += `<option value="${k}">${k}</option>`);
         document.getElementById(`an-${tipe}-kelas`).innerHTML = optKls;
-        document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
+        document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Mata Pelajaran --</option>';
     }
 
     function filterAnalisaMapel(tipe) {
@@ -4536,34 +4538,41 @@ function toggleSidebar() {
     // FUNGSI PRINT AREA (ANALISA SOAL & JAWABAN)
     // ==========================================
     function cetakArea(elementId, orientation = 'portrait') {
-        const elemenCetak = document.getElementById(elementId);
-        
-        if (!elemenCetak) {
-            Swal.fire('Error', 'Area yang akan dicetak tidak ditemukan!', 'error');
-            return;
-        }
+            const elemenCetak = document.getElementById(elementId);
+            
+            if (!elemenCetak) {
+                Swal.fire('Error', 'Area yang akan dicetak tidak ditemukan!', 'error');
+                return;
+            }
 
-        const printArea = document.getElementById('print-area');
-        
-        // Atur orientasi kertas cetak (portrait/landscape)
-        const styleHalaman = `<style>@page { size: A4 ${orientation}; margin: 10mm; }</style>`;
-        
-        // Salin isi dari elemen yang ingin dicetak ke dalam kontainer print
-        printArea.innerHTML = styleHalaman + elemenCetak.innerHTML;
-        
-        // Tampilkan judul/header yang sebelumnya disembunyikan (class 'print-show')
-        const elemenTersembunyi = printArea.querySelectorAll('.print-show');
-        elemenTersembunyi.forEach(el => {
-            el.classList.remove('hidden');
-            el.classList.add('block');
-        });
+            // Tampilkan loading progress agar admin tahu proses sedang berjalan
+            showLoader('Menyiapkan Dokumen Cetak...');
 
-        // Jeda sebentar agar browser merender tampilan sebelum memanggil dialog print
-        setTimeout(() => {
-            window.print();
-            // Bersihkan kembali print-area setelah selesai
-            printArea.innerHTML = '';
-        }, 500);
+            const printArea = document.getElementById('print-area');
+            
+            // Atur orientasi kertas cetak (portrait/landscape)
+            const styleHalaman = `<style>@page { size: A4 ${orientation}; margin: 10mm; }</style>`;
+            
+            // Salin isi dari elemen yang ingin dicetak ke dalam kontainer print
+            printArea.innerHTML = styleHalaman + elemenCetak.innerHTML;
+            
+            // Tampilkan judul/header yang sebelumnya disembunyikan (class 'print-show')
+            const elemenTersembunyi = printArea.querySelectorAll('.print-show');
+            elemenTersembunyi.forEach(el => {
+                el.classList.remove('hidden');
+                el.classList.add('block');
+            });
+
+            // Berikan jeda sejenak untuk memastikan browser selesai merender dan menutup loader sebelum memunculkan jendela print
+            setTimeout(() => {
+                hideLoader(); // Sembunyikan loading
+                window.print();
+                
+                // Bersihkan kembali print-area setelah selesai
+                setTimeout(() => {
+                    printArea.innerHTML = '';
+                }, 500);
+            }, 800);
     }
 
 
