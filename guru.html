@@ -317,8 +317,8 @@
           <thead>
             <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider">
               <th class="p-4 border-b text-center font-bold">No</th>
-              <th class="p-4 border-b font-bold">Kode Soal</th>
-              <th class="p-4 border-b font-bold">Mata Pelajaran</th>
+              <th class="p-4 border-b text-center font-bold">Kode Soal</th>
+              <th class="p-4 border-b text-center font-bold">Mata Pelajaran</th>
               <th class="p-4 border-b text-center font-bold">Kelas</th>
               <th class="p-4 border-b text-center font-bold">Aksi</th>
             </tr>
@@ -352,18 +352,18 @@
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-gray-100 text-gray-700 text-sm text-center">
-              <th rowspan="2" class="p-4 border-b w-12 text-center">No</th>
-              <th rowspan="2" class="p-4 border-b text-center">NISN</th>
-              <th rowspan="2" class="p-4 border-b text-left">Nama Siswa</th>
+              <th rowspan="2" class="p-4 border-b border-r border-gray-200 w-12 text-center">No</th>
+              <th rowspan="2" class="p-4 border-b border-r border-gray-200 text-center">NISN</th>
+              <th rowspan="2" class="p-4 border-b border-r border-gray-200 text-center">Nama Siswa</th>
               <th colspan="4" class="p-2 border-b border-r font-bold text-gray-800 bg-blue-50/50">NILAI</th>
-              <th rowspan="2" class="p-4 border-b font-bold bg-gray-100">Total</th>
-              <th rowspan="2" class="p-4 border-b">Aksi</th>
+              <th rowspan="2" class="p-4 border-b border-r border-gray-200 font-bold bg-gray-100">Total</th>
+              <th rowspan="2" class="p-4 border-b border-r border-gray-200">Aksi</th>
             </tr>
             <tr class="bg-gray-100 text-gray-700 text-sm text-center">
-              <th class="p-2 border-b font-semibold bg-blue-50/30">PG</th>
-              <th class="p-2 border-b font-semibold bg-blue-50/30">PGK</th>
-              <th class="p-2 border-b font-semibold bg-blue-50/30">Isian</th>
-              <th class="p-2 border-b border-r font-semibold bg-blue-50/30">Essay</th>
+              <th class="p-2 border-b border-r border-gray-200 font-semibold bg-blue-50/30">PG</th>
+              <th class="p-2 border-b border-r border-gray-200 font-semibold bg-blue-50/30">PGK</th>
+              <th class="p-2 border-b border-r border-gray-200 font-semibold bg-blue-50/30">Isian</th>
+              <th class="p-2 border-b border-r border-gray-200 font-semibold bg-blue-50/30">Essay</th>
             </tr>
           </thead>
           <tbody id="tabel-rekap-nilai">
@@ -1661,20 +1661,22 @@
           let totalNilai = s.total !== undefined ? s.total : (nilaiPg + nilaiPgk + nilaiIsian + nilaiEssay);
 
           html += `
-          <tr class="border-b hover:bg-gray-50">
-            <td class="p-4 text-center text-sm font-bold">${i + 1}</td>
-            <td class="p-4 text-center font-semibold">${nisn}</td>
-            <td class="p-4 font-semibold">${s.nama}</td>
-            <td class="p-4 text-center text-blue-600 bg-blue-50/10">${nilaiPg}</td>
-            <td class="p-4 text-center text-indigo-600 bg-blue-50/10">${nilaiPgk}</td>
-            <td class="p-4 text-center text-purple-600 bg-blue-50/10">${nilaiIsian}</td>
-            <td class="p-4 text-center text-yellow-600 font-bold bg-blue-50/10 border-r">${nilaiEssay}</td>
-            <td class="p-4 text-center font-bold text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
-            <td class="p-4 text-center flex flex-col gap-2">
-                <button onclick="bukaEditPenilaian(${i})" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition">Nilai Essay</button>
-                <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition">Lembar Jawaban</button>
-            </td>
-          </tr>`; 
+            <tr class="border-b hover:bg-gray-50">
+              <td class="p-4 border-r border-gray-200 text-center text-sm font-bold">${i + 1}</td>
+              <td class="p-4 border-r border-gray-200 text-center font-semibold">${nisn}</td>
+              <td class="p-4 border-r border-gray-200 font-semibold">${s.nama}</td>
+              <td class="p-4 border-r border-gray-200 text-center text-blue-600 bg-blue-50/10">${nilaiPg}</td>
+              <td class="p-4 border-r border-gray-200 text-center text-indigo-600 bg-blue-50/10">${nilaiPgk}</td>
+              <td class="p-4 border-r border-gray-200 text-center text-purple-600 bg-blue-50/10">${nilaiIsian}</td>
+              <td class="p-4 border-r border-gray-200 text-center text-yellow-600 font-bold bg-blue-50/10">${nilaiEssay}</td>
+              <td class="p-4 border-r border-gray-200 text-center font-bold text-green-600 text-lg bg-gray-50/50">${totalNilai}</td>
+              <td class="p-4 border-r border-gray-200 text-center">
+                  <div class="flex flex-col gap-2 w-max mx-auto">
+                      <button onclick="bukaEditPenilaian(${i})" class="w-full bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition">Nilai Essay</button>
+                      <button onclick="cetakLembarJawaban('${kode}', '${s.nis}')" class="w-full bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl hover:bg-indigo-700 shadow-sm text-xs whitespace-nowrap transition">Lembar Jawaban</button>
+                  </div>
+              </td>
+            </tr>`;
         }); 
         tbody.innerHTML = html;
       } catch(e) { tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-red-500">Gagal menarik data.</td></tr>`; } 
