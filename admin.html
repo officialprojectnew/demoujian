@@ -1192,11 +1192,42 @@
 
   <script src="script.js"></script>
   <script>
+    // Pengecekan dini: jika script.js gagal dimuat (404/URL salah), checkAuth/GAS_URL
+    // tidak akan terdefinisi dan SELURUH fitur di bawah akan gagal diam-diam (termasuk
+    // membuat loading spinner macet permanen). Tangkap ini lebih awal dengan pesan jelas.
+    if (typeof checkAuth === 'undefined' || typeof GAS_URL === 'undefined') {
+      document.write('<div style="padding:40px;font-family:sans-serif;color:#b91c1c;background:#fef2f2;min-height:100vh;">'
+        + '<h2>Gagal Memuat Konfigurasi Aplikasi</h2>'
+        + '<p><b>script.js</b> tidak berhasil dimuat, sehingga <code>checkAuth</code> dan/atau <code>GAS_URL</code> tidak terdefinisi.</p>'
+        + '<p>Ini adalah penyebab paling umum tampilan admin "loading terus" / ikon berputar tanpa henti, karena semua permintaan data ke server gagal sejak awal.</p>'
+        + '<p>Periksa: (1) apakah file <code>script.js</code> ada di folder yang sama dan path-nya benar, (2) buka DevTools &gt; Network, pastikan <code>script.js</code> berstatus 200 bukan 404.</p>'
+        + '</div>');
+      throw new Error('script.js gagal dimuat: checkAuth/GAS_URL tidak terdefinisi.');
+    }
     const user = checkAuth('admin');
     
     // Core Functions & Utilities
-    function showLoader(text="Memuat Data...") { document.getElementById('loader-text').innerText=text; document.getElementById('global-loader').classList.remove('hidden'); document.getElementById('global-loader').classList.add('flex'); }
-    function hideLoader() { document.getElementById('global-loader').classList.add('hidden'); document.getElementById('global-loader').classList.remove('flex'); }
+    let _loaderWatchdog = null;
+    function showLoader(text="Memuat Data...") {
+      document.getElementById('loader-text').innerText=text;
+      document.getElementById('global-loader').classList.remove('hidden');
+      document.getElementById('global-loader').classList.add('flex');
+      // Safety-net: jika loader tidak ditutup manual dalam 25 detik (mis. request macet/timeout
+      // tanpa error yang bisa ditangkap try/catch), paksa tutup agar tidak berputar selamanya.
+      clearTimeout(_loaderWatchdog);
+      _loaderWatchdog = setTimeout(() => {
+        const el = document.getElementById('global-loader');
+        if (el && !el.classList.contains('hidden')) {
+          hideLoader();
+          Swal.fire('Waktu Habis', 'Proses memakan waktu terlalu lama. Periksa koneksi internet Anda dan coba lagi.', 'warning');
+        }
+      }, 25000);
+    }
+    function hideLoader() {
+      clearTimeout(_loaderWatchdog);
+      document.getElementById('global-loader').classList.add('hidden');
+      document.getElementById('global-loader').classList.remove('flex');
+    }
     function logoutAdmin() { Swal.fire({ title:'Keluar?', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33', confirmButtonText:'Ya' }).then(r => { if(r.isConfirmed) logout(); }); }
     function comingSoon() { Swal.fire('Fitur Segera Hadir!', 'Menu ini akan tersedia pada pembaruan aplikasi berikutnya.', 'info'); }
     
@@ -2090,8 +2121,13 @@
        Swal.fire({title: 'Hapus Jadwal?', icon: 'warning', showCancelButton: true}).then(async r => {
            if(r.isConfirmed) {
                showLoader('Menghapus...');
-               await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusJadwal', id: id }) });
-               loadDaftarJadwal();
+               try {
+                   await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusJadwal', id: id }) });
+                   loadDaftarJadwal();
+               } catch(e) {
+                   hideLoader();
+                   Swal.fire('Error!', 'Gagal menghapus jadwal. Periksa koneksi Anda.', 'error');
+               }
            }
        });
     }
@@ -2568,8 +2604,13 @@
         Swal.fire({title: 'Hapus Kartu?', icon: 'warning', showCancelButton: true}).then(async r => {
             if(r.isConfirmed) {
                 showLoader('Menghapus...');
-                await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusKartuIndividu', nis: nis }) });
-                loadKartuUjian();
+                try {
+                    await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusKartuIndividu', nis: nis }) });
+                    loadKartuUjian();
+                } catch(e) {
+                    hideLoader();
+                    Swal.fire('Error!', 'Gagal menghapus kartu. Periksa koneksi Anda.', 'error');
+                }
             }
         });
     }
@@ -3041,7 +3082,8 @@
         let katObj = globalKategoriMaster.find(k => k.kode === katKode);
         let kategoriStr = katObj ? katObj.nama : katKode;
         let thnObj = globalTahunMaster.length > 0 ? globalTahunMaster[0].nama : '2026/2027';
-
+        let titleSoal = document.querySelector('#area-cetak-soal h3');
+        if (titleSoal) titleSoal.innerText = `ANALISA BUTIR SOAL ${kategoriStr.toUpperCase()}`;
         let printHeader = `
           <div class="mb-4 text-left text-sm print-show hidden border-b pb-4 border-gray-300">
             <table class="w-full md:w-1/2 font-bold text-gray-800">
@@ -3134,7 +3176,8 @@
         let katObj = globalKategoriMaster.find(k => k.kode === katKode);
         let kategoriStr = katObj ? katObj.nama : katKode;
         let thnObj = globalTahunMaster.length > 0 ? globalTahunMaster[0].nama : '2026/2027';
-
+        let titleJawaban = document.querySelector('#area-cetak-jawaban h3');
+        if (titleJawaban) titleJawaban.innerText = `ANALISIS ${kategoriStr.toUpperCase()}`;
         let printHeader = `
           <div class="mb-4 text-left text-sm print-show hidden border-b pb-4 border-gray-300">
             <table class="w-full md:w-1/2 font-bold text-gray-800">

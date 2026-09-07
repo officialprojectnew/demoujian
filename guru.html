@@ -575,66 +575,94 @@
     // ==========================================
     let globalAnalisaExamsGuru = [];
 
-    // Mengambil dan menyiapkan data filter (Hanya Soal Milik Guru)
-    async function loadDataFilterAnalisaGuru() {
-      try {
-        // Ambil ujian hanya berdasarkan ID Guru yang sedang login
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getPaketGuru', id_guru: user.id }) });
-        const result = await res.json();
-        globalAnalisaExamsGuru = result.data || [];
-        
-        let optKat = '<option value="">-- Pilih Kategori --</option>';
-        if (masterDataCache.kategori && masterDataCache.kategori.length > 0) {
-            masterDataCache.kategori.forEach(c => {
-               optKat += `<option value="${c.kode}">${c.nama} (${c.kode})</option>`;
-            });
-        } else {
-            let categories = new Set();
-            globalAnalisaExamsGuru.forEach(e => {
-                let cat = e.kode.split(/[-_ ]/)[0]; 
-                if(cat) categories.add(cat);
-            });
-            [...categories].sort().forEach(c => optKat += `<option value="${c}">${c}</option>`);
-        }
-        
-        document.getElementById('an-soal-kategori').innerHTML = optKat;
-        document.getElementById('an-jawaban-kategori').innerHTML = optKat;
-        
-        document.getElementById('an-soal-kelas').innerHTML = '<option value="">-- Pilih Kategori --</option>';
-        document.getElementById('an-soal-mapel').innerHTML = '<option value="">-- Pilih Kategori --</option>';
-        
-        document.getElementById('an-jawaban-kelas').innerHTML = '<option value="">-- Pilih Kategori --</option>';
-        document.getElementById('an-jawaban-mapel').innerHTML = '<option value="">-- Pilih Kategori --</option>';
-      } catch(e) {}
-    }
+    // 1. Mengambil dan menyiapkan data filter (Hanya Soal Milik Guru)
+      async function loadDataFilterAnalisaGuru() {
+        try {
+          const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getPaketGuru', id_guru: user.id }) });
+          const result = await res.json();
+          globalAnalisaExamsGuru = result.data || [];
+          
+          // Tarik data Master Kategori jika belum ada di cache (agar nama kategori muncul penuh)
+          if (!masterDataCache.kategori || masterDataCache.kategori.length === 0) {
+            const resMaster = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getMasterUjian' }) });
+            const masterResult = await resMaster.json();
+            if(masterResult.data) {
+                masterDataCache.kategori = masterResult.data.filter(m => m.tipe === 'Kategori');
+                masterDataCache.tahun = masterResult.data.filter(m => m.tipe === 'Tahun');
+            }
+          }
 
-    function filterAnalisaKelasGuru(tipe) {
-        let katKode = document.getElementById(`an-${tipe}-kategori`).value;
-        if(!katKode) {
-            document.getElementById(`an-${tipe}-kelas`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
-            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
-            return;
-        }
-        let filtered = globalAnalisaExamsGuru.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()));
-        let kelasSet = new Set(filtered.map(e => e.kelas));
-        let optKls = '<option value="">-- Pilih Kategori --</option>';
-        [...kelasSet].sort().forEach(k => optKls += `<option value="${k}">${k}</option>`);
-        document.getElementById(`an-${tipe}-kelas`).innerHTML = optKls;
-        document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
-    }
+          let optKat = '<option value="">-- Pilih Kategori --</option>';
+          if (masterDataCache.kategori && masterDataCache.kategori.length > 0) {
+              masterDataCache.kategori.forEach(c => {
+                optKat += `<option value="${c.kode}">${c.nama} (${c.kode})</option>`;
+              });
+          } else {
+              // Fallback mengambil indeks ke-2 (Kategori)
+              let categories = new Set();
+              globalAnalisaExamsGuru.forEach(e => {
+                  let parts = e.kode.split(/[-_ ]/);
+                  let cat = parts.length > 2 ? parts[2] : '';
+                  if(cat) categories.add(cat);
+              });
+              [...categories].sort().forEach(c => optKat += `<option value="${c}">${c}</option>`);
+          }
+          
+          document.getElementById('an-soal-kategori').innerHTML = optKat;
+          document.getElementById('an-jawaban-kategori').innerHTML = optKat;
+          
+          document.getElementById('an-soal-kelas').innerHTML = '<option value="">-- Pilih Kelas --</option>';
+          document.getElementById('an-soal-mapel').innerHTML = '<option value="">-- Pilih Mata Pelajaran --</option>';
+          
+          document.getElementById('an-jawaban-kelas').innerHTML = '<option value="">-- Pilih Kelas --</option>';
+          document.getElementById('an-jawaban-mapel').innerHTML = '<option value="">-- Pilih Mata Pelajaran --</option>';
+        } catch(e) { console.log(e); }
+      }
 
-    function filterAnalisaMapelGuru(tipe) {
-        let katKode = document.getElementById(`an-${tipe}-kategori`).value;
-        let kls = document.getElementById(`an-${tipe}-kelas`).value;
-        if(!kls) {
-            document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Kategori --</option>';
-            return;
-        }
-        let filtered = globalAnalisaExamsGuru.filter(e => e.kode.toUpperCase().includes(katKode.toUpperCase()) && e.kelas === kls);
-        let optMapel = '<option value="">-- Pilih Kategori --</option>';
-        filtered.forEach(e => optMapel += `<option value="${e.kode}">${e.mapel} (${e.kode})</option>`);
-        document.getElementById(`an-${tipe}-mapel`).innerHTML = optMapel;
-    }
+      // 2. Fungsi Filter Kelas berdasarkan Kategori
+      function filterAnalisaKelasGuru(tipe) {
+          let katKode = document.getElementById(`an-${tipe}-kategori`).value;
+          if(!katKode) {
+              document.getElementById(`an-${tipe}-kelas`).innerHTML = '<option value="">-- Pilih Kelas --</option>';
+              document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Mata Pelajaran --</option>';
+              return;
+          }
+          
+          // Pencocokan ketat kategori di indeks ke-2
+          let filtered = globalAnalisaExamsGuru.filter(e => {
+              let parts = e.kode.split('_');
+              return parts.length > 2 && parts[2].toUpperCase() === katKode.toUpperCase();
+          });
+          
+          let kelasSet = new Set(filtered.map(e => e.kelas));
+          let optKls = '<option value="">-- Pilih Kelas --</option>';
+          [...kelasSet].sort().forEach(k => optKls += `<option value="${k}">${k}</option>`);
+          
+          document.getElementById(`an-${tipe}-kelas`).innerHTML = optKls;
+          document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Mata Pelajaran --</option>';
+      }
+
+      // 3. Fungsi Filter Mata Pelajaran berdasarkan Kelas & Kategori
+      function filterAnalisaMapelGuru(tipe) {
+          let katKode = document.getElementById(`an-${tipe}-kategori`).value;
+          let kls = document.getElementById(`an-${tipe}-kelas`).value;
+          
+          if(!kls) {
+              document.getElementById(`an-${tipe}-mapel`).innerHTML = '<option value="">-- Pilih Mata Pelajaran --</option>';
+              return;
+          }
+          
+          // Pencocokan ketat kategori di indeks ke-2 dan Kelas
+          let filtered = globalAnalisaExamsGuru.filter(e => {
+              let parts = e.kode.split('_');
+              let isKatMatch = parts.length > 2 && parts[2].toUpperCase() === katKode.toUpperCase();
+              return isKatMatch && e.kelas === kls;
+          });
+          
+          let optMapel = '<option value="">-- Pilih Mata Pelajaran --</option>';
+          filtered.forEach(e => optMapel += `<option value="${e.kode}">${e.mapel} (${e.kode})</option>`);
+          document.getElementById(`an-${tipe}-mapel`).innerHTML = optMapel;
+      }
 
     // A. MENU ANALISA SOAL
     async function prosesAnalisaSoalGuru() {
@@ -676,7 +704,8 @@
         let katObj = masterDataCache.kategori.find(k => k.kode === katKode);
         let kategoriStr = katObj ? katObj.nama : katKode;
         let thnObj = masterDataCache.tahun.length > 0 ? masterDataCache.tahun[0].nama : '2026/2027';
-
+        let titleSoalGuru = document.querySelector('#area-cetak-soal h3');
+        if (titleSoalGuru) titleSoalGuru.innerText = `ANALISA BUTIR SOAL ${kategoriStr.toUpperCase()}`;
         let printHeader = `
           <div class="mb-4 text-left text-sm print-show hidden border-b pb-4 border-gray-300">
             <table class="w-full md:w-1/2 font-bold text-gray-800">
@@ -771,7 +800,8 @@
         let katObj = (typeof globalKategoriMaster !== 'undefined' ? globalKategoriMaster : masterDataCache.kategori).find(k => k.kode === katKode);
         let kategoriStr = katObj ? katObj.nama : katKode;
         let thnObj = (typeof globalTahunMaster !== 'undefined' ? globalTahunMaster : masterDataCache.tahun).length > 0 ? (typeof globalTahunMaster !== 'undefined' ? globalTahunMaster[0].nama : masterDataCache.tahun[0].nama) : '2026/2027';
-
+        let titleJawabanGuru = document.querySelector('#area-cetak-jawaban h3');
+        if (titleJawabanGuru) titleJawabanGuru.innerText = `ANALISIS ${kategoriStr.toUpperCase()}`;
         let printHeader = `
           <div class="mb-4 text-left text-sm print-show hidden border-b pb-4 border-gray-300">
             <table class="w-full md:w-1/2 font-bold text-gray-800">
