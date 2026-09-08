@@ -2692,15 +2692,20 @@
 
         showLoader('Menyiapkan dokumen cetak...');
 
+        try {
+        // Ambil data yang belum tersedia secara PARALEL (bukan satu-satu/berurutan)
+        // agar proses tidak menunggu request pertama selesai sebelum mulai request kedua.
+        let tugasFetch = [];
         if(!globalUjianData || globalUjianData.length === 0) {
-           try { const resUjian = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }); const resU = await resUjian.json(); globalUjianData = resU.data || []; } catch(e) {}
+           tugasFetch.push(fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }).then(r => r.json()).then(res => { globalUjianData = res.data || []; }).catch(() => {}));
         }
         if(!globalJadwalData || globalJadwalData.length === 0) {
-           try { const resJadwal = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) }); const resJ = await resJadwal.json(); globalJadwalData = resJ.data || []; } catch(e) {}
+           tugasFetch.push(fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) }).then(r => r.json()).then(res => { globalJadwalData = res.data || []; }).catch(() => {}));
         }
         if(allSiswaData.length === 0) {
-           try { const resSiswa = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }); const resS = await resSiswa.json(); allSiswaData = resS.data || []; } catch(e) {}
+           tugasFetch.push(fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }).then(r => r.json()).then(res => { allSiswaData = res.data || []; }).catch(() => {}));
         }
+        if(tugasFetch.length > 0) await Promise.all(tugasFetch);
 
         let namaSekolah = document.getElementById('konf-nama-sekolah').value || 'NAMA SEKOLAH';
         let logoSekolah = document.getElementById('preview-konf-logo').src;
@@ -2795,13 +2800,54 @@
             `;
         });
 
-        printArea.innerHTML = html;
-        hideLoader();
         tutupModal('modal-cetak-kartu-filter');
 
+        // Menggunakan teknik Iframe agar print preview tidak berat
+        let iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+
+        let doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Cetak Kartu Ujian</title>
+                <style>
+                    @page { size: A4 portrait; margin: 5mm; }
+                    body { 
+                        background-color: #ffffff !important; 
+                        margin: 0 !important; 
+                        padding: 0 !important;
+                        font-family: 'Poppins', sans-serif, Arial;
+                    }
+                    .print-card-wrapper { break-inside: avoid; page-break-inside: avoid; }
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                </style>
+            </head>
+            <body>
+                ${html}
+            </body>
+            </html>
+        `);
+        doc.close();
+
+        // Panggil print dari dalam iframe
         setTimeout(() => {
-            window.print();
-        }, 800);
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+        }, 300);
+
+        } catch(e) {
+            Swal.fire('Error', 'Gagal menyiapkan kartu ujian: ' + e.message, 'error');
+        } finally {
+            hideLoader();
+        }
     }
 
     // Modal Generate Master Database
@@ -3413,17 +3459,18 @@
         if(!ruang || checkedIds.length === 0) return Swal.fire('Oops', 'Pilih Ruang dan minimal 1 Mata Pelajaran!', 'warning');
         
         showLoader('Menyiapkan Dokumen Cetak...');
-        
+
+        try {
+        // Ambil data yang belum tersedia secara PARALEL agar lebih cepat
+        let tugasFetch = [];
         if(globalKartuData.length === 0) {
-            try {
-                const resK = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaKartu' }) });
-                globalKartuData = (await resK.json()).data || [];
-            } catch(e) {}
+            tugasFetch.push(fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaKartu' }) }).then(r => r.json()).then(res => { globalKartuData = res.data || []; }).catch(() => {}));
         }
         if(allSiswaData.length === 0) {
-           try { const resSiswa = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }); allSiswaData = (await resSiswa.json()).data || []; } catch(e) {}
+           tugasFetch.push(fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }).then(r => r.json()).then(res => { allSiswaData = res.data || []; }).catch(() => {}));
         }
-        
+        if(tugasFetch.length > 0) await Promise.all(tugasFetch);
+
         let printArea = document.getElementById('print-area');
         let html = '';
         
@@ -3573,13 +3620,52 @@
         
         // Margin diatur urutannya: Atas Kanan Bawah Kiri
         printArea.innerHTML = `<style>@page { size: A4 portrait; margin: 0.5cm 10mm 10mm 10mm; }</style>` + html;
-        hideLoader();
         tutupModal('modal-cetak-ba');
-        
+
+        // Menggunakan teknik Iframe
+        let iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+
+        let doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Cetak Dokumen Ujian</title>
+                <style>
+                    @page { size: A4 portrait; margin: 0.5cm 10mm 10mm 10mm; }
+                    body { 
+                        background-color: #ffffff !important; 
+                        margin: 0; 
+                        padding: 0;
+                        color: #000;
+                    }
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                </style>
+            </head>
+            <body>
+                ${html}
+            </body>
+            </html>
+        `);
+        doc.close();
+
         setTimeout(() => {
-            window.print();
-            printArea.innerHTML = '';
-        }, 800);
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            setTimeout(() => { document.body.removeChild(iframe); }, 1000);
+        }, 300);
+
+        } catch(e) {
+            Swal.fire('Error', 'Gagal menyiapkan berita acara/absen: ' + e.message, 'error');
+        } finally {
+            hideLoader();
+        }
     }
 
     // ==========================================
@@ -4382,8 +4468,8 @@
         setTimeout(() => {
             iframe.contentWindow.focus();
             iframe.contentWindow.print();
-            setTimeout(() => { document.body.removeChild(iframe); }, 1000);
-        }, 1000);
+            setTimeout(() => { document.body.removeChild(iframe); }, 100);
+        }, 100);
 
     } catch(e) {
         hideLoader();
@@ -4568,8 +4654,8 @@ async function cetakRekapPDF(tipeAktor) {
             hideLoader();
             iframe.contentWindow.focus();
             iframe.contentWindow.print(); 
-            setTimeout(() => { document.body.removeChild(iframe); }, 1000);
-        }, 1000);
+            setTimeout(() => { document.body.removeChild(iframe); }, 100);
+        }, 100);
 
     } catch(e) {
         hideLoader();
@@ -4605,6 +4691,8 @@ function toggleSidebar() {
         }
 
         showLoader('Menyiapkan Dokumen Cetak...');
+
+        try {
 
         const clone = elemenCetak.cloneNode(true);
         
@@ -4657,9 +4745,14 @@ function toggleSidebar() {
             
             setTimeout(() => {
                 document.body.removeChild(iframe);
-            }, 1000);
+            }, 100);
             
         }, 1200);
+
+        } catch(e) {
+            hideLoader();
+            Swal.fire('Error', 'Gagal menyiapkan dokumen cetak: ' + e.message, 'error');
+        }
     }
 
 
