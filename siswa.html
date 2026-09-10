@@ -337,6 +337,7 @@
                   confirmButtonColor: '#16a34a',
                   allowOutsideClick: false
               }).then(() => {
+                  masukLayarPenuh();
                   initCameraAndStart(token, sisaWaktuUjian, false);
               });
               return; // Stop eksekusi agar tidak memunculkan modal mulai baru
@@ -360,7 +361,12 @@
                           <td class="py-3 font-bold text-gray-900" ><span class="font-bold">${dataUjian.waktu} Menit</span></td></tr>
                       </table><br><p class="text-xs text-red-600 text-center font-bold">*Anda wajib memberikan Izin Kamera setelah mengklik Mulai Ujian.</p></div>`,
             icon: 'info', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Mulai Ujian', allowOutsideClick: false
-          }).then((res) => { if (res.isConfirmed) initCameraAndStart(token, sisaWaktuUjian, true); });
+          }).then((res) => { 
+            if (res.isConfirmed) {
+              masukLayarPenuh();
+              initCameraAndStart(token, sisaWaktuUjian, true);
+            }
+          });
         } else { Swal.fire('Ditolak!', result.pesan, 'error'); }
       } catch (e) { hideLoader(); Swal.fire('Error!', 'Gagal terhubung ke server.', 'error'); }
     }
@@ -598,6 +604,8 @@
       captureAndSendToBackend('Selesai');
       setTimeout(() => stopCamera(), 2000); 
       
+      keluarLayarPenuh();
+
       localStorage.removeItem(STORAGE_KEY); 
       let totalSkorPG = await jalankanKirimData(true);
       
@@ -608,6 +616,31 @@
       document.getElementById('btn-toggle-soal-hp').classList.add('hidden');
       switchViewSiswa('view-hasil');
     }
+
+    // --- FUNGSI FULL SCREEN ---
+function masukLayarPenuh() {
+  let elem = document.documentElement; // Targetkan seluruh halaman web
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { /* Safari */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE11 */
+    elem.msRequestFullscreen();
+  }
+}
+
+function keluarLayarPenuh() {
+  if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { /* Safari */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE11 */
+      document.msExitFullscreen();
+    }
+  }
+}
+// --------------------------
   </script>
 </body>
 </html>
