@@ -301,16 +301,46 @@
 
         if (result.status === 'success') {
           dataUjian = result.ujian;
-          let savedDataStr = localStorage.getItem(STORAGE_KEY); let savedData = savedDataStr ? JSON.parse(savedDataStr) : null;
           
-          if (savedData && savedData.kode_soal === dataUjian.kode) {
-              listSoal = savedData.listSoal; jawabanSiswa = savedData.jawabanSiswa || {}; statusRagu = savedData.statusRagu || {}; elapsedSecondsTracking = savedData.elapsedSeconds || 0;
-              Swal.fire({ title: 'Progres Ditemukan!', text: 'Sistem menemukan jawaban autosave. Melanjutkan ujian...', icon: 'info', confirmButtonColor: '#16a34a' }).then(() => initCameraAndStart(token, savedData.sisaWaktu, false)); return;
-          }
-
+          // Siapkan soal dengan nomor original
           listSoal = result.soal.map((soal, index) => { soal.original_no = index + 1; return soal; });
+          
+          // Acak urutan soal
           for (let i = listSoal.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [listSoal[i], listSoal[j]] = [listSoal[j], listSoal[i]]; }
+          
           jawabanSiswa = {}; statusRagu = {}; elapsedSecondsTracking = 0;
+          let sisaWaktuUjian = parseInt(dataUjian.waktu) * 60;
+
+          // HAPUS LOGIKA LOCALSTORAGE, GANTI DENGAN CEK PROGRESS SERVER
+          if (result.progress) {
+              let savedDetail = [];
+              try { savedDetail = JSON.parse(result.progress.detail); } catch(e){}
+              
+              if (savedDetail.length > 0) {
+                  // Pasangkan jawaban dari database dengan urutan soal yang baru diacak
+                  listSoal.forEach((soal, idx) => {
+                      let savedJawaban = savedDetail.find(d => d.no === soal.original_no);
+                      if (savedJawaban && savedJawaban.jaw && savedJawaban.jaw !== '-') {
+                          jawabanSiswa[idx] = savedJawaban.jaw;
+                      }
+                  });
+              }
+              
+              if (result.progress.sisa_waktu > 0) {
+                  sisaWaktuUjian = parseInt(result.progress.sisa_waktu);
+              }
+
+              Swal.fire({ 
+                  title: 'Progres Ditemukan!', 
+                  text: 'Anda sebelumnya sudah mengerjakan ujian ini. Melanjutkan dari penyimpanan server...', 
+                  icon: 'info', 
+                  confirmButtonColor: '#16a34a',
+                  allowOutsideClick: false
+              }).then(() => {
+                  initCameraAndStart(token, sisaWaktuUjian, false);
+              });
+              return; // Stop eksekusi agar tidak memunculkan modal mulai baru
+          }
 
           Swal.fire({
             title: 'Konfirmasi Ujian',
@@ -330,7 +360,7 @@
                           <td class="py-3 font-bold text-gray-900" ><span class="font-bold">${dataUjian.waktu} Menit</span></td></tr>
                       </table><br><p class="text-xs text-red-600 text-center font-bold">*Anda wajib memberikan Izin Kamera setelah mengklik Mulai Ujian.</p></div>`,
             icon: 'info', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Mulai Ujian', allowOutsideClick: false
-          }).then((res) => { if (res.isConfirmed) initCameraAndStart(token, parseInt(dataUjian.waktu) * 60, true); });
+          }).then((res) => { if (res.isConfirmed) initCameraAndStart(token, sisaWaktuUjian, true); });
         } else { Swal.fire('Ditolak!', result.pesan, 'error'); }
       } catch (e) { hideLoader(); Swal.fire('Error!', 'Gagal terhubung ke server.', 'error'); }
     }
@@ -545,13 +575,14 @@
           kode_soal: dataUjian.kode, 
           nis: user.id, 
           nama: user.nama, 
-          nilai_pg: skorPG,         // Rincian PG
-          nilai_pgk: skorPGK,       // Rincian PGK
-          nilai_isian: skorIsian,   // Rincian Isian
-          nilai_essay: 0,           // Diisi manual oleh guru nantinya
+          nilai_pg: skorPG,         
+          nilai_pgk: skorPGK,       
+          nilai_isian: skorIsian,   
+          nilai_essay: 0,           
           nilai_otomatis: totalOtomatis,
           total: totalOtomatis, 
           detail: detailJawaban,
+          sisa_waktu: totalDetik,   // <--- Tambahkan baris ini
           is_final: isFinal 
         }
       };

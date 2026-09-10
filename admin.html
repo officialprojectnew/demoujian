@@ -4083,65 +4083,56 @@
         dataImportDapodik[k][idx][field] = val;
     }
 
-    async function simpanImportDapodik() {
-        let allStudents = [];
-        for(let k in dataImportDapodik) {
-            allStudents = allStudents.concat(dataImportDapodik[k]);
-        }
-
-        if(allStudents.length === 0) return Swal.fire('Kosong', 'Tidak ada data siswa untuk disimpan!', 'warning');
-
-        // 1. Cek Validasi Kelengkapan (Kecuali Foto)
-        for(let i = 0; i < allStudents.length; i++) {
-            let s = allStudents[i];
-            if(!s.nis || !s.nama || !s.nisn || !s.kelas || !s.password) {
-                let namaInfo = s.nama || "(Nama Kosong)";
-                let klsInfo = s.kelas || "(Kelas Kosong)";
-                return Swal.fire('Data Belum Lengkap!', `Data siswa atas nama <b>${namaInfo}</b> kelas <b>${klsInfo}</b> belum lengkap!<br>Silakan lengkapi di tabel sebelum menyimpan.`, 'warning');
+        async function simpanImportDapodik() {
+            let allStudents = [];
+            for(let k in dataImportDapodik) {
+                allStudents = allStudents.concat(dataImportDapodik[k]);
             }
-        }
 
-        // 2. Eksekusi Simpan Ke Database (Di-loop untuk hindari error tabrakan Database)
-        Swal.fire({
-            title: 'Menyimpan Data...',
-            html: 'Menyimpan <b>0</b> dari ' + allStudents.length + ' siswa...',
-            allowOutsideClick: false,
-            showConfirmButton: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
+            if(allStudents.length === 0) return Swal.fire('Kosong', 'Tidak ada data siswa untuk disimpan!', 'warning');
 
-        let successCount = 0;
-        let failCount = 0;
+            // 1. Cek Validasi Kelengkapan Data
+            for(let i = 0; i < allStudents.length; i++) {
+                let s = allStudents[i];
+                if(!s.nis || !s.nama || !s.nisn || !s.kelas || !s.password) {
+                    let namaInfo = s.nama || "(Nama Kosong)";
+                    let klsInfo = s.kelas || "(Kelas Kosong)";
+                    return Swal.fire('Data Belum Lengkap!', `Data siswa atas nama <b>${namaInfo}</b> kelas <b>${klsInfo}</b> belum lengkap!<br>Silakan lengkapi di tabel sebelum menyimpan.`, 'warning');
+                }
+            }
 
-        for(let i = 0; i < allStudents.length; i++) {
-            let s = allStudents[i];
-            
-            // Tambahkan tanda kutip satu (') secara gaib agar Google Sheets membacanya sebagai Teks murni
-            let payload = { 
-                nis: "'" + s.nis, 
-                nama: s.nama, 
-                nisn: s.nisn ? ("'" + s.nisn) : "", 
-                kelas: s.kelas, 
-                password: "'" + s.password, 
-                foto: "" 
-            };
-            
+            // 2. Eksekusi Simpan Ke Database HANYA 1 KALI REQUEST
+            Swal.fire({
+                title: 'Menyimpan Data...',
+                html: 'Mengirim <b>' + allStudents.length + '</b> data secara massal ke server...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
             try {
-                let res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanSiswa', data: payload }) });
+                // Kirim semua data array langsung ke endpoint 'simpanSiswaMassal'
+                let res = await fetch(GAS_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ 
+                        action: 'simpanSiswaMassal', 
+                        data: allStudents 
+                    }) 
+                });
+                
                 let result = await res.json();
-                if(result.status === 'success') successCount++;
-                else failCount++; 
+                
+                if(result.status === 'success') {
+                    Swal.fire('Selesai', result.pesan, 'info');
+                    tutupModal('modal-import-dapodik');
+                    loadRekapSiswa(); // Refresh table utama
+                } else {
+                    Swal.fire('Gagal', result.pesan, 'error');
+                }
             } catch(e) {
-                failCount++;
+                Swal.fire('Error', 'Gagal menghubungi server.', 'error');
             }
-            
-            Swal.update({ html: `Menyimpan <b>${i+1}</b> dari ${allStudents.length} siswa...` });
         }
-
-        Swal.fire('Selesai', `Tersimpan: <b>${successCount} Siswa</b>.<br>Gagal / Duplikat: <b>${failCount} Siswa</b>.`, 'info');
-        tutupModal('modal-import-dapodik');
-        loadRekapSiswa(); // Refresh table utama
-    }
 
     // ==========================================
     // FITUR BACKUP, RESTORE & RESET
