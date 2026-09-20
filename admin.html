@@ -1212,7 +1212,7 @@
     
     // Core Functions & Utilities
     let _loaderWatchdog = null;
-    function showLoader(text="Memuat Data...") {
+    function showLoader(text="") {
       document.getElementById('loader-text').innerText=text;
       document.getElementById('global-loader').classList.remove('hidden');
       document.getElementById('global-loader').classList.add('flex');
@@ -1335,7 +1335,7 @@
     // Fungsi utama yang dipecah
     async function loadDashboard() {
       // Tetap tampilkan loader tapi dengan transisi yang lebih lembut jika diperlukan
-      // showLoader('Menyinkronkan Dashboard...'); <-- Opsional, Anda bisa mematikannya agar langsung masuk ke dashboard
+      // showLoader(''); <-- Opsional, Anda bisa mematikannya agar langsung masuk ke dashboard
       
       // 1. Reset angka ke state loading (Opsional tapi bagus untuk UX)
       document.getElementById('dash-siswa').innerText = '...';
@@ -1518,12 +1518,12 @@
       // Validasi panjang string dari nilai aslinya
       if(nisnAsli.length !== 10) return Swal.fire('Oops!', 'NISN harus berjumlah tepat 10 angka!', 'warning');
       
-      showLoader('Menyimpan Data...');
+      showLoader('');
       try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanSiswa', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Berhasil!', result.pesan, 'success'); tutupModal('modal-tambah-siswa'); loadRekapSiswa(); } else { Swal.fire('Gagal!', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error!','Gagal.','error'); }
     }
 
     async function loadRekapSiswa() {
-      showLoader('Menarik Data Siswa...');
+      showLoader('');
       try { 
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) }); 
         const result = await res.json(); hideLoader(); 
@@ -1741,10 +1741,10 @@
       
       if(nisnAsli.length !== 10) return Swal.fire('Oops!', 'NISN harus berjumlah tepat 10 angka!', 'warning');
       
-      showLoader('Memperbarui Data & Foto...');
+      showLoader('');
       try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editSiswa', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Berhasil!', result.pesan, 'success'); tutupModal('modal-edit-siswa'); loadRekapSiswa(); } else { Swal.fire('Gagal!', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error!','Gagal.','error');} 
     }
-    function hapusSiswa(nis) { Swal.fire({ title: 'Hapus Siswa?', text: "Data tidak bisa dikembalikan.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusSiswa', nis }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapSiswa(); } catch(e) { hideLoader(); } } }); }
+    function hapusSiswa(nis) { Swal.fire({ title: 'Hapus Siswa?', text: "Data tidak bisa dikembalikan.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then(async (result) => { if (result.isConfirmed) { showLoader(''); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusSiswa', nis }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapSiswa(); } catch(e) { hideLoader(); } } }); }
 
 // ================= CRUD GURU =================
     function bukaModalTambahGuru() { ['tambah-nip-guru','tambah-nama-guru','tambah-user-guru','tambah-pass-guru','tambah-foto-guru'].forEach(i => document.getElementById(i).value=''); bukaModal('modal-tambah-guru'); }
@@ -1754,22 +1754,22 @@
       const data = { nip: document.getElementById('tambah-nip-guru').value, nama: document.getElementById('tambah-nama-guru').value, username: document.getElementById('tambah-user-guru').value, password: document.getElementById('tambah-pass-guru').value, foto: base64Foto };
       if(!data.nip || !data.nama || !data.username || !data.password) return Swal.fire('Oops!', 'Isi semua!', 'warning');
       if(data.nip.length !== 18) return Swal.fire('Oops!', 'NIP harus berjumlah tepat 18 angka!', 'warning');
-      showLoader('Menyimpan Guru...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanGuru', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Sukses!', result.pesan, 'success'); tutupModal('modal-tambah-guru'); loadRekapGuru(); } else Swal.fire('Gagal!', result.pesan, 'error'); } catch(e) { hideLoader(); }
+      showLoader(''); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanGuru', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Sukses!', result.pesan, 'success'); tutupModal('modal-tambah-guru'); loadRekapGuru(); } else Swal.fire('Gagal!', result.pesan, 'error'); } catch(e) { hideLoader(); }
     }
     
     function bukaEditGuru(data) { document.getElementById('edit-nip-guru').value = data.nip; document.getElementById('edit-nama-guru').value = data.nama; document.getElementById('edit-user-guru').value = data.username; document.getElementById('edit-pass-guru').value = data.password; document.getElementById('edit-foto-guru').value = ''; bukaModal('modal-edit-guru'); }
     
     async function simpanEditGuru() { 
       let fileInput = document.getElementById('edit-foto-guru'); let base64Foto = ""; if (fileInput.files.length > 0) base64Foto = await getBase64(fileInput.files[0]);
-      const data = { nip: document.getElementById('edit-nip-guru').value, nama: document.getElementById('edit-nama-guru').value, username: document.getElementById('edit-user-guru').value, password: document.getElementById('edit-pass-guru').value, foto: base64Foto }; showLoader('Memperbarui...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editGuru', data }) }); await res.json(); hideLoader(); tutupModal('modal-edit-guru'); loadRekapGuru(); } catch(e) { hideLoader(); } 
+      const data = { nip: document.getElementById('edit-nip-guru').value, nama: document.getElementById('edit-nama-guru').value, username: document.getElementById('edit-user-guru').value, password: document.getElementById('edit-pass-guru').value, foto: base64Foto }; showLoader(''); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editGuru', data }) }); await res.json(); hideLoader(); tutupModal('modal-edit-guru'); loadRekapGuru(); } catch(e) { hideLoader(); } 
     }
     
-    function hapusGuru(nip) { Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya!' }).then(async (result) => { if (result.isConfirmed) { showLoader('Menghapus...'); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusGuru', nip }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapGuru(); } catch(e) { hideLoader(); } } }); }
+    function hapusGuru(nip) { Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya!' }).then(async (result) => { if (result.isConfirmed) { showLoader(''); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusGuru', nip }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapGuru(); } catch(e) { hideLoader(); } } }); }
 
     // ================= MENU: DATABASE ATRIBUT SOAL =================
     // Ditarik otomatis saat initApp
     async function loadMasterUjian() {
-      showLoader('Memuat...');
+      showLoader('');
       try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getMasterUjian' }) });
         const result = await res.json();
@@ -1805,7 +1805,7 @@
       
       if (!nama || !kode) return Swal.fire('Oops', 'Nama dan Kode tidak boleh kosong!', 'warning');
       
-      showLoader('Menyimpan Data...');
+      showLoader('');
       try {
         await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanMasterUjian', data: { tipe, nama, kode } }) });
         hideLoader();
@@ -1816,7 +1816,7 @@
 
     async function hapusMaster(tipe, nama) {
       if(!confirm(`Hapus ${nama}?`)) return;
-      showLoader('Menghapus...');
+      showLoader('');
       try {
         await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusMasterUjian', data: { tipe, nama } }) });
         hideLoader(); await loadMasterUjian(); // Refresh & Update Global
@@ -1826,7 +1826,7 @@
     // ================= BANK SOAL (KUMPULAN SOAL DATABASE WIDGET) =================
     let bankSoalData = [];
     async function loadBankSoalGrup() {
-      showLoader('Menarik Data Bank Soal...');
+      showLoader('');
       try {
         const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) });
         const result = await response.json();
@@ -1919,7 +1919,7 @@
     }
 
     async function lihatRincianSoal(kode, mapel) {
-      showLoader(`Menarik Isi Soal ${kode}...`);
+      showLoader(``);
       try {
         const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getBankSoal', kode_soal: kode }) });
         const result = await response.json();
@@ -1988,7 +1988,7 @@
     let globalUjianData = [];
 
     async function loadMenuJadwal() {
-       showLoader('Muat Formulir Jadwal...');
+       showLoader('');
        try {
            const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) });
            const result = await res.json();
@@ -2082,7 +2082,7 @@
        
        if(!tgl || !jMulai || !jSelesai || !soal || !sesi || !ruang) return Swal.fire('Oops', 'Lengkapi semua form jadwal!', 'warning');
 
-       showLoader('Menyimpan Jadwal...');
+       showLoader('');
        try {
            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanJadwal', data: { tanggal: tgl, jam_mulai: jMulai, jam_selesai: jSelesai, kode_soal: soal, ruang: ruang, sesi: sesi } }) });
            document.getElementById('jadwal-tanggal').value = ''; document.getElementById('jadwal-mulai').value = ''; document.getElementById('jadwal-selesai').value = ''; document.getElementById('jadwal-soal').value = ''; document.getElementById('jadwal-sesi').value = ''; document.getElementById('jadwal-ruang').value = '';
@@ -2113,7 +2113,7 @@
           ruang: document.getElementById('edit-jadwal-ruang').value.toUpperCase()
        };
        if(!data.tanggal || !data.jam_mulai || !data.jam_selesai || !data.kode_soal || !data.sesi || !data.ruang) return Swal.fire('Oops', 'Lengkapi semua!', 'warning');
-       showLoader('Update Jadwal...');
+       showLoader('');
        try {
            await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editJadwal', data: data }) });
            tutupModal('modal-edit-jadwal');
@@ -2124,7 +2124,7 @@
     function hapusJadwal(id) {
        Swal.fire({title: 'Hapus Jadwal?', icon: 'warning', showCancelButton: true}).then(async r => {
            if(r.isConfirmed) {
-               showLoader('Menghapus...');
+               showLoader('');
                try {
                    await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusJadwal', id: id }) });
                    loadDaftarJadwal();
@@ -2140,7 +2140,7 @@
     // FITUR PEMANTAUAN WEBCAM
     // ==========================================
     async function loadFilterPemantauan() {
-    showLoader('Muat Filter...');
+    showLoader('');
     try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) });
         const result = await res.json();
@@ -2188,7 +2188,7 @@
        
        if(!kode) return Swal.fire('Pilih', 'Pilih soal terlebih dahulu untuk memantau.', 'info');
        
-       showLoader('Menarik data pemantauan...');
+       showLoader('');
        try {
            const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getPemantauan', kode_soal: kode, kelas: kelas }) });
            const result = await res.json();
@@ -2239,7 +2239,7 @@
     let currentWkt = "";
 
     async function loadManajemenUjian() {
-      showLoader('Menarik Jadwal & Ujian...');
+      showLoader('');
       try {
         const [resUjian, resJadwal] = await Promise.all([
            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaUjian' }) }).then(r => r.json()),
@@ -2449,7 +2449,7 @@
 
         Swal.fire({ title: 'Aktifkan Semua?', text: `${payload.length} Soal akan diaktifkan dan dibuatkan token.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#16a34a', confirmButtonText: 'Ya' }).then(async r => {
             if(r.isConfirmed) {
-                showLoader('Mengaktifkan Ujian...');
+                showLoader('');
                 try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjianMassal', data: payload }) }); hideLoader(); Swal.fire('Berhasil', 'Ujian berhasil diaktifkan', 'success'); loadManajemenUjian(); } 
                 catch(e) { hideLoader(); Swal.fire('Error', 'Gagal update massal', 'error'); }
             }
@@ -2466,20 +2466,20 @@
 
         Swal.fire({ title: 'Nonaktifkan Semua?', text: `${payload.length} soal akan dinonaktifkan dan token akan dihapus.`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then(async r => {
             if(r.isConfirmed) {
-                showLoader('Menonaktifkan Ujian...');
+                showLoader('');
                 try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjianMassal', data: payload }) }); hideLoader(); Swal.fire('Berhasil', 'Semua ujian di sesi ini dinonaktifkan', 'success'); loadManajemenUjian(); } 
                 catch(e) { hideLoader(); Swal.fire('Error', 'Gagal update massal', 'error'); }
             }
         });
     }
 
-    function toggleStatusUjian(kode, targetStatus) { Swal.fire({ title: 'Ubah Status?', text: `Ujian ${kode} akan menjadi ${targetStatus}.`, icon: 'question', showCancelButton: true, confirmButtonColor: targetStatus==='Aktif'?'#16a34a':'#d33', confirmButtonText: `Ya` }).then(async (result) => { if(result.isConfirmed) { let tokenBaru = targetStatus === 'Aktif' ? Math.random().toString(36).substring(2, 7).toUpperCase() : ''; showLoader('Update Status...'); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjian', kode, status: targetStatus, token: tokenBaru }) }); await res.json(); hideLoader(); loadManajemenUjian(); loadDashboard(); } catch(e) { hideLoader(); } } }); }
+    function toggleStatusUjian(kode, targetStatus) { Swal.fire({ title: 'Ubah Status?', text: `Ujian ${kode} akan menjadi ${targetStatus}.`, icon: 'question', showCancelButton: true, confirmButtonColor: targetStatus==='Aktif'?'#16a34a':'#d33', confirmButtonText: `Ya` }).then(async (result) => { if(result.isConfirmed) { let tokenBaru = targetStatus === 'Aktif' ? Math.random().toString(36).substring(2, 7).toUpperCase() : ''; showLoader(''); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatusUjian', kode, status: targetStatus, token: tokenBaru }) }); await res.json(); hideLoader(); loadManajemenUjian(); loadDashboard(); } catch(e) { hideLoader(); } } }); }
     // ================= FUNGSI KIRIM TOKEN KE WHATSAPP =================
     // ================= FUNGSI KIRIM TOKEN KE WHATSAPP =================
     async function kirimTokenWA(kode, mapel, kelas, token) {
         // 1. Tarik data siswa dari server jika belum ada di memori
         if (!allSiswaData || allSiswaData.length === 0) {
-            showLoader('Memuat data siswa...');
+            showLoader('');
             try {
                 const resSiswa = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) });
                 const resS = await resSiswa.json();
@@ -2560,7 +2560,7 @@
     let globalKartuData = [];
 
     async function loadKartuUjian() {
-      const tbody = document.getElementById('tabel-kartu-ujian'); showLoader('Menarik Kartu Ujian...');
+      const tbody = document.getElementById('tabel-kartu-ujian'); showLoader('');
       try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSemuaKartu' }) }); 
         const result = await res.json(); 
@@ -2626,7 +2626,7 @@
 
         if(!data.nama || !data.nisn) return Swal.fire('Oops', 'Form harus diisi', 'warning');
 
-        showLoader('Menyimpan Perubahan...');
+        showLoader('');
         try {
             await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editKartuIndividu', data: data }) });
             hideLoader();
@@ -2638,7 +2638,7 @@
     function hapusKartuIndividu(nis) {
         Swal.fire({title: 'Hapus Kartu?', icon: 'warning', showCancelButton: true}).then(async r => {
             if(r.isConfirmed) {
-                showLoader('Menghapus...');
+                showLoader('');
                 try {
                     await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusKartuIndividu', nis: nis }) });
                     loadKartuUjian();
@@ -2725,7 +2725,7 @@
         
         if(selectedNis.length === 0) return Swal.fire('Oops', 'Pilih minimal 1 siswa untuk dicetak!', 'warning');
 
-        showLoader('Menyiapkan dokumen cetak...');
+        showLoader('');
 
         try {
         // Ambil data yang belum tersedia secara PARALEL (bukan satu-satu/berurutan)
@@ -2888,7 +2888,7 @@
 
     // Modal Generate Master Database
     async function bukaModalGenerateKartu() {
-        showLoader('Menyiapkan Data...');
+        showLoader('');
         try {
             if(!allSiswaData || allSiswaData.length === 0) {
                 const resSiswa = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getSiswa' }) });
@@ -2985,7 +2985,7 @@
         if(nis_list.length === 0) return Swal.fire('Oops', 'Pilih minimal 1 siswa!', 'warning');
         if(!sesi || !ruang) return Swal.fire('Oops', 'Sesi dan Ruang harus dipilih!', 'warning');
 
-        showLoader('Memproses Kartu...');
+        showLoader('');
         try {
             const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'generateKartuPilihan', data: { nis_list: nis_list, sesi: sesi, ruang: ruang } }) });
             const r = await res.json();
@@ -2999,7 +2999,7 @@
       const kode = document.getElementById('select-rekap-admin').value; 
       if(!kode) return Swal.fire('Info', 'Pilih paket ujian!', 'info'); 
       const tbody = document.getElementById('tabel-rekap-nilai-admin'); 
-      showLoader('Menarik Nilai...'); 
+      showLoader(''); 
       try { 
         // Tarik rekap nilai dan profil siswa secara bersamaan
         const [resNilai, resSiswa] = await Promise.all([
@@ -3130,7 +3130,7 @@
       const kkm = parseFloat(document.getElementById('input-kkm-jawaban').value) || 65; // Mengambil KKM dari menu Analisa Jawaban
       
       if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
-      showLoader('Menganalisis Butir Soal...');
+      showLoader('');
       try {
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) });
         const result = await res.json();
@@ -3231,7 +3231,7 @@
       const kkm = parseFloat(document.getElementById('input-kkm-jawaban').value) || 65;
       if(!kode) return Swal.fire('Info', 'Selesaikan pilihan filter paket ujian terlebih dahulu!', 'info');
       
-      showLoader('Menganalisis Jawaban...');
+      showLoader('');
       try {
         const [resRekap, resSiswa] = await Promise.all([
             fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getRekapUjian', kode_soal: kode }) }).then(r => r.json()),
@@ -3393,7 +3393,7 @@
     }
 
     async function loadBeritaAbsen() {
-        showLoader('Memuat Jadwal Ujian...');
+        showLoader('');
         try {
             // Hapus blok pengecekan '.length === 0' agar sistem selalu menarik data jadwal terbaru
             const resJadwal = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getJadwal' }) });
@@ -3494,7 +3494,7 @@
         
         if(!ruang || checkedIds.length === 0) return Swal.fire('Oops', 'Pilih Ruang dan minimal 1 Mata Pelajaran!', 'warning');
         
-        showLoader('Menyiapkan Dokumen Cetak...');
+        showLoader('');
 
         try {
         // Ambil data yang belum tersedia secara PARALEL agar lebih cepat
@@ -3784,7 +3784,7 @@
 
     // // Aktif mengambil data dari database setiap menu konfigurasi di-klik
     async function loadKonfigurasi() {
-        showLoader('Menarik Konfigurasi Database...');
+        showLoader('');
         await loadKonfigurasiGlobal();
         hideLoader();
     }
@@ -3813,7 +3813,7 @@
             return Swal.fire('Data Tidak Valid', 'NSS harus berjumlah tepat 12 digit angka!', 'warning');
         }
 
-        showLoader('Menyiapkan Berkas & Menyimpan...');
+        showLoader('');
         
         try {
             // ... (lanjutan kode proses upload file gambar logo, kop, ttd, dst tidak diubah) ...
@@ -3872,7 +3872,7 @@
             confirmButtonText: 'Ya, Ubah & Logout'
         }).then(async (result) => {
             if (result.isConfirmed) {
-                showLoader('Memperbarui Akun...');
+                showLoader('');
                 try {
                     // user.id diambil dari session login saat ini
                     const payloadData = {
@@ -4139,7 +4139,7 @@
     // ==========================================
 
     async function prosesBackupDatabase() {
-        showLoader('Mengekstrak Database...');
+        showLoader('');
         try {
             const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'backupDatabase' }) });
             const result = await res.json();
@@ -4189,7 +4189,7 @@
                     try {
                         const backupData = JSON.parse(e.target.result); // Validasi format JSON
                         
-                        showLoader('Merestore Database (Jangan tutup tab ini)...');
+                        showLoader('');
                         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'restoreDatabase', data: backupData }) });
                         const resJson = await res.json();
                         hideLoader();
@@ -4240,7 +4240,7 @@
                     }
                 }).then(async (res2) => {
                     if(res2.isConfirmed) {
-                        showLoader('Membersihkan Database...');
+                        showLoader('');
                         try {
                             const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'resetDatabase' }) });
                             const responseData = await response.json();
@@ -4267,7 +4267,7 @@
     }
 
     async function cetakLembarJawaban(kode_soal, nis) {
-    showLoader('Menyiapkan Lembar Jawaban...');
+    showLoader('');
     try {
         // Tarik data secara paralel (Ditambah data Jadwal & Master Kategori)
         const [resRekap, resSoal, resSiswa, resKonf, resJadwal, resMaster] = await Promise.all([
@@ -4556,7 +4556,7 @@ async function cetakRekapPDF(tipeAktor) {
     let tbody = document.getElementById(tableId);
     if (tbody.querySelector('td[colspan]')) return Swal.fire('Info', 'Data kosong, tidak ada yang bisa dicetak.', 'info');
 
-    showLoader('Menyiapkan Dokumen PDF...');
+    showLoader('');
     try {
         // Tarik data Ujian, Jadwal, dan Master untuk keperluan Header PDF secara paralel
         const [resUjian, resJadwal, resMaster] = await Promise.all([
@@ -4717,7 +4717,7 @@ function toggleSidebar() {
             return;
         }
 
-        showLoader('Menyiapkan Dokumen Cetak...');
+        showLoader('');
 
         try {
 
