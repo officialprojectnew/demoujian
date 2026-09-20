@@ -1659,7 +1659,7 @@
     // Timpa loadRekapGuru lama
     async function loadRekapGuru() {
       const tbody = document.getElementById('tabel-rekap-guru'); 
-      showLoader('Menarik Data Guru...');
+      showLoader('');
       try { 
         const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getGuru' }) }); 
         const result = await res.json(); 
