@@ -1744,7 +1744,7 @@
       showLoader('');
       try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editSiswa', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Berhasil!', result.pesan, 'success'); tutupModal('modal-edit-siswa'); loadRekapSiswa(); } else { Swal.fire('Gagal!', result.pesan, 'error'); } } catch(e) { hideLoader(); Swal.fire('Error!','Gagal.','error');} 
     }
-    function hapusSiswa(nis) { Swal.fire({ title: 'Hapus Siswa?', text: "Data tidak bisa dikembalikan.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then(async (result) => { if (result.isConfirmed) { showLoader(''); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusSiswa', nis }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapSiswa(); } catch(e) { hideLoader(); } } }); }
+    function hapusSiswa(nis) { Swal.fire({ title: 'Hapus Siswa', text: "", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Ya' }).then(async (result) => { if (result.isConfirmed) { showLoader(''); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusSiswa', nis }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapSiswa(); } catch(e) { hideLoader(); } } }); }
 
 // ================= CRUD GURU =================
     function bukaModalTambahGuru() { ['tambah-nip-guru','tambah-nama-guru','tambah-user-guru','tambah-pass-guru','tambah-foto-guru'].forEach(i => document.getElementById(i).value=''); bukaModal('modal-tambah-guru'); }
@@ -1753,8 +1753,8 @@
       let fileInput = document.getElementById('tambah-foto-guru'); let base64Foto = ""; if (fileInput.files.length > 0) base64Foto = await getBase64(fileInput.files[0]);
       const data = { nip: document.getElementById('tambah-nip-guru').value, nama: document.getElementById('tambah-nama-guru').value, username: document.getElementById('tambah-user-guru').value, password: document.getElementById('tambah-pass-guru').value, foto: base64Foto };
       if(!data.nip || !data.nama || !data.username || !data.password) return Swal.fire('Oops!', 'Isi semua!', 'warning');
-      if(data.nip.length !== 18) return Swal.fire('Oops!', 'NIP harus berjumlah tepat 18 angka!', 'warning');
-      showLoader(''); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanGuru', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Sukses!', result.pesan, 'success'); tutupModal('modal-tambah-guru'); loadRekapGuru(); } else Swal.fire('Gagal!', result.pesan, 'error'); } catch(e) { hideLoader(); }
+      if(data.nip.length !== 18) return Swal.fire('Oops !', 'NIP harus berjumlah tepat 18 angka', 'warning');
+      showLoader(''); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'simpanGuru', data }) }); const result = await res.json(); hideLoader(); if(result.status === 'success') { Swal.fire('Sukses', result.pesan, 'success'); tutupModal('modal-tambah-guru'); loadRekapGuru(); } else Swal.fire('Gagal!', result.pesan, 'error'); } catch(e) { hideLoader(); }
     }
     
     function bukaEditGuru(data) { document.getElementById('edit-nip-guru').value = data.nip; document.getElementById('edit-nama-guru').value = data.nama; document.getElementById('edit-user-guru').value = data.username; document.getElementById('edit-pass-guru').value = data.password; document.getElementById('edit-foto-guru').value = ''; bukaModal('modal-edit-guru'); }
@@ -1764,7 +1764,7 @@
       const data = { nip: document.getElementById('edit-nip-guru').value, nama: document.getElementById('edit-nama-guru').value, username: document.getElementById('edit-user-guru').value, password: document.getElementById('edit-pass-guru').value, foto: base64Foto }; showLoader(''); try { const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'editGuru', data }) }); await res.json(); hideLoader(); tutupModal('modal-edit-guru'); loadRekapGuru(); } catch(e) { hideLoader(); } 
     }
     
-    function hapusGuru(nip) { Swal.fire({ title: 'Hapus?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya!' }).then(async (result) => { if (result.isConfirmed) { showLoader(''); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusGuru', nip }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapGuru(); } catch(e) { hideLoader(); } } }); }
+    function hapusGuru(nip) { Swal.fire({ title: 'Hapus', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya' }).then(async (result) => { if (result.isConfirmed) { showLoader(''); try { await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'hapusGuru', nip }) }); hideLoader(); Swal.fire('Terhapus!', '', 'success'); loadRekapGuru(); } catch(e) { hideLoader(); } } }); }
 
     // ================= MENU: DATABASE ATRIBUT SOAL =================
     // Ditarik otomatis saat initApp
@@ -1803,7 +1803,7 @@
       let nama = document.getElementById(idNama).value;
       let kode = document.getElementById(idKode).value.toUpperCase();
       
-      if (!nama || !kode) return Swal.fire('Oops', 'Nama dan Kode tidak boleh kosong!', 'warning');
+      if (!nama || !kode) return Swal.fire('Oops', 'Nama dan Kode tidak boleh kosong', 'warning');
       
       showLoader('');
       try {
@@ -2122,7 +2122,7 @@
     }
 
     function hapusJadwal(id) {
-       Swal.fire({title: 'Hapus Jadwal?', icon: 'warning', showCancelButton: true}).then(async r => {
+       Swal.fire({title: 'Hapus Jadwal', icon: 'warning', showCancelButton: true}).then(async r => {
            if(r.isConfirmed) {
                showLoader('');
                try {
@@ -2636,7 +2636,7 @@
     }
 
     function hapusKartuIndividu(nis) {
-        Swal.fire({title: 'Hapus Kartu?', icon: 'warning', showCancelButton: true}).then(async r => {
+        Swal.fire({title: 'Hapus Kartu', icon: 'warning', showCancelButton: true}).then(async r => {
             if(r.isConfirmed) {
                 showLoader('');
                 try {
